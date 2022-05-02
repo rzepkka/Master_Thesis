@@ -6,14 +6,12 @@ import scipy.stats
 import pandas as pd
 from matplotlib import rc
 import pickle
-# from bokeh.models import Circle, HoverTool, PrintfTickFormatter
-# from bokeh.models import LassoSelectTool, WheelZoomTool, PanTool, BoxZoomTool, SaveTool, ResetTool, ColumnDataSource
-# import markdown
 
 from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
 # from streamlit_echarts import st_echarts
 
 # from mapping_2D import mapping_dk, dk_dict, aseg_dict
+from mapping_3D import dk_regions_3D, dk_df_3D, aseg_df_3D
 
 from pathlib import Path
 import base64
@@ -29,8 +27,8 @@ import rpy2.robjects as robjects
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects import pandas2ri
 
-from IPython.display import HTML
-
+import os
+import webbrowser
 
 utils = importr('utils')
 base = importr("base")
@@ -39,6 +37,8 @@ ggseg = importr("ggseg")
 ggplot2 = importr("ggplot2")
 dplyr = importr("dplyr")
 tidyr = importr("tidyr")
+htmlwidgets = importr('htmlwidgets')
+htmltools = importr('htmltools')
 
 ggseg3d = importr('ggseg3d')
 
@@ -67,16 +67,15 @@ def main():
 
     if chosen_plot_type == 'Boxplots - event centers':
 
-
         options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(options)
-        chosen_subtypes = st.multiselect('Choose subtype to compare:', options)
+        chosen_subtypes = st.multiselect('Select subtype to compare:', options)
         color_list = []
 
         default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']
 
         for idx, subtype in enumerate(chosen_subtypes):
-            subtype_color = st.text_input(f'Choose color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
+            subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
             color_list.append(subtype_color)
 
         # color_map = {chosen_subtypes[i]: color_list[i] for i in range(len(chosen_subtypes))}
@@ -117,32 +116,56 @@ def main():
 
     elif chosen_plot_type == 'Ggseg - 3D':
 
-        
-        dk_data = pd.read_csv("data/dk_R_subtype0.csv") 
-        with localconverter(robjects.default_converter + pandas2ri.converter):
-            dk_data_R = robjects.conversion.py2rpy(dk_data)
+        options_subtypes = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
+        options_regions = ['Cortical','Subcortical']
+        chosen_subtype = st.selectbox('Select subtype for 3D visualization:', options_subtypes)
+        chosen_region = st.selectbox('Select regions to visualize:', options_regions)
 
+        # GET ATLASES
         dk_3d = ggseg3d.get_atlas('dk_3d', surface = ["LCBC",'inflated'], hemisphere = ['left','right'])
+        aseg_3d = ggseg3d.get_atlas('aseg_3d', surface = "LCBC", hemisphere = 'subcort')
 
+        # MAP DK-DATA
+        dk_mapped = dk_regions_3D(T)
+
+        # SPECIFY COLORS FOR SEQUENTIAL PALETTE
         colors = robjects.r('''
             c('#6e0101','#ffabab')
             ''')
-        st.write(colors)
 
-        plot_dk = ggseg3d.ggseg3d(dk_data_R, atlas = dk_3d, surface = ["LCBC",'inflated'], hemisphere = ['left','right'],
-               label = 'region', colour = 'p', palette = colors)
+        if chosen_region == "Cortical":
 
+            # CONVERT DK-DATA
+            dk_data = dk_df_3D(T, S, mapped_dict = dk_mapped, subtype = chosen_subtype)
+            with localconverter(robjects.default_converter + pandas2ri.converter):
+                dk_data_R = robjects.conversion.py2rpy(dk_data)
 
-        st.write(type(plot_dk))
-        st.write(plot_dk)
+            plot_regions = ggseg3d.ggseg3d(dk_data_R, atlas = dk_3d, surface = ["LCBC",'inflated'], hemisphere = ['left','right'],
+                   label = 'region', colour = 'p', palette = colors, vminmax = [0,25])
 
-        # html_string = plot_dk
-        # st.markdown(html_string, unsafe_allow_html=True)
+        elif chosen_region =="Subcortical":
+            
+            # CONVERT ASEG-DATA
+            aseg_data = aseg_df_3D(T,S, subtype = chosen_subtype)
+            with localconverter(robjects.default_converter + pandas2ri.converter):
+                aseg_data_R = robjects.conversion.py2rpy(aseg_data)
+            
+            plot_regions = ggseg3d.ggseg3d(aseg_data_R, atlas = aseg_3d, surface = "LCBC", hemisphere = 'subcort',
+               label = 'region', colour = 'p', palette = colors, vminmax = [0,25])
 
-        # print(plot_dk)
+        if st.button('Open visualization in a new tab'):
+           
+            # 1. PRINT THE FUNCTION OUTPUT
+            print(plot_regions)
 
-        components.iframe('/Users/macos/Documents/GitHub/Master_Thesis/notebook examples/html_outputs/plot_dk.html')
+            # 2. LOAD FROM FILE
+            # filename = "file://"+os.getcwd()+"/notebook_examples/html_outputs/" + "plot_dk.html"
+            # webbrowser.open(filename, new = 2)
 
+        if st.button('Download visualisation as HTML file'):
+
+            htmlwidgets.saveWidget(plot_regions, f"html_outputs/{chosen_subtype}_{chosen_region}.html", selfcontained = False)
+            st.info(f'File succesfully downloaded to: {os.getcwd()}/html_outputs')
 
 
     elif chosen_plot_type == 'Pie Plot':
