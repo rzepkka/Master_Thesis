@@ -5,7 +5,7 @@ import pandas as pd
 # ====================================== DK-ATLAS ==================================================================================================================
 
 
-def dk_regions_2D(T): # mapping_dk
+def dk_regions_2D(T):
     """
     Creates a dictionary of DK-atlas labels grouped into larger regions corresponding to T.biomarker_labels
     :param T: Timeline object from snowphlake
@@ -106,7 +106,7 @@ def dk_regions_2D(T): # mapping_dk
     return dic
 
 
-def dk_dict_2D(T,S, mapped_dict, subtype_labels = None, subtype = None): # dk_dict
+def dk_dict_2D(T,S, mapped_dict, subtype_labels = None, subtype = None):
     
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function
@@ -148,7 +148,7 @@ def dk_dict_2D(T,S, mapped_dict, subtype_labels = None, subtype = None): # dk_di
 # ====================================== ASEG atlas ==================================================================================================================
 
 
-def aseg_dict_2D(T, S, subtype_labels = None, subtype = None): # aseg_dict
+def aseg_dict_2D(T, S, subtype_labels = None, subtype = None):
     
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function from R ggseg3d package
