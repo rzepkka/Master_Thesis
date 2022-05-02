@@ -2,6 +2,8 @@ import numpy as np
 import scipy.stats 
 import pandas as pd
 
+# ====================================== DK-ATLAS ==================================================================================================================
+
 
 def dk_regions_2D(T): # mapping_dk
     """
@@ -142,6 +144,8 @@ def dk_dict_2D(T,S, mapped_dict, subtype_labels = None, subtype = None): # dk_di
     dic_dk = dict(zip(dk_flat, list_plot))
     
     return dic_dk
+
+# ====================================== ASEG atlas ==================================================================================================================
 
 
 def aseg_dict_2D(T, S, subtype_labels = None, subtype = None): # aseg_dict
