@@ -5,7 +5,7 @@ import pandas as pd
 
 # ====================================== DK-ATLAS ==================================================================================================================
 
-def dk_regions_3D(T): # mapping_dk_R
+def dk_regions_3D(T):
 
     """
     Creates a dictionary of dk-atlas labels grouped into larger regions corresponding to T.biomarker_labels
@@ -109,7 +109,7 @@ def dk_regions_3D(T): # mapping_dk_R
     return dic
 
 
-def dk_df_3D(T,S, mapped_dict, subtype_labels = None, subtype = None): # dk_df_R
+def dk_df_3D(T,S, mapped_dict, subtype_labels = None, subtype = None):
     
     """
     Creates a dictionary, which can be used as input to ggseg3d() function
@@ -165,7 +165,7 @@ def dk_df_3D(T,S, mapped_dict, subtype_labels = None, subtype = None): # dk_df_R
 
 # ====================================== ASEG atlas ==================================================================================================================
 
-def aseg_df_3D(T, S, subtype_labels = None, subtype = None): # aseg_df_R
+def aseg_df_3D(T, S, subtype_labels = None, subtype = None):
     
     """
     Creates a dictionary, which can be used as input to ggseg3d() function from R ggseg3d package
