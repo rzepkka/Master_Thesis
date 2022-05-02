@@ -122,10 +122,9 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
 
     return fig
 
-# ==========================================================================================================================================================================
+# ============= 2D PLOTTING =============================================================================================================================================================
 
 def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
-
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function
     :param T: timeline object from snowphlake
@@ -142,8 +141,7 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
     else:
         dk_ = dk_dict_2D(T, S, mapped_dict = mapped_dict, subtype = subtype)
         dk = {k: v for k, v in dk_.items() if v <= slider}
-        
-    
+           
     if subtype is None:
         # subtype = 'default = 0'
         pass
@@ -154,7 +152,6 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
 
 
 def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
-
     """
     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
     :param T: timeline object from snowphlake
@@ -179,9 +176,7 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
 
 
-
 def plot_ggseg(T,S, subtype_labels = None, subtype = None):     
-
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function
     :param T: timeline object from snowphlake
@@ -207,7 +202,9 @@ def plot_ggseg(T,S, subtype_labels = None, subtype = None):
                 background='k', edgecolor='w', bordercolor='gray', title=f'Subcortical regions for Subtype: {subtype}',
                 fontsize = 20)
 
-# ==========================================================================================================================================================================
+
+
+# ========== in progress ================================================================================================================================================================
 
 def subtypes_pieplot(numbers, subtypes): # labels, pi0_mean, evn_full, evn,num_subtypes, width, height,color_list
     fig = go.FigureWidget()
