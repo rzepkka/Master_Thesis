@@ -1,4 +1,7 @@
 import streamlit as st
+import streamlit.components as stc
+import streamlit.components.v1 as components
+
 import scipy.stats 
 import pandas as pd
 from matplotlib import rc
@@ -10,7 +13,7 @@ import pickle
 from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
 # from streamlit_echarts import st_echarts
 
-from mapping import mapping_dk, dk_dict, aseg_dict
+# from mapping_2D import mapping_dk, dk_dict, aseg_dict
 
 from pathlib import Path
 import base64
@@ -26,6 +29,9 @@ import rpy2.robjects as robjects
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects import pandas2ri
 
+from IPython.display import HTML
+
+
 utils = importr('utils')
 base = importr("base")
 datasets = importr('datasets')
@@ -35,21 +41,6 @@ dplyr = importr("dplyr")
 tidyr = importr("tidyr")
 
 ggseg3d = importr('ggseg3d')
-
-# # load R packages
-# utils = importr('utils')
-# utils.chooseCRANmirror(ind=1)
-
-# utils.install_packages('ggseg_3d', repos="https://cloud.r-project.org")
-# ggseg3d = importr('ggseg3d')
-
-
-# base = importr("base")
-# datasets = importr('datasets')
-# ggseg = importr("ggseg")
-# ggplot2 = importr("ggplot2")
-# dplyr = importr("dplyr")
-# tidyr = importr("tidyr")
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -127,7 +118,7 @@ def main():
     elif chosen_plot_type == 'Ggseg - 3D':
 
         
-        dk_data = pd.read_csv("dk_R_subtype0.csv") 
+        dk_data = pd.read_csv("data/dk_R_subtype0.csv") 
         with localconverter(robjects.default_converter + pandas2ri.converter):
             dk_data_R = robjects.conversion.py2rpy(dk_data)
 
@@ -148,7 +139,9 @@ def main():
         # html_string = plot_dk
         # st.markdown(html_string, unsafe_allow_html=True)
 
-        print(plot_dk)
+        # print(plot_dk)
+
+        components.iframe('/Users/macos/Documents/GitHub/Master_Thesis/notebook examples/html_outputs/plot_dk.html')
 
 
 

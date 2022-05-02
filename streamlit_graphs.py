@@ -6,7 +6,7 @@ import pandas as pd
 from matplotlib import rc
 import pickle
 
-from mapping import mapping_dk, dk_dict, aseg_dict
+from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
 
 # plotly
 import plotly.express as px
@@ -135,12 +135,12 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
     :param slider: int
     :returns a figures by plt.show() -> ggseg.plot_dk() 
     """
-    mapped_dict = mapping_dk(T)    
+    mapped_dict = dk_regions_2D(T)    
     
     if slider is None:
-        dk = dk_dict(T, S, mapped_dict = mapped_dict, subtype = subtype)  
+        dk = dk_dict_2D(T, S, mapped_dict = mapped_dict, subtype = subtype)  
     else:
-        dk_ = dk_dict(T, S, mapped_dict = mapped_dict, subtype = subtype)
+        dk_ = dk_dict_2D(T, S, mapped_dict = mapped_dict, subtype = subtype)
         dk = {k: v for k, v in dk_.items() if v <= slider}
         
     
@@ -165,9 +165,9 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
     :returns a figures by plt.show() -> ggseg.plot_aseg()
     """
     if slider is None:  
-        aseg = aseg_dict(T,S, subtype = subtype)
+        aseg = aseg_dict_2D(T,S, subtype = subtype)
     else:
-        aseg_ = aseg_dict(T,S, subtype = subtype)
+        aseg_ = aseg_dict_2D(T,S, subtype = subtype)
         aseg = {k: v for k, v in aseg_.items() if v <= slider}
 
     if subtype is None:
@@ -191,9 +191,9 @@ def plot_ggseg(T,S, subtype_labels = None, subtype = None):
     :returns two figures -> ggseg.plot_dk() and ggseg.plot_aseg()
     """
 
-    mapped_dict = mapping_dk(T)    
-    dk = dk_dict(T, S, mapped_dict = mapped_dict, subtype = subtype)  
-    aseg = aseg_dict(T,S, subtype = subtype)
+    mapped_dict = dk_regions_2D(T)    
+    dk = dk_dict_2D(T, S, mapped_dict = mapped_dict, subtype = subtype)  
+    aseg = aseg_dict_2D(T,S, subtype = subtype)
 
     if subtype is None:
         subtype = 'default = 0'
