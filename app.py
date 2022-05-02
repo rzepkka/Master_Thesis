@@ -67,7 +67,7 @@ def main():
     st.sidebar.header("Adjusting Plots")
 
     # SELECT PLOT
-    plot_type_list = ['Boxplots - event centers', 'Ggseg - 3D', 'Pie Plot'] # 'Ggseg - 2D'
+    plot_type_list = ['Boxplots - event centers', 'Ggseg - 3D', 'Pie Plot']
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
 
     # CHOOSE WIDTH AND HEIGHT
@@ -123,28 +123,6 @@ def main():
 
 
         st.plotly_chart(eventCenters)
-
-
-    # elif chosen_plot_type == 'Ggseg - 2D':
-
-    #     options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
-    #     chosen_subtype = st.selectbox('Choose subtype to visualize:', options)
-
-    #     region_names = ['Cortical regions', 'Subcortical regions']
-
-    #     regions = st.radio('Choose brain regions to display:', region_names)
-
-    #     if regions == "Cortical regions":
-    #         ggseg_dk = plot_dk_atlas(T = T,
-    #                     S = S,
-    #                     subtype = chosen_subtype)
-    #         st.pyplot(ggseg_dk)
-
-    #     elif regions == 'Subcortical regions':  
-    #         ggseg_aseg = plot_aseg_atlas(T = T,
-    #                     S = S,
-    #                     subtype = chosen_subtype)       
-    #         st.pyplot(ggseg_aseg)
 
     elif chosen_plot_type == 'Ggseg - 3D':
 
