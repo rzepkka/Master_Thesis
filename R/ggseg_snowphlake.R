@@ -45,6 +45,19 @@ p = ggseg3d(.data = dk_data,
 
 p
 
+library(htmltools)
+save_html(p, 'plot_htmltools.html', background = "white", libdir = "lib", lang = "en")
+
+library(htmlwidgets)
+saveWidget(p, "plot_htmlwidgets.html", selfcontained = F, libdir = "lib")
+
+htmltools::tags$iframe(
+  src = "plot_htmlwidgets.html.html", 
+  scrolling = "no", 
+  seamless = "seamless",
+  frameBorder = "0"
+)
+
 # RIGHT HEMISPHERE
 ggseg3d(.data = dk_data, 
         atlas = dk_3d,
