@@ -26,7 +26,7 @@ filtered_aseg
 
 # ============= DK-atlas ========================================================================================
 
-dk_data <- read.csv(file = 'dk_R_subtype0.csv')
+dk_data <- read.csv(file = 'data/dk_R_subtype0.csv')
 dk_data
 
 # DK for subtype 0
@@ -46,17 +46,10 @@ p = ggseg3d(.data = dk_data,
 p
 
 library(htmltools)
-save_html(p, 'plot_htmltools.html', background = "white", libdir = "lib", lang = "en")
+# save_html(p, 'plot_htmltools.html', background = "white", libdir = "lib", lang = "en")
 
 library(htmlwidgets)
-saveWidget(p, "plot_htmlwidgets.html", selfcontained = F, libdir = "lib")
-
-htmltools::tags$iframe(
-  src = "plot_htmlwidgets.html.html", 
-  scrolling = "no", 
-  seamless = "seamless",
-  frameBorder = "0"
-)
+# saveWidget(p, "plot_htmlwidgets.html", selfcontained = F, libdir = "lib")
 
 # RIGHT HEMISPHERE
 ggseg3d(.data = dk_data, 
@@ -80,7 +73,7 @@ ggseg3d(.data = dk_data,
 
 # ============= ASEG ========================================================================================
 
-aseg_data <- read.csv(file = 'aseg_R_subtype0.csv')
+aseg_data <- read.csv(file = 'data/aseg_R_subtype0.csv')
 aseg_data
 
 # without point of reference
