@@ -61,14 +61,14 @@ def main():
     st.sidebar.header("Adjusting Plots")
 
     # SELECT PLOT
-    plot_type_list = ['Boxplots - event centers', 'Ggseg - 3D', 'Pie Plot']
+    plot_type_list = ['Disease timeline', '3D Visualisation', 'Pie Plot']
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
 
     # CHOOSE WIDTH AND HEIGHT
-    chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1000)
-    chosen_height = st.sidebar.number_input('Select height of the plot in px',value=800)
+    chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1100)
+    chosen_height = st.sidebar.number_input('Select height of the plot in px',value=850)
 
-    if chosen_plot_type == 'Boxplots - event centers':
+    if chosen_plot_type == 'Disease timeline':
 
         options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(options)
@@ -90,25 +90,13 @@ def main():
                 pass
             else: options_compare.append(label)
 
-
-        chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
-
-        for subtype in chosen_subtypes:
-            subtype_list.append(subtype)
-
         color_list = []
 
         default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']
 
+ 
 
-        # color_map = {chosen_subtypes[i]: color_list[i] for i in range(len(chosen_subtypes))}
-
-        # order_list = chosen_subtypes
-        # orderBy = st.selectbox("Select additional subtypes to compare",order_list)
-
-        # chosen_2D = subtype_visualize        
-
-        col1, col2 = st.columns([2.2,3])
+        col1, col2 = st.columns([2,3.2])
 
         if subtype_visualize != None:
             slider = st.slider(label = 'Choose regions to display', 
@@ -126,6 +114,22 @@ def main():
                 st.pyplot(ggseg_aseg)
 
 
+        col3, col4 = st.columns([1,4])
+
+        if col3.button('Open 3D visualiszation in a new tab'):          
+            # 2. LOAD FROM FILE
+            filename = "file://"+os.getcwd()+ "/2_plots.html"
+            webbrowser.open(filename, new = 2)
+
+        if col4.button('Download visualisation as HTML file'):
+            pass
+
+
+        chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
+
+        for subtype in chosen_subtypes:
+            subtype_list.append(subtype)
+
         for idx, subtype in enumerate(subtype_list):
             subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
             color_list.append(subtype_color)
@@ -141,7 +145,7 @@ def main():
 
         st.plotly_chart(eventCenters)
 
-    elif chosen_plot_type == 'Ggseg - 3D':
+    elif chosen_plot_type == '3D Visualisation':
 
         options_subtypes = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         options_regions = ['Cortical','Subcortical']
