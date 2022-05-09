@@ -65,8 +65,8 @@ def main():
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
 
     # CHOOSE WIDTH AND HEIGHT
-    chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1100)
-    chosen_height = st.sidebar.number_input('Select height of the plot in px',value=850)
+    chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1000)
+    chosen_height = st.sidebar.number_input('Select height of the plot in px',value=800)
 
     if chosen_plot_type == 'Disease timeline':
 
@@ -75,27 +75,21 @@ def main():
 
     
         subtype_list = []
-        subtype_visualize = st.selectbox('Select a subtype to visualize:', options)
-        
+        subtype_visualize = st.selectbox('Select a subtype to visualize:', options)       
         subtype_list.append(subtype_visualize)
-
-        # options_compare = options.remove(subtype_visualize)
-
-        # subtypes_compare = st.multiselect('Select additional subtypes to compare:', options_compare)
 
         options_compare = []
 
+        # list for additional subtypes to compare
         for label in options:
             if label == subtype_visualize:
                 pass
             else: options_compare.append(label)
 
         color_list = []
-
         default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']
 
- 
-
+    
         col1, col2 = st.columns([2,3.2])
 
         if subtype_visualize != None:
@@ -118,7 +112,7 @@ def main():
 
         if col3.button('Open 3D visualiszation in a new tab'):          
             # 2. LOAD FROM FILE
-            filename = "file://"+os.getcwd()+ "/2_plots.html"
+            filename = "file://"+os.getcwd()+ f"/html_3D/{subtype_visualize}.html"
             webbrowser.open(filename, new = 2)
 
         if col4.button('Download visualisation as HTML file'):
