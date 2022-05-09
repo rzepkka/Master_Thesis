@@ -210,7 +210,7 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
         pass
     else:
         return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
-                  vminmax = [0,1],
+                  # vminmax = [0,1],
                   background='black', edgecolor='white', bordercolor='gray', title=f'Cortical regions',fontsize = 24)
 
 
@@ -235,7 +235,7 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
         pass 
     else:
         return ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
-                vminmax = [0,1],
+                # vminmax = [0,1],
                 background='black', edgecolor='white', bordercolor='gray', title=f'Subcortical regions', fontsize = 18)
 
 
