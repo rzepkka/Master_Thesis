@@ -1,0 +1,69 @@
+region,hemi,p
+bankssts,left,14
+transverse temporal,left,14
+superior temporal,left,14
+temporal pole,left,14
+entorhinal,left,14
+middle temporal,left,14
+inferior temporal,left,14
+fusiform,left,14
+parahippocampal,left,14
+superior frontal,left,13
+frontal pole,left,13
+caudal middle frontal,left,13
+rostral middle frontal,left,13
+pars opercularis,left,13
+pars orbitalis,left,13
+pars triangularis,left,13
+medial orbitofrontal,left,13
+lateral orbitofrontal,left,13
+precentral,left,13
+paracentral,left,13
+postcentral,left,22
+superior parietal,left,22
+precuneus,left,22
+inferior parietal,left,22
+supramarginal,left,22
+lateral occipital,left,8
+cuneus,left,8
+pericalcarine,left,8
+lingual,left,8
+caudal anterior cingulate,left,2
+rostral anterior cingulate,left,2
+posterior cingulate,left,2
+isthmus cingulate,left,2
+insula,left,16
+bankssts,right,17
+transverse temporal,right,17
+superior temporal,right,17
+temporal pole,right,17
+entorhinal,right,17
+middle temporal,right,17
+inferior temporal,right,17
+fusiform,right,17
+parahippocampal,right,17
+superior frontal,right,1
+frontal pole,right,1
+caudal middle frontal,right,1
+rostral middle frontal,right,1
+pars opercularis,right,1
+pars orbitalis,right,1
+pars triangularis,right,1
+medial orbitofrontal,right,1
+lateral orbitofrontal,right,1
+precentral,right,1
+paracentral,right,1
+postcentral,right,7
+superior parietal,right,7
+precuneus,right,7
+inferior parietal,right,7
+supramarginal,right,7
+lateral occipital,right,18
+cuneus,right,18
+pericalcarine,right,18
+lingual,right,18
+caudal anterior cingulate,right,19
+rostral anterior cingulate,right,19
+posterior cingulate,right,19
+isthmus cingulate,right,19
+insula,right,23
