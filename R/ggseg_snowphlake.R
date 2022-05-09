@@ -29,7 +29,7 @@ filtered_aseg
 
 # ============= DK-atlas ========================================================================================
 
-dk_data <- read.csv(file = 'data/dk_R_subtype0.csv')
+dk_data <- read.csv(file = 'data/dk_R_Subtype 0.csv')
 dk_data
 
 # DK for subtype 0
@@ -163,7 +163,13 @@ fig1
 saveWidget(fig1, "4_plots.html", selfcontained = F, libdir = "lib")
 
 
-# 2 subplots
+# ============= 2 subplots =============================
+
+dk_data <- read.csv(file = 'data/dk_R_slider_Subtype 0.csv')
+aseg_data <- read.csv(file = 'data/aseg_R_slider_Subtype 0.csv')
+
+dk_data
+aseg_data
 
 dk = ggseg3d(.data = dk_data,
              atlas = dk_3d,
@@ -181,32 +187,51 @@ aseg = ggseg3d(.data = aseg_data,
                palette = colors,
                text = "p", 
                # na.alpha= .5,
-               options.legend = list(title=list(text="Subcortical"),
-                                     colorbar=list(limits=c(0,25))),
-               scene = 'scene2',
-)
+               options.legend = list(title=list(text="Subcortical"),dtick=0.1,
+                                     tickformatstops=list(dtickrange=c(0,1))),
+               scene = 'scene2'
+               )
+
 
 aseg
 
-colorbar(dk, limits=c(0,25))
+colorbar(dk, limits = c(0, 1))
+
+# colorbar(dk, limits=c(0,25))
 
 
 fig2 <- subplot(dk, aseg)
-fig2 <- fig2 %>% layout(title = "3D Visualization of the disease timeline",
+fig2 <- fig2 %>% layout(title = "Subtype 4 - 3D Visualization of the disease timeline",
                         scene = list(domain=list(x=c(0,1),y=c(0.5,1)),
                                      aspectmode='auto',
-                                     xaxis=list(backgroundcolor='white')),
+                                     xaxis=list(backgroundcolor='white')
+                                     ),
                         scene2 = list(domain=list(x=c(0,1),y=c(0,0.5)),
                                       aspectmode='auto'
-                        ))
+                        )) 
+fig2 
 
-fig2
+# SAVE 3D PLOTS TO LOAD THEM INTO STREAMLIT 
 
-# p1.scene = 'scene1'
-# p2.scene = 'scene2'
-
-saveWidget(fig2, "2_plots.html", selfcontained = F, libdir = "lib")
+saveWidget(fig2, "html_3D/Subtype 4.html", selfcontained = F, libdir = "lib")
 
 
-ggseg3d(show.legend = TRUE, hemisphere = "left", limits=c(0,25))
+
+
+p <- plot_ly(mtcars, x = ~wt, y = ~mpg, color = ~cyl)
+
+# pass any colorbar attribute -- 
+# https://plotly.com/r/reference/#scatter-marker-colorbar
+colorbar(p, len = 0.5)
+
+# Expand the limits of the colorbar
+colorbar(p, limits = c(0, 20))
+# values outside the colorbar limits are considered "missing"
+colorbar(p, limits = c(5, 6))
+
+# also works on colorbars generated via a z value
+corr <- cor(diamonds[vapply(diamonds, is.numeric, logical(1))])
+plot_ly(x = rownames(corr), y = colnames(corr), z = corr) %>%
+  add_heatmap() %>%
+  colorbar(limits = c(-1, 1))
 
