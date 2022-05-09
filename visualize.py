@@ -82,7 +82,7 @@ def subtypes_piechart(S,diagnosis,diagnostic_labels_for_plotting,title = None,su
     
 
 def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
-        subtype_labels = None, orderBy = None, width=1200, height=900):
+        subtype_labels = None, orderBy = None, width=1200, height=900, slider = None):
     
     """
     Creates event centers box plots for multiple subtypes
@@ -95,6 +95,7 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
     :param orderBy: string, name of the subtype to order the boxplots by; default None
     :param width: chosen width of the returned plot
     :param height: chosen height of the returned plot
+    :param slider: int, value of the slider from 2D visualizations
     :return: plotly box figure
     """
 
@@ -180,6 +181,10 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
                       hovermode=False)
 
     fig.update_layout(legend_font_size=22)
+
+    fig.add_vline(x=slider, line_width=2, line_dash="dash", line_color="red",
+                  annotation_text="Slider position",
+                 annotation_font_color="red")
 
     return fig
 
