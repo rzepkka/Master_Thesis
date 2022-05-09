@@ -7,7 +7,10 @@ import pandas as pd
 from matplotlib import rc
 import pickle
 
-from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
+# from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
+
+from visualize import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas
+
 # from streamlit_echarts import st_echarts
 
 # from mapping_2D import mapping_dk, dk_dict, aseg_dict
@@ -69,34 +72,45 @@ def main():
 
         options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(options)
-        chosen_subtypes = st.multiselect('Select subtype to compare:', options)
+
+    
+        subtype_list = []
+        subtype_visualize = st.selectbox('Select a subtype to visualize:', options)
+        
+        subtype_list.append(subtype_visualize)
+
+        # options_compare = options.remove(subtype_visualize)
+
+        # subtypes_compare = st.multiselect('Select additional subtypes to compare:', options_compare)
+
+        options_compare = []
+
+        for label in options:
+            if label == subtype_visualize:
+                pass
+            else: options_compare.append(label)
+
+
+        chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
+
+        for subtype in chosen_subtypes:
+            subtype_list.append(subtype)
+
         color_list = []
 
         default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']
 
-        for idx, subtype in enumerate(chosen_subtypes):
-            subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
-            color_list.append(subtype_color)
 
         # color_map = {chosen_subtypes[i]: color_list[i] for i in range(len(chosen_subtypes))}
 
-        order_list = chosen_subtypes
-        orderBy = st.selectbox("Select subtype to order by",order_list)
+        # order_list = chosen_subtypes
+        # orderBy = st.selectbox("Select additional subtypes to compare",order_list)
 
-        eventCenters = event_centers(T = T,
-                                    S = S, 
-                                    color_list = color_list,
-                                    chosen_subtypes = chosen_subtypes,
-                                    subtype_labels = options, 
-                                    orderBy = orderBy,
-                                    width = chosen_width,
-                                    height = chosen_height)
-
-        chosen_2D = orderBy        
+        # chosen_2D = subtype_visualize        
 
         col1, col2 = st.columns([2.2,3])
 
-        if chosen_2D != None:
+        if subtype_visualize != None:
             slider = st.slider(label = 'Choose regions to display', 
                                 help = 'Only display regions with ordering <= to the chosen value',
                                 min_value = 0, 
@@ -104,13 +118,26 @@ def main():
                                 value=len(T.biomarker_labels), step=1)
         
             with col1:
-                ggseg_dk = plot_dk_atlas(T = T, S = S, subtype = chosen_2D, slider = slider)
+                ggseg_dk = plot_dk_atlas(T = T, S = S, subtype = subtype_visualize, slider = slider)
                 st.pyplot(ggseg_dk)
 
             with col2:     
-                ggseg_aseg = plot_aseg_atlas(T = T, S = S, subtype = chosen_2D, slider = slider)       
+                ggseg_aseg = plot_aseg_atlas(T = T, S = S, subtype = subtype_visualize, slider = slider)       
                 st.pyplot(ggseg_aseg)
 
+
+        for idx, subtype in enumerate(subtype_list):
+            subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
+            color_list.append(subtype_color)
+
+        eventCenters = event_centers(T = T,
+                                    S = S, 
+                                    color_list = color_list,
+                                    chosen_subtypes = subtype_list,
+                                    subtype_labels = options, 
+                                    orderBy = subtype_visualize,
+                                    width = chosen_width,
+                                    height = chosen_height)
 
         st.plotly_chart(eventCenters)
 
