@@ -96,77 +96,10 @@ ggseg3d(.data = aseg_data,
         options.legend = list(title=list(text=""))) %>% 
   add_glassbrain()
 
+
 #=========== INPUTS TO 3D SUBPLOTS ========================================================================================
-
-# LEFT HEMISPHERE
-dk_left = ggseg3d(.data = dk_data,
-                  atlas = dk_3d,
-                  hemisphere = 'left',
-                  colour = "p",
-                  palette = colors,
-                  text = "p",
-                  options.legend = list(title=list(text="Left")),
-                  scene = 'scene')
-dk_left
-
-# RIGHT HEMISPHERE
-dk_right = ggseg3d(.data = dk_data,
-                   atlas = dk_3d,
-                   hemisphere = 'right',
-                   colour = "p",
-                   palette = colors,
-                   text = "p",
-                   options.legend = list(title=list(text="Right")),
-                   scene = 'scene2')
-dk_right
-
-# WHOLE BRAIN
-dk_whole = ggseg3d(.data = dk_data,
-                   atlas = dk_3d,
-                   hemisphere = c('left','right'),
-                   colour = "p",
-                   palette = colors,
-                   text = "p",
-                   options.legend = list(title=list(text="Cortical")),
-                   scene = 'scene3')
-dk_whole
-
-# ASEG
-aseg = ggseg3d(.data = aseg_data, 
-               atlas = aseg_3d, 
-               colour = "p", 
-               palette = colors,
-               text = "p", 
-               options.legend = list(title=list(text="Subcortical")),
-               scene = 'scene4')
-
-aseg
-
-# ========= 3D SUBPLOTS =============================================================================================================================================
-
-# subplot and define scene
-fig1 <- subplot(dk_left, dk_right, dk_whole, aseg)
-
-# 4-subplots
-fig1 <- fig1 %>% layout(title = "3D Subplots",
-                        scene = list(text ='Right hemishphere',domain=list(x=c(0,0.5),y=c(0.5,1)),
-                                     aspectmode='auto', pan_camera ="left medial"),
-                        scene2 = list(domain=list(x=c(0.5,1),y=c(0.5,1)),
-                                      aspectmode='auto'),
-                        scene3 = list(domain=list(x=c(0,0.5),y=c(0,0.5)),
-                                      aspectmode='auto'),
-                        scene4 = list(domain=list(x=c(0.5,1),y=c(0,0.5)),
-                                      aspectmode='auto'))
-
-fig1
-
-saveWidget(fig1, "4_plots.html", selfcontained = F, libdir = "lib")
-
-
-# ============= 2 subplots =============================
-
-dk_data <- read.csv(file = 'data/dk_R_slider_Subtype 0.csv')
-aseg_data <- read.csv(file = 'data/aseg_R_slider_Subtype 0.csv')
+dk_data <- read.csv(file = 'data/dk_R_slider_Subtype 4.csv')
+aseg_data <- read.csv(file = 'data/aseg_R_slider_Subtype 4.csv')
 
 dk_data
 aseg_data
@@ -190,15 +123,11 @@ aseg = ggseg3d(.data = aseg_data,
                options.legend = list(title=list(text="Subcortical"),dtick=0.1,
                                      tickformatstops=list(dtickrange=c(0,1))),
                scene = 'scene2'
-               )
+)
 
 
 aseg
-
-colorbar(dk, limits = c(0, 1))
-
-# colorbar(dk, limits=c(0,25))
-
+# ========= 3D SUBPLOTS =============================================================================================================================================
 
 fig2 <- subplot(dk, aseg)
 fig2 <- fig2 %>% layout(title = "Subtype 4 - 3D Visualization of the disease timeline",
@@ -213,10 +142,10 @@ fig2
 
 # SAVE 3D PLOTS TO LOAD THEM INTO STREAMLIT 
 
-saveWidget(fig2, "html_3D/Subtype 4.html", selfcontained = F, libdir = "lib")
+saveWidget(fig2, "html_3D/slider/Subtype 4.html", selfcontained = F, libdir = "lib")
 
 
-
+# =============================
 
 p <- plot_ly(mtcars, x = ~wt, y = ~mpg, color = ~cyl)
 
