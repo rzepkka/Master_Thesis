@@ -95,9 +95,9 @@ def main():
         if subtype_visualize != None:
             slider = st.slider(label = 'Choose regions to display', 
                                 help = 'Only display regions with ordering <= to the chosen value',
-                                min_value = 0, 
-                                max_value = len(T.biomarker_labels), 
-                                value=len(T.biomarker_labels), step=1)
+                                min_value = 0.0, 
+                                max_value = 1.0, 
+                                value=1.0, step=0.01)
         
             with col1:
                 ggseg_dk = plot_dk_atlas(T = T, S = S, subtype = subtype_visualize, slider = slider)
@@ -112,7 +112,7 @@ def main():
 
         if col3.button('Open 3D visualiszation in a new tab'):          
             # 2. LOAD FROM FILE
-            filename = "file://"+os.getcwd()+ f"/html_3D/{subtype_visualize}.html"
+            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{subtype_visualize}.html"
             webbrowser.open(filename, new = 2)
 
         if col4.button('Download visualisation as HTML file'):
