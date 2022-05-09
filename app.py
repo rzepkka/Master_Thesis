@@ -135,7 +135,8 @@ def main():
                                     subtype_labels = options, 
                                     orderBy = subtype_visualize,
                                     width = chosen_width,
-                                    height = chosen_height)
+                                    height = chosen_height,
+                                    slider = slider)
 
         st.plotly_chart(eventCenters)
 

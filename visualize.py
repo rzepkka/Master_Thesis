@@ -183,8 +183,9 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
     fig.update_layout(legend_font_size=22)
 
     fig.add_vline(x=slider, line_width=2, line_dash="dash", line_color="red",
-                  annotation_text="Slider position",
-                 annotation_font_color="red")
+                  annotation_text="Slider value",
+                  annotation_position="top left",
+                  annotation_font_color="red")
 
     return fig
 
@@ -215,7 +216,7 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
         pass
     else:
         return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
-                  # vminmax = [0,1],
+                  vminmax = [0,1],
                   background='black', edgecolor='white', bordercolor='gray', title=f'Cortical regions',fontsize = 24)
 
 
@@ -240,7 +241,7 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
         pass 
     else:
         return ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
-                # vminmax = [0,1],
+                vminmax = [0,1],
                 background='black', edgecolor='white', bordercolor='gray', title=f'Subcortical regions', fontsize = 18)
 
 
