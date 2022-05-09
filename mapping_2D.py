@@ -129,7 +129,7 @@ def dk_dict_2D(T,S, mapped_dict, subtype_labels = None, subtype = None):
     # clean names from capital letters
     labels = list(map(lambda x: x.lower(), T.biomarker_labels))
        
-    dic = dict(zip(labels, T.sequence_model['ordering'][subtype_labels[subtype]]))
+    dic = dict(zip(labels, T.sequence_model['event_centers'][subtype_labels[subtype]]))
                 
     # flat lost of dict values (single list of DK-labels)
     dk_flat = [x for v in mapped_dict.values() for x in v]
@@ -167,7 +167,7 @@ def aseg_dict_2D(T, S, subtype_labels = None, subtype = None):
     elif subtype is None:
         subtype = subtype_labels[0]
     
-    dic_aseg = dict(zip(T.biomarker_labels, T.sequence_model['ordering'][subtype_labels[subtype]]))
+    dic_aseg = dict(zip(T.biomarker_labels, T.sequence_model['event_centers'][subtype_labels[subtype]]))
         
     return dic_aseg
 
