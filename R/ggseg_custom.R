@@ -1,12 +1,6 @@
-install.packages('devtools')
-# library(devtools)
-# install_github("rzepkka/ggseg3D")
-
 library(ggseg3d)
 
-aseg_data <- read.csv(file = 'data/aseg_R_slider_Subtype 0.csv')
-
-# ========== NEW GGSEG_3D =======================================
+# ========== CUSTOM GGSEG_3D =======================================
 
 custom_ggseg <- function(.data=NULL, atlas="dk_3d",
                     surface = "LCBC", hemisphere = c("right","subcort"),
@@ -25,7 +19,7 @@ custom_ggseg <- function(.data=NULL, atlas="dk_3d",
     atlas3d <- data_merge(.data, atlas3d)
   }
   
-  pal.colours <- custom_palette(palette)
+  pal.colours <- get_palette(palette)
   
   # If colour column is numeric, calculate the gradient
   if(is.numeric(unlist(atlas3d[,colour]))){
@@ -98,62 +92,51 @@ custom_ggseg <- function(.data=NULL, atlas="dk_3d",
   p
 }
 
-# ========== COLORBAR =======================================
-custom_palette <- function(palette){
-  
-  if(is.null(palette)){
-    palette = c("skyblue", "dodgerblue")
-  }
-  
-  if(!is.null(names(palette))){
-    pal.colours <- names(palette)
-    pal.values <- unname(palette)
-    pal.norm <- range_norm(pal.values)
-  }else{
-    pal.colours <- palette
-    pal.norm <- seq(0,1, length.out = length(pal.colours))
-    pal.values <- seq(0,1, length.out = length(pal.colours))
-  }
-  
-  # Might be a single colour
-  pal.colours = if(length(palette) == 1){
-    # If a single colour, dummy create a second
-    # palette row for interpolation
-    data.frame(values = c(pal.values,pal.values+1),
-               norm = c(0, 1 ),
-               orig = c(pal.colours,pal.colours),
-               stringsAsFactors = F)
-  }else{
-    data.frame(values = pal.values,
-               norm = pal.norm,
-               orig = pal.colours,
-               stringsAsFactors = F)
-  }
-  
-  pal.colours$hex <- gradient_n_pal(
-    colours = pal.colours$orig,
-    values = pal.colours$values,
-    space = "Lab")(pal.colours$values)
-  
-  pal.colours
-  
-}
-
 # =========== ADD CUSTOM FUNCTIONS TO ENVIRONMENT ==============================
 
 environment(custom_ggseg) <- asNamespace('ggseg3d')
-environment(custom_palette) <- asNamespace('ggseg3d')
 
+#=========== INPUTS TO 3D SUBPLOTS ========================================================================================
+dk_data <- read.csv(file = 'data/dk_R_slider_Subtype 4.csv')
+aseg_data <- read.csv(file = 'data/aseg_R_slider_Subtype 4.csv')
 
+dk = custom_ggseg(.data = dk_data,
+             atlas = dk_3d,
+             hemisphere = c('left','right'),
+             colour = "p",
+             palette = colors,
+             text = "p",
+             options.legend = list(title=list(text="Cortical"),dtick=0.1,
+                              tickformatstops=list(dtickrange=c(0,1))),
+             scene = 'scene')
+dk
 
 aseg = custom_ggseg(.data = aseg_data, 
                atlas = aseg_3d, 
                colour = "p", 
                palette = colors,
                text = "p", 
-               # na.alpha= .5,
-               # options.legend = list(title=list(text="Subcortical")),
-               scene = 'scene'
+               options.legend = list(title=list(text="Subcortical"),dtick=0.1,
+                                     tickformatstops=list(dtickrange=c(0,1))),
+               scene = 'scene2'
 )
 
 aseg
+
+# ========= 3D SUBPLOTS =============================================================================================================================================
+
+fig2 <- subplot(dk, aseg)
+fig2 <- fig2 %>% layout(title = "Subtype 4 - 3D Visualization of the disease timeline",
+                        scene = list(domain=list(x=c(0,1),y=c(0.5,1)),
+                                     aspectmode='auto',
+                                     xaxis=list(backgroundcolor='white')
+                        ),
+                        scene2 = list(domain=list(x=c(0,1),y=c(0,0.5)),
+                                      aspectmode='auto'
+                        )) 
+fig2 
+
+# SAVE 3D PLOTS TO LOAD THEM INTO STREAMLIT 
+
+saveWidget(fig2, "html_3D/slider/Subtype 4.html", selfcontained = F, libdir = "lib")
+
