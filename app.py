@@ -8,6 +8,7 @@ from matplotlib import rc
 import pickle
 
 # from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
+from streamlit_graphs import subtypes_pieplot
 
 from visualize import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas
 
@@ -107,12 +108,13 @@ def main():
                 ggseg_aseg = plot_aseg_atlas(T = T, S = S, subtype = subtype_visualize, slider = slider)       
                 st.pyplot(ggseg_aseg)
 
+        html_file = subtype_visualize.replace(" ","_")
 
         col3, col4 = st.columns([1,4])
 
         if col3.button('Open 3D visualiszation in a new tab'):          
             # 2. LOAD FROM FILE
-            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{subtype_visualize}.html"
+            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
             webbrowser.open(filename, new = 2)
 
         if col4.button('Download visualisation as HTML file'):
@@ -140,58 +142,58 @@ def main():
 
         st.plotly_chart(eventCenters)
 
-    elif chosen_plot_type == '3D Visualisation':
+    # elif chosen_plot_type == '3D Visualisation':
 
-        options_subtypes = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
-        options_regions = ['Cortical','Subcortical']
-        chosen_subtype = st.selectbox('Select subtype for 3D visualization:', options_subtypes)
-        chosen_region = st.selectbox('Select regions to visualize:', options_regions)
+    #     options_subtypes = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
+    #     options_regions = ['Cortical','Subcortical']
+    #     chosen_subtype = st.selectbox('Select subtype for 3D visualization:', options_subtypes)
+    #     chosen_region = st.selectbox('Select regions to visualize:', options_regions)
 
-        # GET ATLASES
-        dk_3d = ggseg3d.get_atlas('dk_3d', surface = ["LCBC",'inflated'], hemisphere = ['left','right'])
-        aseg_3d = ggseg3d.get_atlas('aseg_3d', surface = "LCBC", hemisphere = 'subcort')
+    #     # GET ATLASES
+    #     dk_3d = ggseg3d.get_atlas('dk_3d', surface = ["LCBC",'inflated'], hemisphere = ['left','right'])
+    #     aseg_3d = ggseg3d.get_atlas('aseg_3d', surface = "LCBC", hemisphere = 'subcort')
 
-        # MAP DK-DATA
-        dk_mapped = dk_regions_3D(T)
+    #     # MAP DK-DATA
+    #     dk_mapped = dk_regions_3D(T)
 
-        # SPECIFY COLORS FOR SEQUENTIAL PALETTE
-        colors = robjects.r('''
-            c('#6e0101','#ffabab')
-            ''')
+    #     # SPECIFY COLORS FOR SEQUENTIAL PALETTE
+    #     colors = robjects.r('''
+    #         c('#6e0101','#ffabab')
+    #         ''')
 
-        if chosen_region == "Cortical":
+    #     if chosen_region == "Cortical":
 
-            # CONVERT DK-DATA
-            dk_data = dk_df_3D(T, S, mapped_dict = dk_mapped, subtype = chosen_subtype)
-            with localconverter(robjects.default_converter + pandas2ri.converter):
-                dk_data_R = robjects.conversion.py2rpy(dk_data)
+    #         # CONVERT DK-DATA
+    #         dk_data = dk_df_3D(T, S, mapped_dict = dk_mapped, subtype = chosen_subtype)
+    #         with localconverter(robjects.default_converter + pandas2ri.converter):
+    #             dk_data_R = robjects.conversion.py2rpy(dk_data)
 
-            plot_regions = ggseg3d.ggseg3d(dk_data_R, atlas = dk_3d, surface = ["LCBC",'inflated'], hemisphere = ['left','right'],
-                   label = 'region', colour = 'p', palette = colors, vminmax = [0,25])
+    #         plot_regions = ggseg3d.ggseg3d(dk_data_R, atlas = dk_3d, surface = ["LCBC",'inflated'], hemisphere = ['left','right'],
+    #                label = 'region', colour = 'p', palette = colors, vminmax = [0,25])
 
-        elif chosen_region =="Subcortical":
+    #     elif chosen_region =="Subcortical":
             
-            # CONVERT ASEG-DATA
-            aseg_data = aseg_df_3D(T,S, subtype = chosen_subtype)
-            with localconverter(robjects.default_converter + pandas2ri.converter):
-                aseg_data_R = robjects.conversion.py2rpy(aseg_data)
+    #         # CONVERT ASEG-DATA
+    #         aseg_data = aseg_df_3D(T,S, subtype = chosen_subtype)
+    #         with localconverter(robjects.default_converter + pandas2ri.converter):
+    #             aseg_data_R = robjects.conversion.py2rpy(aseg_data)
             
-            plot_regions = ggseg3d.ggseg3d(aseg_data_R, atlas = aseg_3d, surface = "LCBC", hemisphere = 'subcort',
-               label = 'region', colour = 'p', palette = colors, vminmax = [0,25])
+    #         plot_regions = ggseg3d.ggseg3d(aseg_data_R, atlas = aseg_3d, surface = "LCBC", hemisphere = 'subcort',
+    #            label = 'region', colour = 'p', palette = colors, vminmax = [0,25])
 
-        if st.button('Open visualization in a new tab'):
+    #     if st.button('Open visualization in a new tab'):
            
-            # 1. PRINT THE FUNCTION OUTPUT
-            print(plot_regions)
+    #         # 1. PRINT THE FUNCTION OUTPUT
+    #         print(plot_regions)
 
-            # 2. LOAD FROM FILE
-            # filename = "file://"+os.getcwd()+"/notebook_examples/html_outputs/" + "plot_dk.html"
-            # webbrowser.open(filename, new = 2)
+    #         # 2. LOAD FROM FILE
+    #         # filename = "file://"+os.getcwd()+"/notebook_examples/html_outputs/" + "plot_dk.html"
+    #         # webbrowser.open(filename, new = 2)
 
-        if st.button('Download visualisation as HTML file'):
+    #     if st.button('Download visualisation as HTML file'):
 
-            htmlwidgets.saveWidget(plot_regions, f"html_outputs/{chosen_subtype}_{chosen_region}.html", selfcontained = False)
-            st.info(f'File succesfully downloaded to: {os.getcwd()}/html_outputs')
+    #         htmlwidgets.saveWidget(plot_regions, f"html_outputs/{chosen_subtype}_{chosen_region}.html", selfcontained = False)
+    #         st.info(f'File succesfully downloaded to: {os.getcwd()}/html_outputs')
 
 
     elif chosen_plot_type == 'Pie Plot':
@@ -205,28 +207,28 @@ def main():
         fig, out = subtypes_pieplot(default_numbers, options) # labels, pi0_mean, evn_full, evn,num_subtypes, chosen_width, chosen_height, subtype_color
         st.plotly_chart(fig, use_container_width=True)
 
-    #     # BOX PLOT
-    #     chosen_subtypes = st.multiselect('Choose subtype to compare:', options)
+        # # BOX PLOT
+        # chosen_subtypes = st.multiselect('Choose subtype to compare:', options)
 
-    #     color_list = []
-    #     default_color_list = ['#9baee4', '#880000', '#ffa07a', '#04977d', '#fd8ef3']
-    #     for idx, subtype in enumerate(chosen_subtypes):
-    #         subtype_color = st.text_input(f'Choose color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
-    #         color_list.append(subtype_color)
+        # color_list = []
+        # default_color_list = ['#9baee4', '#880000', '#ffa07a', '#04977d', '#fd8ef3']
+        # for idx, subtype in enumerate(chosen_subtypes):
+        #     subtype_color = st.text_input(f'Choose color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
+        #     color_list.append(subtype_color)
 
-    #     color_map = {chosen_subtypes[i]: color_list[i] for i in range(len(chosen_subtypes))}
-    #     order_list = chosen_subtypes
-    #     orderBy = st.selectbox("Select subtype to order by",order_list)
+        # color_map = {chosen_subtypes[i]: color_list[i] for i in range(len(chosen_subtypes))}
+        # order_list = chosen_subtypes
+        # orderBy = st.selectbox("Select subtype to order by",order_list)
 
-    #     eventCenters = event_centers(T = T,
-    #                                 S = S, 
-    #                                 color_list = default_color_list,
-    #                                 chosen_subtypes = chosen_subtypes,
-    #                                 subtype_labels = options, 
-    #                                 orderBy = orderBy,
-    #                                 width = chosen_width,
-    #                                 height = chosen_height)
-    #     st.plotly_chart(eventCenters)
+        # eventCenters = event_centers(T = T,
+        #                             S = S, 
+        #                             color_list = default_color_list,
+        #                             chosen_subtypes = chosen_subtypes,
+        #                             subtype_labels = options, 
+        #                             orderBy = orderBy,
+        #                             width = chosen_width,
+        #                             height = chosen_height)
+        # st.plotly_chart(eventCenters)
 
 main()
 
