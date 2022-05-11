@@ -1,4 +1,12 @@
 library(ggseg3d)
+library(ggseg)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(htmltools)
+library(htmlwidgets)
+library(plotly)
+
 
 # ========== CUSTOM GGSEG_3D =======================================
 
@@ -100,6 +108,9 @@ environment(custom_ggseg) <- asNamespace('ggseg3d')
 dk_data <- read.csv(file = 'data/dk_R_slider_Subtype 4.csv')
 aseg_data <- read.csv(file = 'data/aseg_R_slider_Subtype 4.csv')
 
+# make a change for better sequentiol HEX values
+colors = c("indianred4",'indianred2','coral1','lightpink1','mistyrose1')
+
 dk = custom_ggseg(.data = dk_data,
              atlas = dk_3d,
              hemisphere = c('left','right'),
@@ -138,5 +149,5 @@ fig2
 
 # SAVE 3D PLOTS TO LOAD THEM INTO STREAMLIT 
 
-saveWidget(fig2, "html_3D/slider/Subtype 4.html", selfcontained = F, libdir = "lib")
+saveWidget(fig2, "html_3D/slider/Subtype_4.html", selfcontained = F, libdir = "sub4")
 
