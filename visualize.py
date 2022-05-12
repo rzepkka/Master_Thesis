@@ -178,6 +178,7 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
                                    tick0 = 0.0, 
                                    dtick = 0.1),
                       title_font_size=34,
+                      title_x=0.5,
                       hovermode=False)
 
     fig.update_layout(legend_font_size=22)
