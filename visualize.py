@@ -9,6 +9,7 @@ import plotly.graph_objs as go
 import plotly.offline as pyo
 import ggseg
 from collections import Counter
+from plotly.subplots import make_subplots
 
 from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
 
@@ -195,7 +196,171 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
 
 # ============= PATIENT STAGING =============================================================================================================================================================
 
-def staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02):
+def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=900):
+    """
+    Creates a barplot
+    :param S: dictionary, Snowphlake output
+    :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
+    :param color_list: list with color hex values
+    :param num_bins: int, how many bins should be displayed
+    :param bin_width: int
+    :return: plotly go Bar figure
+    """  
+    
+    # Convert NaNs to 0.0
+    staging = np.array([np.float64(0.0) if np.isnan(stage) else stage for stage in S['staging']])
+   
+    # Count number of each subtype occurences
+    counter = dict(Counter(diagnosis))
+        
+    # Get labels
+    labels = list(set(diagnosis))[::-1]
+    
+    # Get indexes
+    diagnosis = np.array(diagnosis)
+    staging = np.array(staging)
+    
+    # Get indexes for each diagnostic label
+    idx_list = []
+    for l in labels:
+        idx = np.where(diagnosis==l)
+        idx = idx[0]
+        idx_list.append(idx)
+
+    # Bar settings
+    num_bins = num_bins
+    bin_width = np.repeat(bin_width, num_bins)
+          
+    color_list = color_list
+        
+    count=-1    
+    num_bins = num_bins
+    bar_width = np.repeat(0.02, num_bins)
+    counter = dict(Counter(diagnosis))
+
+    fig = go.Figure()
+    
+    for idx in idx_list:
+                if len(idx)>0:
+                    count=count+1;
+                freq,binc=np.histogram(staging[idx],bins=num_bins)
+                freq = (1.*freq)/len(staging)
+                
+                label = labels[count]
+
+                fig.add_trace(go.Bar(
+                            x=binc[:-1],
+                            y=freq,
+                            name=f'{label} (n = {counter[label]})',
+                            width=bin_width,
+                            marker_color=color_list[count]
+                )) 
+                
+    fig.update_layout(
+        title="Patient Staging",
+        title_font_size=34,
+        title_x=0.5,
+        xaxis_title="Disease Stage",
+        yaxis_title="Frequency of occurences",
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0.0,
+            dtick = 0.1
+        ),
+        barmode='group',
+        legend_font_size=22,
+        # legend=dict(
+        #     yanchor="top",
+        #     y=0.95,
+        #     xanchor="right",
+        #     x=0.95),
+        autosize = False,
+        width=width,
+        height=height
+    )
+    
+    fig.update_xaxes(range=[-0.05, 1.0])
+    
+    fig.update_yaxes(title_font_size = 18, 
+                    tickfont_size=14)
+    
+    fig.update_xaxes(title_font_size = 18, 
+                    tickfont_size = 14)
+
+    return fig
+
+def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400):
+    """
+    Creates a boxplot
+    :param S: dictionary, Snowphlake output
+    :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
+    :param color_list: list with color hex values
+    :return: plotly go Box figure
+    """
+    
+    # Convert NaNs to 0.0
+    staging = np.array([np.float64(0.0) if np.isnan(stage) else stage for stage in S['staging']])
+   
+    # Count number of each subtype occurences
+    counter = dict(Counter(diagnosis))
+        
+    # Get labels
+    labels = list(set(diagnosis))[::-1]
+    
+    # Get indexes
+    diagnosis = np.array(diagnosis)
+    staging = np.array(staging)
+    
+    # Get indexes for each diagnostic label
+    idx_list = []
+    for l in labels:
+        idx = np.where(diagnosis==l)
+        idx = idx[0]
+        idx_list.append(idx)
+           
+    fig = go.Figure()
+
+    for count, idx in enumerate(idx_list):
+        fig.add_trace(go.Box(x=staging[idx], name=labels[count],
+                             fillcolor=color_list[count],
+                            line_color='#000000'))
+
+    fig.update_xaxes(range=[-0.05, 1.0])
+
+    fig.update_layout(
+            title="Staging - Boxplots",
+            title_font_size=34,
+            title_x=0.5,
+            xaxis_title="Disease Stage",
+            yaxis_title="Diagnosis",
+            xaxis = dict(
+                tickmode = 'linear',
+                tick0 = 0.0,
+                dtick = 0.1
+            ),
+            legend_font_size=22,
+            # legend=dict(
+            #     yanchor="top",
+            #     y=0.97,
+            #     xanchor="right",
+            #     x=0.97),
+            autosize = False,
+            width=width,
+            height=height
+        )
+    
+    fig.update_yaxes(title_font_size = 18, 
+                    tickfont_size=14)
+    
+    fig.update_xaxes(title_font_size = 18, 
+                    tickfont_size = 14)
+
+    return fig
+
+
+
+# Both plots at one Figure
+def staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=800):
     """
     Creates a barplot
     :param S: dictionary, Snowphlake output
@@ -214,7 +379,6 @@ def staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02):
         
     # Get labels
     labels = list(set(diagnosis))
-#     labels = labels[::-1]
     
     # Convers lists to np.arrays
     diagnosis = np.array(diagnosis)
@@ -248,6 +412,17 @@ def staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02):
                             marker_color=color_list[count]
                 ),row=1, col=1) 
 
+    # ADD BOXES BELOW
+        
+    for count, idx in enumerate(idx_list):
+        fig.add_trace(go.Box(x=staging[idx], 
+                             name=labels[count],
+                             fillcolor=color_list[count],
+                            line_color='#000000',
+                            showlegend=False),
+                      row=2,col=1)    
+        
+    #STYLE THE PLOT
     fig.update_layout(
         title="Patient Staging",
         title_font_size=34,
@@ -262,22 +437,13 @@ def staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02):
         barmode='group',
         legend_font_size=16,
         autosize = False,
-        width=1000,
-        height=1200
+        width=width,
+        height=height,
+        hovermode="closest"
     )
-    
-    # ADD BOXES BELOW
-        
-    for count, idx in enumerate(idx_list):
-        fig.add_trace(go.Box(x=staging[idx], 
-                             name=labels[count],
-                             fillcolor=color_list[count],
-                            line_color='#000000',
-                            showlegend=False),
-                      row=2,col=1)    
-        
-    #STYLE THE PLOT
-    fig.update_layout(hovermode="closest")
+
+    # fig.update_layout(hovermode="closest",
+    #                 xaxis_title="Disease Stage")
     
     fig.update_xaxes(range=[-0.05, 1.0],row=1, col=1)
     
