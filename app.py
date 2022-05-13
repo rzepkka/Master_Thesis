@@ -93,6 +93,8 @@ def main():
     
         col1, col2 = st.columns([2,3.2])
 
+        # ======================= 2D ===============================================================================================================
+
         if subtype_visualize != None:
             slider = st.slider(label = 'Choose regions to display', 
                                 help = 'Only display regions with ordering <= to the chosen value',
@@ -108,8 +110,9 @@ def main():
                 ggseg_aseg = plot_aseg_atlas(T = T, S = S, subtype = subtype_visualize, slider = slider)       
                 st.pyplot(ggseg_aseg)
 
-        html_file = subtype_visualize.replace(" ","_")
 
+        # ======================= 3D ===============================================================================================================
+        html_file = subtype_visualize.replace(" ","_")
         col3, col4 = st.columns([1,4])
 
         if col3.button('Open 3D visualiszation in a new tab'):          
@@ -120,6 +123,7 @@ def main():
         if col4.button('Download visualisation as HTML file'):
             pass
 
+        # ======================= EVENT CENTERS ===============================================================================================================
 
         chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
 
@@ -141,6 +145,20 @@ def main():
                                     slider = slider)
 
         st.plotly_chart(eventCenters)
+
+
+        # ======================= PATIENT STAGING ===============================================================================================================
+
+    
+
+
+
+
+
+
+
+
+
 
     # elif chosen_plot_type == '3D Visualisation':
 
