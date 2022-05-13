@@ -270,11 +270,11 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
         ),
         barmode='group',
         legend_font_size=22,
-        # legend=dict(
-        #     yanchor="top",
-        #     y=0.95,
-        #     xanchor="right",
-        #     x=0.95),
+        legend=dict(
+            yanchor="top",
+            y=0.95,
+            xanchor="right",
+            x=0.95),
         autosize = False,
         width=width,
         height=height
@@ -340,12 +340,13 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400):
                 tick0 = 0.0,
                 dtick = 0.1
             ),
-            legend_font_size=22,
+            # legend_font_size=22,
             # legend=dict(
             #     yanchor="top",
             #     y=0.97,
             #     xanchor="right",
             #     x=0.97),
+            showlegend=False,
             autosize = False,
             width=width,
             height=height
