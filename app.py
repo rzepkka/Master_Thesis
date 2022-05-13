@@ -179,7 +179,8 @@ def main():
         # BOXES
         box_staging = staging_boxes(S=S,
                                 diagnosis=diagnosis,
-                                color_list=color_list)
+                                color_list=color_list,
+                                width=chosen_width)
         
         st.plotly_chart(box_staging)
 
