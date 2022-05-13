@@ -4,36 +4,36 @@ import streamlit.components.v1 as components
 
 import scipy.stats 
 import pandas as pd
-from matplotlib import rc
+import numpy as np
 import pickle
+import numpy as np
+import os
+import webbrowser
+from collections import Counter
 
-# from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
-from streamlit_graphs import subtypes_pieplot
-
-from visualize import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas
-
-# from streamlit_echarts import st_echarts
-
-# from mapping_2D import mapping_dk, dk_dict, aseg_dict
-from mapping_3D import dk_regions_3D, dk_df_3D, aseg_df_3D
-
-from pathlib import Path
-import base64
-import time
 import matplotlib.pyplot as plt
+from matplotlib import rc
 
 # rpy2
 import rpy2
 import rpy2.robjects.packages as rpackages
-from rpy2.robjects.packages import importr, data
-
 import rpy2.robjects as robjects
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects import pandas2ri
+from rpy2.robjects.packages import importr, data
 
-import os
-import webbrowser
 
+# IMPORT MY FUNCTIONS
+# from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
+from streamlit_graphs import subtypes_pieplot
+
+from visualize import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, staging, patient_staging, staging_boxes
+
+# from streamlit_echarts import st_echarts
+# from mapping_2D import mapping_dk, dk_dict, aseg_dict
+# from mapping_3D import dk_regions_3D, dk_df_3D, aseg_df_3D
+
+# LOAD R PACKAGES
 utils = importr('utils')
 base = importr("base")
 datasets = importr('datasets')
@@ -43,12 +43,11 @@ dplyr = importr("dplyr")
 tidyr = importr("tidyr")
 htmlwidgets = importr('htmlwidgets')
 htmltools = importr('htmltools')
-
 ggseg3d = importr('ggseg3d')
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-# Import Pikle File
+# LOAD PICKLE FILE
 read_input_file = open('data/ADC_FTLD_subtypes_agecorrected_zscore_final.pickle','rb')
 load_inputs = pickle.load(read_input_file)
 read_input_file.close()
@@ -73,27 +72,17 @@ def main():
 
         options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(options)
-
-    
+ 
         subtype_list = []
         subtype_visualize = st.selectbox('Select a subtype to visualize:', options)       
         subtype_list.append(subtype_visualize)
 
-        options_compare = []
-
-        # list for additional subtypes to compare
-        for label in options:
-            if label == subtype_visualize:
-                pass
-            else: options_compare.append(label)
-
         color_list = []
-        default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']
-
-    
-        col1, col2 = st.columns([2,3.2])
+        default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']  
 
         # ======================= 2D ===============================================================================================================
+        
+        col1, col2 = st.columns([2,3.2])
 
         if subtype_visualize != None:
             slider = st.slider(label = 'Choose regions to display', 
@@ -103,20 +92,26 @@ def main():
                                 value=1.0, step=0.01)
         
             with col1:
-                ggseg_dk = plot_dk_atlas(T = T, S = S, subtype = subtype_visualize, slider = slider)
+                ggseg_dk = plot_dk_atlas(T = T, 
+                                        S = S, 
+                                        subtype = subtype_visualize, 
+                                        slider = slider)
                 st.pyplot(ggseg_dk)
 
             with col2:     
-                ggseg_aseg = plot_aseg_atlas(T = T, S = S, subtype = subtype_visualize, slider = slider)       
+                ggseg_aseg = plot_aseg_atlas(T = T, 
+                                        S = S, 
+                                        subtype = subtype_visualize, 
+                                        slider = slider)       
                 st.pyplot(ggseg_aseg)
 
 
         # ======================= 3D ===============================================================================================================
+        
         html_file = subtype_visualize.replace(" ","_")
         col3, col4 = st.columns([1,4])
 
         if col3.button('Open 3D visualiszation in a new tab'):          
-            # 2. LOAD FROM FILE
             filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
             webbrowser.open(filename, new = 2)
 
@@ -124,6 +119,14 @@ def main():
             pass
 
         # ======================= EVENT CENTERS ===============================================================================================================
+
+        # list for additional subtypes to compare
+        options_compare = []
+        for label in options:
+            if label == subtype_visualize:
+                pass
+            else: 
+                options_compare.append(label)
 
         chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
 
@@ -149,7 +152,36 @@ def main():
 
         # ======================= PATIENT STAGING ===============================================================================================================
 
-    
+
+        # load diagnosis variable
+        diagnosis = np.array(['Control' if np.isnan(subtype) else "FTD" for subtype in S['subtypes']])
+
+        color_list = ['#4daf4a','#377eb8','#e41a1c', '#ffff00']
+
+        # plot_staging = staging(S=S,
+        #                         diagnosis=diagnosis, 
+        #                         color_list = color_list,
+        #                         num_bins=10, 
+        #                         bin_width=0.04,
+        #                         width = chosen_width,
+        #                         height = chosen_height)
+
+        plot_staging = patient_staging(S=S,
+                                diagnosis=diagnosis, 
+                                color_list = color_list,
+                                num_bins=10, 
+                                bin_width=0.04,
+                                width = chosen_width,
+                                height = chosen_height)
+        
+        st.plotly_chart(plot_staging)
+
+        # BOXES
+        box_staging = staging_boxes(S=S,
+                                diagnosis=diagnosis,
+                                color_list=color_list)
+        
+        st.plotly_chart(box_staging)
 
 
 
