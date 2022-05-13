@@ -9,7 +9,6 @@ library(plotly)
 
 
 # ========== CUSTOM GGSEG_3D =======================================
-
 custom_ggseg <- function(.data=NULL, atlas="dk_3d",
                     surface = "LCBC", hemisphere = c("right","subcort"),
                     label = "region", text = NULL, colour = "colour",
@@ -86,7 +85,6 @@ custom_ggseg <- function(.data=NULL, atlas="dk_3d",
     
     dt_leg <- dplyr::mutate(pal.colours,
                             x = 0, y = 0, z = 0)
-    
     p <- plotly::add_trace(p, data = dt_leg,
                            x = ~ x, y = ~ y, z = ~ z,
                            
