@@ -253,7 +253,8 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
                             y=freq,
                             name=f'{label} (n = {counter[label]})',
                             width=bin_width,
-                            marker_color=color_list[count]
+                            marker_color=color_list[count],
+                            opacity=0.8
                 )) 
                 
     fig.update_layout(
@@ -323,7 +324,8 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400):
     for count, idx in enumerate(idx_list):
         fig.add_trace(go.Box(x=staging[idx], name=labels[count],
                              fillcolor=color_list[count],
-                            line_color='#000000'))
+                            line_color='#000000',
+                            opacity=0.8))
 
     fig.update_xaxes(range=[-0.05, 1.0])
 
