@@ -85,7 +85,7 @@ def subtypes_piechart(S,diagnosis,diagnostic_labels_for_plotting,title = None,su
 # ============= EVENT CENTERS =============================================================================================================================================================
 
 def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
-        subtype_labels = None, orderBy = None, width=1200, height=900, slider = None):
+        subtype_labels = None, orderBy = None, width=1050, height=900, slider = None, fontsize=[34,18,14,22]):
     
     """
     Creates event centers box plots for multiple subtypes
@@ -169,22 +169,29 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
     labels_sorted = list(df_sorted.index)
     labels_sorted.reverse()
 
+    font_title, font_axes, font_ticks, font_legend = fontsize
+
     fig.update_yaxes(categoryarray=labels_sorted, 
                     categoryorder="array", 
-                    title_font_size = 18, 
-                    tickfont_size=14)
+                    title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
 
-    fig.update_xaxes(title_font_size = 18, 
-                    tickfont_size = 14)
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
     
     fig.update_layout(xaxis = dict(tickmode = 'linear', 
                                    tick0 = 0.0, 
                                    dtick = 0.1),
-                      title_font_size=34,
+                      title_font_size=font_title,
                       title_x=0.5,
                       hovermode=False)
 
-    fig.update_layout(legend_font_size=22)
+    fig.update_layout(legend_font_size=font_legend,
+                    legend=dict(
+                        yanchor="top",
+                        y=0.90,
+                        xanchor="right",
+                        x=0.95))
 
     fig.add_vline(x=slider, line_width=2, line_dash="dash", line_color="red",
                   annotation_text=f"Slider value = {slider}",
@@ -196,7 +203,8 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
 
 # ============= PATIENT STAGING =============================================================================================================================================================
 
-def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=900):
+def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=900, 
+                        fontsize=[34,18,14,22], opacity=0.8):
     """
     Creates a barplot
     :param S: dictionary, Snowphlake output
@@ -239,27 +247,27 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
     counter = dict(Counter(diagnosis))
 
     fig = go.Figure()
-    
-    for idx in idx_list:
-                if len(idx)>0:
-                    count=count+1;
-                freq,binc=np.histogram(staging[idx],bins=num_bins)
-                freq = (1.*freq)/len(staging)
-                
-                label = labels[count]
 
-                fig.add_trace(go.Bar(
-                            x=binc[:-1],
-                            y=freq,
-                            name=f'{label} (n = {counter[label]})',
-                            width=bin_width,
-                            marker_color=color_list[count],
-                            opacity=0.8
-                )) 
+    for count, idx in enumerate(idx_list):
+        freq,binc=np.histogram(staging[idx],bins=num_bins)
+        freq = (1.*freq)/len(staging)
+        label = labels[count]
+
+        fig.add_trace(go.Bar(
+                    x=binc,
+                    y=freq,
+                    name=f'{label} (n = {counter[label]})',
+                    width=bin_width,
+                    marker_color=color_list[count],
+                    opacity=opacity
+        )) 
                 
+
+    font_title, font_axes, font_ticks, font_legend = fontsize
+
     fig.update_layout(
         title="Patient Staging",
-        title_font_size=34,
+        title_font_size=font_title,
         title_x=0.5,
         xaxis_title="Disease Stage",
         yaxis_title="Frequency of occurences",
@@ -269,7 +277,7 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
             dtick = 0.1
         ),
         barmode='group',
-        legend_font_size=22,
+        legend_font_size=font_legend,
         legend=dict(
             yanchor="top",
             y=0.95,
@@ -282,15 +290,15 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
     
     fig.update_xaxes(range=[-0.05, 1.0])
     
-    fig.update_yaxes(title_font_size = 18, 
-                    tickfont_size=14)
+    fig.update_yaxes(title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
     
-    fig.update_xaxes(title_font_size = 18, 
-                    tickfont_size = 14)
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
 
     return fig
 
-def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400):
+def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
     """
     Creates a boxplot
     :param S: dictionary, Snowphlake output
@@ -329,9 +337,11 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400):
 
     fig.update_xaxes(range=[-0.05, 1.0])
 
+    font_title, font_axes, font_ticks, font_legend = fontsize
+
     fig.update_layout(
-            title="Staging - Boxplots",
-            title_font_size=34,
+            # title="Staging - Boxplots",
+            title_font_size=font_title,
             title_x=0.5,
             xaxis_title="Disease Stage",
             yaxis_title="Diagnosis",
@@ -340,7 +350,7 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400):
                 tick0 = 0.0,
                 dtick = 0.1
             ),
-            # legend_font_size=22,
+            legend_font_size=font_legend,
             # legend=dict(
             #     yanchor="top",
             #     y=0.97,
@@ -352,11 +362,11 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400):
             height=height
         )
     
-    fig.update_yaxes(title_font_size = 18, 
-                    tickfont_size=14)
+    fig.update_yaxes(title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
     
-    fig.update_xaxes(title_font_size = 18, 
-                    tickfont_size = 14)
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
 
     return fig
 

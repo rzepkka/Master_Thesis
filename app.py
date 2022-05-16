@@ -67,6 +67,8 @@ def main():
 
     local_css("style.css")
 
+    st.header('Disease progression timeline')
+
     # SELECT PLOT
     plot_type_list = ['Disease timeline', '3D Visualisation', 'Pie Plot']
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
@@ -77,46 +79,49 @@ def main():
 
     if chosen_plot_type == 'Disease timeline':
 
-        # BUTTONS
-        col3, col4 = st.columns([1,6])
-
-        if col3.button('Open 3D visualiszation in a new tab'):          
-            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
-            webbrowser.open(filename, new = 2)
-
-        if col4.button('Download 3D visualisation as HTML file'):
-            pass
-
         # SELECTION
         options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(options)
  
         subtype_list = []
-        subtype_visualize = st.selectbox('Select a subtype to visualize:', options)       
+        subtype_visualize = st.selectbox('Select a subtype to visualize:',options)       
         subtype_list.append(subtype_visualize)
+
+        # BUTTONS
+        html_file = subtype_visualize.replace(" ","_")
+
+        if st.sidebar.button('Open 3D visualiszation in a new tab'):
+            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
+            webbrowser.open(filename, new = 2)
+
+        if st.sidebar.button('Download 3D visualisation as HTML file'):
+            st.sidebar.warning('Feature not added yet')
 
         color_list = []
         default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']  
 
         # ======================= 2D ===============================================================================================================
         
-        col1, col2 = st.columns([2,3.2])
+        col_cortical, col_subcortical, col_blank = st.columns([2,3.2,3])
 
         if subtype_visualize != None:
-            slider = st.slider(label = 'Choose regions to display', 
-                                help = 'Only display regions with ordering <= to the chosen value',
-                                min_value = 0.0, 
-                                max_value = 1.0, 
-                                value=1.0, step=0.01)
+
+            col_slider, col_slider_blank = st.columns([5.2,3])
+            with col_slider:
+                slider = st.slider(label = 'Choose regions to display', 
+                                    help = 'Only display regions with ordering <= to the chosen value',
+                                    min_value = 0.0, 
+                                    max_value = 1.0, 
+                                    value=1.0, step=0.01)
         
-            with col1:
+            with col_cortical:
                 ggseg_dk = plot_dk_atlas(T = T, 
                                         S = S, 
                                         subtype = subtype_visualize, 
                                         slider = slider)
                 st.pyplot(ggseg_dk)
 
-            with col2:     
+            with col_subcortical:     
                 ggseg_aseg = plot_aseg_atlas(T = T, 
                                         S = S, 
                                         subtype = subtype_visualize, 
@@ -124,17 +129,6 @@ def main():
                 st.pyplot(ggseg_aseg)
 
 
-        # ======================= 3D ===============================================================================================================
-        
-        html_file = subtype_visualize.replace(" ","_")
-        # col3, col4 = st.columns([1,4])
-
-        # if col3.button('Open 3D visualiszation in a new tab'):          
-        #     filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
-        #     webbrowser.open(filename, new = 2)
-
-        # if col4.button('Download visualisation as HTML file'):
-        #     pass
 
         # ======================= EVENT CENTERS ===============================================================================================================
 
@@ -146,14 +140,25 @@ def main():
             else: 
                 options_compare.append(label)
 
-        chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
+        col_event_centers, col_event_centers_options = st.columns([3,1])
 
-        for subtype in chosen_subtypes:
-            subtype_list.append(subtype)
+        with col_event_centers_options:
+            st.subheader('Style event centers graph')
+            chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
 
-        for idx, subtype in enumerate(subtype_list):
-            subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
-            color_list.append(subtype_color)
+            title_font = st.number_input('Title size:',value=34)
+            title_axes = st.number_input('Axis labels size:',value=18)
+            title_ticks = st.number_input('Ticks size:',value=14)
+            title_legend = st.number_input('Legend size:',value=22)
+
+            font_list = [title_font, title_axes, title_ticks, title_legend]
+
+            for subtype in chosen_subtypes:
+                subtype_list.append(subtype)
+
+            for idx, subtype in enumerate(subtype_list):
+                subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
+                color_list.append(subtype_color)
 
         eventCenters = event_centers(T = T,
                                     S = S, 
@@ -163,47 +168,75 @@ def main():
                                     orderBy = subtype_visualize,
                                     width = chosen_width,
                                     height = chosen_height,
-                                    slider = slider)
+                                    slider = slider,
+                                    fontsize = font_list)
+        with col_event_centers:
+            st.plotly_chart(eventCenters)
 
-        st.plotly_chart(eventCenters)
+        # ADD DIVIDER
+        st.markdown('---')
 
 
         # ======================= PATIENT STAGING ===============================================================================================================
 
+        col_staging, col_staging_options = st.columns([3,1])
 
         # load diagnosis variable
         diagnosis = np.array(['Control' if np.isnan(subtype) else "FTD" for subtype in S['subtypes']])
 
+        diagnosis_labels = list(set(diagnosis))
+
         color_list = ['#4daf4a','#377eb8','#e41a1c', '#ffff00']
+        color_diagnosis =[]
 
-        # plot_staging = staging(S=S,
-        #                         diagnosis=diagnosis, 
-        #                         color_list = color_list,
-        #                         num_bins=10, 
-        #                         bin_width=0.04,
-        #                         width = chosen_width,
-        #                         height = chosen_height)
 
+        with col_staging_options:
+            st.subheader('Style patient staging graphs')
+
+            num_bins = st.number_input('Select the number of bins', value = 10)
+            bin_width = st.number_input('Select bin width:', value = 0.04)
+            opacity = st.number_input('Select opacity value:', value=0.8)
+
+            title_font = st.number_input('Title font:',value=34)
+            title_axes = st.number_input('Axis labels font:',value=18)
+            title_ticks = st.number_input('Ticks size font:',value=14)
+            title_legend = st.number_input('Legend font:',value=22)
+
+            font_list = [title_font, title_axes, title_ticks, title_legend]
+
+            for idx, label in enumerate(diagnosis_labels):
+                color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
+                color_diagnosis.append(color)
+
+
+        # BARPLOT
         plot_staging = patient_staging(S=S,
                                 diagnosis=diagnosis, 
-                                color_list = color_list,
-                                num_bins=10, 
-                                bin_width=0.04,
+                                color_list = color_diagnosis,
+                                num_bins=num_bins, 
+                                bin_width=bin_width,
                                 width = chosen_width,
-                                height = chosen_height)
+                                height = chosen_height,
+                                fontsize=font_list,
+                                opacity=opacity)
         
-        st.plotly_chart(plot_staging)
+        
 
-        # BOXES
+        # BOX
         box_staging = staging_boxes(S=S,
                                 diagnosis=diagnosis,
-                                color_list=color_list,
-                                width=chosen_width)
+                                color_list=color_diagnosis,
+                                width=chosen_width,
+                                fontsize=font_list)
         
-        st.plotly_chart(box_staging)
+        with col_staging:
+            st.plotly_chart(plot_staging)
+            st.plotly_chart(box_staging)
 
 
 
+        # ADD DIVIDER
+        st.markdown('---')
 
 
 
