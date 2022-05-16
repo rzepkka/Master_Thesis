@@ -25,7 +25,7 @@ from rpy2.robjects.packages import importr, data
 
 # IMPORT MY FUNCTIONS
 # from streamlit_graphs import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, subtypes_pieplot
-from streamlit_graphs import subtypes_pieplot
+# from streamlit_graphs import subtypes_pieplot
 
 from visualize import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, staging, patient_staging, staging_boxes
 
@@ -47,6 +47,7 @@ ggseg3d = importr('ggseg3d')
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
+
 # LOAD PICKLE FILE
 read_input_file = open('data/ADC_FTLD_subtypes_agecorrected_zscore_final.pickle','rb')
 load_inputs = pickle.load(read_input_file)
@@ -60,6 +61,12 @@ def main():
     st.set_page_config(layout="wide")
     st.sidebar.header("Adjusting Plots")
 
+    def local_css(file_name):
+        with open(file_name) as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+    local_css("style.css")
+
     # SELECT PLOT
     plot_type_list = ['Disease timeline', '3D Visualisation', 'Pie Plot']
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
@@ -70,6 +77,17 @@ def main():
 
     if chosen_plot_type == 'Disease timeline':
 
+        # BUTTONS
+        col3, col4 = st.columns([1,6])
+
+        if col3.button('Open 3D visualiszation in a new tab'):          
+            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
+            webbrowser.open(filename, new = 2)
+
+        if col4.button('Download 3D visualisation as HTML file'):
+            pass
+
+        # SELECTION
         options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(options)
  
@@ -109,14 +127,14 @@ def main():
         # ======================= 3D ===============================================================================================================
         
         html_file = subtype_visualize.replace(" ","_")
-        col3, col4 = st.columns([1,4])
+        # col3, col4 = st.columns([1,4])
 
-        if col3.button('Open 3D visualiszation in a new tab'):          
-            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
-            webbrowser.open(filename, new = 2)
+        # if col3.button('Open 3D visualiszation in a new tab'):          
+        #     filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
+        #     webbrowser.open(filename, new = 2)
 
-        if col4.button('Download visualisation as HTML file'):
-            pass
+        # if col4.button('Download visualisation as HTML file'):
+        #     pass
 
         # ======================= EVENT CENTERS ===============================================================================================================
 
