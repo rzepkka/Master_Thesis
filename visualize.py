@@ -10,6 +10,7 @@ import plotly.offline as pyo
 import ggseg
 from collections import Counter
 from plotly.subplots import make_subplots
+import collections
 
 from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
 
@@ -81,6 +82,34 @@ def subtypes_piechart(S,diagnosis,diagnostic_labels_for_plotting,title = None,su
 
     return fig, ax
     
+
+# ============= PIE CHART =============================================================================================================================================================
+
+def subtype_piechart(S, subtype_labels=None):
+    
+    # Get subtype labels
+    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+    if subtype_labels is None:
+        subtype_labels = []
+        for i in range(len(unique_subtypes)):
+            subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
+    
+    # Count number of each subtype
+    counter = dict(Counter(S['subtypes'][~np.isnan(S['subtypes'])]))
+    counter = collections.OrderedDict(sorted(counter.items()))
+    
+    # data for plotting
+    values = list(counter.values())
+    labels = list(subtype_labels)
+    
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='value+percent')]) # , pull=[0, 0, 0.2, 0]
+        
+    fig.update_layout(title="Subtypes Pie Chart",
+                      title_x=0.5,
+                      title_font_size=24,
+                      legend_font_size=18)
+    
+    return fig
 
 # ============= EVENT CENTERS =============================================================================================================================================================
 
@@ -256,7 +285,7 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
         fig.add_trace(go.Bar(
                     x=binc,
                     y=freq,
-                    name=f'{label} (n = {counter[label]})',
+                    name=f'{label} (n = {counter[label]})', 
                     width=bin_width,
                     marker_color=color_list[count],
                     opacity=opacity
