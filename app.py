@@ -10,9 +10,14 @@ import numpy as np
 import os
 import webbrowser
 from collections import Counter
+import collections
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
+
+#
+import plotly.graph_objs as go
+from ipywidgets import Output
 
 import rpy2
 import rpy2.robjects.packages as rpackages
@@ -23,6 +28,7 @@ from rpy2.robjects.packages import importr, data
 
 from visualize import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, staging, patient_staging, staging_boxes, subtype_piechart
 
+from visualize import atypicality, atypicality_boxes
 
 # LOAD R PACKAGES
 utils = importr('utils')
@@ -44,8 +50,16 @@ read_input_file = open('data/ADC_FTLD_subtypes_agecorrected_zscore_final.pickle'
 load_inputs = pickle.load(read_input_file)
 read_input_file.close()
 
-T, S, X = load_inputs
+T, S, Sboot = load_inputs
 
+def get_labels(S):
+    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+    subtype_labels = []
+    for i in range(len(unique_subtypes)):
+        subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
+    return subtype_labels
+
+labels = get_labels(S=S)
 
 def main():
 
@@ -55,7 +69,6 @@ def main():
     def local_css(file_name):
         with open(file_name) as f:
             st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
     local_css("style.css")
 
     st.header('Disease progression timeline')
@@ -75,7 +88,7 @@ def main():
 
         # SELECTION
         options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
-        num_subtypes = len(options)
+        num_subtypes = len(labels)
  
         subtype_list = []
 
@@ -186,28 +199,65 @@ def main():
         color_list = ['#4daf4a','#377eb8','#e41a1c', '#ffff00']
         color_diagnosis =[]
 
+        chosen_plot = col_staging.selectbox('Select plot:',['Patient Staging', 'Atypicality', 'Both'])
+
+        #  ================== PATIENT STAGING =================================================================================================================
 
         with col_staging_options:
-            st.subheader('Style patient staging graphs')
-
-            num_bins = st.number_input('Select the number of bins', value = 10)
-            bin_width = st.number_input('Select bin width:', value = 0.04)
+            st.subheader('Style the graphs') 
             opacity = st.number_input('Select opacity value:', value=0.8)
-
             title_font = st.number_input('Title font:',value=34)
             title_axes = st.number_input('Axis labels font:',value=18)
             title_ticks = st.number_input('Ticks size font:',value=14)
             title_legend = st.number_input('Legend font:',value=22)
-
             font_list = [title_font, title_axes, title_ticks, title_legend]
 
-            for idx, label in enumerate(diagnosis_labels):
-                color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
-                color_diagnosis.append(color)
 
+        if chosen_plot =='Patient Staging':
 
-        # BARPLOT
-        plot_staging = patient_staging(S=S,
+            with col_staging_options:
+
+                num_bins = st.number_input('Select the number of bins', value = 10)
+                bin_width = st.number_input('Select bin width:', value = 0.04)
+
+                for idx, label in enumerate(diagnosis_labels):
+                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
+                        color_diagnosis.append(color)
+
+                # BARPLOT
+                plot_staging = patient_staging(S=S,
+                                        diagnosis=diagnosis, 
+                                        color_list = color_diagnosis,
+                                        num_bins=num_bins, 
+                                        bin_width=bin_width,
+                                        width = chosen_width,
+                                        height = chosen_height,
+                                        fontsize=font_list,
+                                        opacity=opacity)
+
+                # BOX
+                box_staging = staging_boxes(S=S,
+                                        diagnosis=diagnosis,
+                                        color_list=color_diagnosis,
+                                        width=chosen_width,
+                                        fontsize=font_list)
+
+            with col_staging:
+                st.plotly_chart(plot_staging)
+                st.plotly_chart(box_staging)  
+
+        elif chosen_plot =='Atypicality':   
+
+            with col_staging_options:
+
+                num_bins = st.number_input('Select the number of bins', value = 15)
+                bin_width = st.number_input('Select bin width:', value = 1.2)
+
+                for idx, label in enumerate(diagnosis_labels):
+                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
+                        color_diagnosis.append(color)
+
+                plot_atypicality = atypicality(S=S,
                                 diagnosis=diagnosis, 
                                 color_list = color_diagnosis,
                                 num_bins=num_bins, 
@@ -216,21 +266,17 @@ def main():
                                 height = chosen_height,
                                 fontsize=font_list,
                                 opacity=opacity)
-        
-        
-
-        # BOX
-        box_staging = staging_boxes(S=S,
-                                diagnosis=diagnosis,
-                                color_list=color_diagnosis,
-                                width=chosen_width,
-                                fontsize=font_list)
-        
-        with col_staging:
-            st.plotly_chart(plot_staging)
-            st.plotly_chart(box_staging)
 
 
+                box_atypicality = atypicality_boxes(S=S,
+                                        diagnosis=diagnosis,
+                                        color_list=color_diagnosis,
+                                        width=chosen_width,
+                                        fontsize=font_list)
+
+            with col_staging:
+                    st.plotly_chart(plot_atypicality)
+                    st.plotly_chart(box_atypicality)
 
         # ADD DIVIDER
         st.markdown('---')

@@ -225,7 +225,8 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
     fig.add_vline(x=slider, line_width=2, line_dash="dash", line_color="red",
                   annotation_text=f"Slider value = {slider}",
                   annotation_position="top left",
-                  annotation_font_color="red")
+                  annotation_font_color="red"
+                  )
 
     return fig
 
@@ -497,7 +498,179 @@ def staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, w
 
     return fig
 
+# ============= ATYPICALITY =============================================================================================================================================================
 
+def atypicality(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=900, 
+                        fontsize=[34,18,14,22], opacity=0.8):
+    """
+    Creates a barplot
+    :param S: dictionary, Snowphlake output
+    :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
+    :param color_list: list with color hex values
+    :param num_bins: int, how many bins should be displayed
+    :param bin_width: int
+    :return: plotly go Bar figure
+    """  
+    
+    # Convert NaNs to 0.0
+    atypical = np.array([np.float64(0.0) if np.isnan(x) else x for x in S['atypicality']])
+   
+    # Count number of each subtype occurences
+    counter = dict(Counter(diagnosis))
+        
+    # Get labels
+    labels = list(set(diagnosis))
+    
+    # Get indexes
+    diagnosis = np.array(diagnosis)
+    atypical = np.array(atypical)
+    
+    # Get indexes for each diagnostic label
+    idx_list = []
+    for l in labels:
+        idx = np.where(diagnosis==l)
+        idx = idx[0]
+        idx_list.append(idx)
+
+    # Bar settings
+    num_bins = num_bins
+    bin_width = np.repeat(bin_width, num_bins)
+          
+    color_list = color_list
+        
+    count=-1    
+    num_bins = num_bins
+    bar_width = np.repeat(0.02, num_bins)
+    counter = dict(Counter(diagnosis))
+
+    fig = go.Figure()
+    
+    for idx in idx_list:
+                if len(idx)>0:
+                    count=count+1;
+                freq,binc=np.histogram(atypical[idx],bins=num_bins)
+                freq = (1.*freq)/len(atypical)
+                
+                label = labels[count]
+
+                fig.add_trace(go.Bar(
+                            x=binc[:-1],
+                            y=freq,
+                            name=f'{label} (n = {counter[label]})',
+                            width=bin_width,
+                            marker_color=color_list[count],
+                            opacity=opacity
+                )) 
+
+    font_title, font_axes, font_ticks, font_legend = fontsize
+                
+    fig.update_layout(
+        title="Atypicality",
+        title_font_size=font_title,
+        title_x=0.5,
+        xaxis_title="Value",
+        yaxis_title="Frequency of occurences",
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0.0,
+            dtick = 2
+        ),
+        barmode='group',
+        legend_font_size=font_legend,
+        legend=dict(
+            yanchor="top",
+            y=0.95,
+            xanchor="right",
+            x=0.95),
+        autosize = False,
+        width=width,
+        height=height
+    )
+    
+    fig.update_xaxes(range=[np.min(atypical)-0.05, np.max(atypical)])
+    
+    fig.update_yaxes(title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
+    
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
+
+    return fig
+
+
+
+
+def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
+    """
+    Creates a boxplot
+    :param S: dictionary, Snowphlake output
+    :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
+    :param color_list: list with color hex values
+    :return: plotly go Box figure
+    """
+    
+    # Convert NaNs to 0.0
+    atypical = np.array([np.float64(0.0) if np.isnan(x) else x for x in S['atypicality']])
+   
+    # Count number of each subtype occurences
+    counter = dict(Counter(diagnosis))
+        
+    # Get labels
+    labels = list(set(diagnosis))
+    
+    # Get indexes
+    diagnosis = np.array(diagnosis)
+    atypical = np.array(atypical)
+    
+    # Get indexes for each diagnostic label
+    idx_list = []
+    for l in labels:
+        idx = np.where(diagnosis==l)
+        idx = idx[0]
+        idx_list.append(idx)
+        
+    
+    fig = go.Figure()
+
+    for count, idx in enumerate(idx_list):
+        fig.add_trace(go.Box(x=atypical[idx], name=labels[count],
+                             fillcolor=color_list[count],
+                            line_color='#000000'))
+
+    fig.update_xaxes(range=[np.min(atypical)-0.05, np.max(atypical)])
+
+    font_title, font_axes, font_ticks, font_legend = fontsize
+    
+    fig.update_layout(
+            title="Atypicality - Boxplots",
+            title_font_size=font_title,
+            title_x=0.5,
+            xaxis_title="Value",
+            yaxis_title="Diagnosis",
+            xaxis = dict(
+                tickmode = 'linear',
+                tick0 = 0.0,
+                dtick = 2
+            ),
+            legend_font_size=font_legend,
+            legend=dict(
+                yanchor="top",
+                y=0.97,
+                xanchor="right",
+                x=0.97),
+            showlegend=False,
+            autosize = False,
+            width=width,
+            height=height
+        )
+    
+    fig.update_yaxes(title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
+    
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
+
+    return fig
 
 # ============= 2D PLOTTING =============================================================================================================================================================
 
