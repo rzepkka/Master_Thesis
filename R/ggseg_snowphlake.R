@@ -29,7 +29,7 @@ filtered_aseg
 
 # ============= DK-atlas ========================================================================================
 
-dk_data <- read.csv(file = 'data/dk_R_Subtype 0.csv')
+dk_data <- read.csv(file = 'data/dk_R_Subtype 3.csv')
 dk_data
 
 # DK for subtype 0
@@ -73,7 +73,7 @@ ggseg3d(.data = dk_data,
 
 # ============= ASEG ========================================================================================
 
-aseg_data <- read.csv(file = 'data/aseg_R_subtype0.csv')
+aseg_data <- read.csv(file = 'data/aseg_R_Subtype 0.csv')
 aseg_data
 
 # without point of reference
