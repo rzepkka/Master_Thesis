@@ -176,6 +176,7 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
 
 
+
 def plot_ggseg(T,S, subtype_labels = None, subtype = None):     
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function
@@ -201,6 +202,105 @@ def plot_ggseg(T,S, subtype_labels = None, subtype = None):
                 vminmax = [0,25],
                 background='k', edgecolor='w', bordercolor='gray', title=f'Subcortical regions for Subtype: {subtype}',
                 fontsize = 20)
+
+
+# ============= NOT IN USE =============================================================================================================================================================
+
+# Both plots at one Figure
+def staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=800):
+    """
+    Creates a barplot
+    :param S: dictionary, Snowphlake output
+    :param diagnosis: np.array or list with diagnosis labels corresponding to records in S
+    :param color_list: list with color hex values (optional)
+    :param num_bins: int, how many bins should be displayed (optional, defaults to 10)
+    :param bin_width: int, desired width of the bars on the plot (optional, defaults to 0.02)
+    :return: plotly go Bar figure
+    """   
+    
+    # Convert NaNs to 0.0
+    staging = np.array([np.float64(0.0) if np.isnan(stage) else stage for stage in S['staging']])
+   
+    # Count number of each subtype occurences
+    counter = dict(Counter(diagnosis))
+        
+    # Get labels
+    labels = list(set(diagnosis))
+    
+    # Convers lists to np.arrays
+    diagnosis = np.array(diagnosis)
+    staging = np.array(staging)
+    
+    # Get indexes for each diagnostic label
+    idx_list = []
+    for l in labels:
+        idx = np.where(diagnosis==l)
+        idx = idx[0]
+        idx_list.append(idx)
+
+    # Assign bar settings
+    bin_width = np.repeat(bin_width, num_bins)        
+    if color_list == ['#000000']:
+        color_list = ['#4daf4a','#377eb8','#e41a1c', '#ffff00']
+            
+    # Create subplots
+    fig = make_subplots(rows=2, cols=1)
+    
+    for count, idx in enumerate(idx_list):
+                freq,binc=np.histogram(staging[idx],bins=num_bins)
+                freq = (1.*freq)/len(staging)
+                label = labels[count]
+
+                fig.add_trace(go.Bar(
+                            x=binc,
+                            y=freq,
+                            name=f'{label} (n = {counter[label]})',
+                            width=bin_width,
+                            marker_color=color_list[count]
+                ),row=1, col=1) 
+
+    # ADD BOXES BELOW
+        
+    for count, idx in enumerate(idx_list):
+        fig.add_trace(go.Box(x=staging[idx], 
+                             name=labels[count],
+                             fillcolor=color_list[count],
+                            line_color='#000000',
+                            showlegend=False),
+                      row=2,col=1)    
+        
+    #STYLE THE PLOT
+    fig.update_layout(
+        title="Patient Staging",
+        title_font_size=34,
+        title_x=0.5,
+        xaxis_title="Disease Stage",
+        yaxis_title="Frequency of occurences",
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0.0,
+            dtick = 0.1
+        ),
+        barmode='group',
+        legend_font_size=16,
+        autosize = False,
+        width=width,
+        height=height,
+        hovermode="closest"
+    )
+
+    # fig.update_layout(hovermode="closest",
+    #                 xaxis_title="Disease Stage")
+    
+    fig.update_xaxes(range=[-0.05, 1.0],row=1, col=1)
+    
+    fig.update_yaxes(title_font_size = 18, 
+                    tickfont_size=14)
+    
+    fig.update_xaxes(title_font_size = 18, 
+                    tickfont_size = 14)
+
+    return fig
 
 
 
