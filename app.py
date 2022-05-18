@@ -26,9 +26,9 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr, data
 
-from visualize import event_centers, plot_ggseg, plot_dk_atlas, plot_aseg_atlas, staging, patient_staging, staging_boxes, subtype_piechart
+from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes, subtype_piechart
 
-from visualize import atypicality, atypicality_boxes
+from visualize import atypicality, atypicality_boxes, staging_scatterplot
 
 # LOAD R PACKAGES
 utils = importr('utils')
@@ -46,11 +46,14 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
 # LOAD PICKLE FILE
-read_input_file = open('data/ADC_FTLD_subtypes_agecorrected_zscore_final.pickle','rb')
+# read_input_file = open('data/ADC_FTLD_subtypes_agecorrected_zscore_final.pickle','rb')
+read_input_file = open('data/EDADS_subtype_timelines_agecorrected_opt.pickle','rb')
 load_inputs = pickle.load(read_input_file)
 read_input_file.close()
 
 T, S, Sboot = load_inputs
+
+diagnosis = np.load('data/diagnosis.npy', allow_pickle=True)
 
 def get_labels(S):
     unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
@@ -64,7 +67,7 @@ labels = get_labels(S=S)
 def main():
 
     st.set_page_config(layout="wide")
-    st.sidebar.header("Adjusting Plots")
+    st.sidebar.title("Adjusting Plots")
 
     def local_css(file_name):
         with open(file_name) as f:
@@ -87,14 +90,14 @@ def main():
         st.plotly_chart(plot_piechart)
 
         # SELECTION
-        options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
+        # options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(labels)
  
         subtype_list = []
 
         col_select, col_select_blank = st.columns([5.2,3])
         with col_select:
-            subtype_visualize = st.selectbox('Select a subtype to visualize:',options)       
+            subtype_visualize = st.selectbox('Select a subtype to visualize:',labels)       
         subtype_list.append(subtype_visualize)
 
         # BUTTONS
@@ -144,7 +147,7 @@ def main():
 
         # list for additional subtypes to compare
         options_compare = []
-        for label in options:
+        for label in labels:
             if label == subtype_visualize:
                 pass
             else: 
@@ -174,7 +177,7 @@ def main():
                                     S = S, 
                                     color_list = color_list,
                                     chosen_subtypes = subtype_list,
-                                    subtype_labels = options, 
+                                    subtype_labels = labels, 
                                     orderBy = subtype_visualize,
                                     width = chosen_width,
                                     height = chosen_height,
@@ -192,14 +195,15 @@ def main():
         col_staging, col_staging_options = st.columns([3,1])
 
         # load diagnosis variable
-        diagnosis = np.array(['Control' if np.isnan(subtype) else "FTD" for subtype in S['subtypes']])
+        # diagnosis = np.array(['Control' if np.isnan(subtype) else "FTD" for subtype in S['subtypes']])
 
         diagnosis_labels = list(set(diagnosis))
 
-        color_list = ['#4daf4a','#377eb8','#e41a1c', '#ffff00']
+        color_list = ['#4daf4a','#377eb8','#e41a1c', '#00ff00']
         color_diagnosis =[]
 
-        chosen_plot = col_staging.selectbox('Select plot:',['Patient Staging', 'Atypicality', 'Both'])
+        with col_staging:
+            chosen_plot = st.selectbox('Select plot:',['Patient Staging', 'Atypicality', 'Scatterplot'])
 
         #  ================== PATIENT STAGING =================================================================================================================
 
@@ -221,8 +225,9 @@ def main():
                 bin_width = st.number_input('Select bin width:', value = 0.04)
 
                 for idx, label in enumerate(diagnosis_labels):
-                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
-                        color_diagnosis.append(color)
+                        if label != 'CN':
+                            color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
+                            color_diagnosis.append(color)
 
                 # BARPLOT
                 plot_staging = patient_staging(S=S,
@@ -254,6 +259,7 @@ def main():
                 bin_width = st.number_input('Select bin width:', value = 1.2)
 
                 for idx, label in enumerate(diagnosis_labels):
+                    if label != 'CN':
                         color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
                         color_diagnosis.append(color)
 
@@ -277,6 +283,22 @@ def main():
             with col_staging:
                     st.plotly_chart(plot_atypicality)
                     st.plotly_chart(box_atypicality)
+
+        else:
+
+            with col_staging_options:
+
+                for idx, label in enumerate(diagnosis_labels):
+                    if label != 'CN':
+                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
+                        color_diagnosis.append(color)
+
+                plot_scatter = staging_scatterplot(S=S,
+                                                diagnosis=diagnosis,
+                                                color_list=color_diagnosis)
+
+            with col_staging:
+                st.plotly_chart(plot_scatter)
 
         # ADD DIVIDER
         st.markdown('---')
