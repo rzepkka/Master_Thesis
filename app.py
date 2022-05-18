@@ -104,7 +104,7 @@ def main():
         html_file = subtype_visualize.replace(" ","_")
 
         if st.sidebar.button('Open 3D visualiszation in a new tab'):
-            filename = "file://"+os.getcwd()+ f"/html_3D/slider/{html_file}.html"
+            filename = "file://"+os.getcwd()+ f"/html_3D/{html_file}.html"
             webbrowser.open(filename, new = 2)
 
         if st.sidebar.button('Download 3D visualisation as HTML file'):
