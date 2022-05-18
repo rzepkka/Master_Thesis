@@ -12,6 +12,7 @@ from collections import Counter
 from plotly.subplots import make_subplots
 import collections
 
+from mapping_2D import mapping_dk, dk_dict, aseg_dict
 from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
 
 
@@ -182,7 +183,7 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
                  x="Score", 
                  y="Region", 
                  color = 'Subtype',
-                 color_discrete_map=color_map,
+                    
                  title=f"Event Centers", width=width, height=height, 
                  labels={"Score": "Disease Stage",  "Region": "Region Names"})
     
@@ -270,9 +271,8 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
     num_bins = num_bins
     bin_width = np.repeat(bin_width, num_bins)
           
-    color_list = color_list
+    # color_list = color_list
         
-    count=-1    
     num_bins = num_bins
     bar_width = np.repeat(0.02, num_bins)
     counter = dict(Counter(diagnosis))
@@ -447,7 +447,6 @@ def atypicality(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.0
           
     color_list = color_list
         
-    count=-1    
     num_bins = num_bins
     bar_width = np.repeat(0.02, num_bins)
     # counter = dict(Counter(diagnosis))
@@ -585,12 +584,13 @@ def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400,
 # ============= SCATTEEPLOT =============================================================================================================================================================
 
 
-def staging_scatterplot(S, diagnosis, color_list = ['#000000']):
+def staging_scatterplot(S, diagnosis, color_list = ['#000000'], width=1100, height=800, fontsize=[34,18,14,22]):
     """
     Creates a scatterplot of staging vs. atypicality
     :param S: dictionary, Snowphlake output
     :return: plotly scatterplot
     """     
+    labels = list(set(diagnosis[diagnosis!='CN']))
     staging = list(S['staging'])
     atypical = list(S['atypicality'])
     diagnosis = list(diagnosis)
@@ -598,14 +598,107 @@ def staging_scatterplot(S, diagnosis, color_list = ['#000000']):
     df = pd.DataFrame(list(zip(staging, atypical,diagnosis)),
                columns =['Stage', 'Atypicality','Diagnosis'])
     df = df[df['Diagnosis'] != 'CN']
+
+    color_map = {labels[i]: color_list[i] for i in range(len(color_list))}
+    font_title, font_axes, font_ticks, font_legend = fontsize
+
+
+    fig = px.scatter(df, x='Stage', y='Atypicality', color='Diagnosis', color_discrete_map=color_map)
+
+    fig.update_layout(
+        title="Staging ~ Atypicality",
+        title_font_size=font_title,
+        title_x=0.5,
+        xaxis_title="Stage",
+        yaxis_title="Atypicality",
+        xaxis = dict(
+            tickmode = 'linear',
+            tick0 = 0.0,
+            dtick = 2
+        ),
+        barmode='group',
+        legend_font_size=font_legend,
+        # legend=dict(
+        #     yanchor="top",
+        #     y=0.95,
+        #     xanchor="right",
+        #     x=0.95),
+        autosize = False,
+        width=width,
+        height=height
+    )
     
-    fig = px.scatter(df, x='Stage', y='Atypicality', color='Diagnosis')
+    fig.update_xaxes(range=[np.min(atypical)-1.5, np.max(atypical)])
+    
+    fig.update_yaxes(title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
+    
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
 
     return fig  
 
-# ============= 2D PLOTTING =============================================================================================================================================================
+# ============= 2D PLOTTING OLD =============================================================================================================================================================
 
 def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
+
+    """
+    Creates a dictionary, which can be used as input to ggseg.plot_dk() function
+    :param T: timeline object from snowphlake
+    :param S: dictionary from snowphlake
+    :param subtype_labels: a list with names of the subtypes (optional)
+    :param subtype: name or index of the subtype to visualise (optional)  
+    :param slider: int
+    :returns a figures by plt.show() -> ggseg.plot_dk() 
+    """
+    
+    # Change hemi when changing files
+    mapped_dict = mapping_dk(hemi = False)    
+    
+    if slider is None:
+        dk = dk_dict(T, S, mapped_dict = mapped_dict, subtype = subtype)  
+    else:
+        dk_ = dk_dict(T, S, mapped_dict = mapped_dict, subtype = subtype)
+        dk = {k: v for k, v in dk_.items() if v <= slider}
+        
+    
+    if subtype is None:
+        # subtype = 'default = 0'
+        pass
+    else:
+        return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
+                  vminmax = [0,1],
+                  background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 24)
+
+
+def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
+
+    """
+    Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
+    :param T: timeline object from snowphlake
+    :param S: dictionary from snowphlake
+    :param subtype_labels: a list with names of the subtypes (optional)
+    :param subtype: name or index of the subtype to visualise (optional)  
+    :param slider: int
+    :returns a figures by plt.show() -> ggseg.plot_aseg()
+    """
+    if slider is None:  
+        aseg = aseg_dict(T,S, subtype = subtype)
+    else:
+        aseg_ = aseg_dict(T,S, subtype = subtype)
+        aseg = {k: v for k, v in aseg_.items() if v <= slider}
+
+    if subtype is None:
+        # subtype = 'Subtype 0'
+        pass 
+    else:
+        return ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
+                vminmax = [0,1],
+                background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
+
+# ============= 2D PLOTTING OLD =============================================================================================================================================================
+
+# def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function
     :param T: timeline object from snowphlake
@@ -637,7 +730,7 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
                         fontsize = 24)
 
 
-def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
+# def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
     """
     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
     :param T: timeline object from snowphlake
