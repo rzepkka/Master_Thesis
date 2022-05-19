@@ -103,7 +103,7 @@ def main():
         # BUTTONS
         html_file = subtype_visualize.replace(" ","_")
 
-        if st.sidebar.button('Open 3D visualiszation in a new tab'):
+        if st.sidebar.button('Open 3D visualization in a new tab'):
             filename = "file://"+os.getcwd()+ f"/html_3D/{html_file}.html"
             webbrowser.open(filename, new = 2)
 
@@ -295,7 +295,9 @@ def main():
 
                 plot_scatter = staging_scatterplot(S=S,
                                                 diagnosis=diagnosis,
-                                                color_list=color_diagnosis)
+                                                color_list=color_diagnosis,
+                                                width = chosen_width,
+                                                height = chosen_height,)
 
             with col_staging:
                 st.plotly_chart(plot_scatter)
