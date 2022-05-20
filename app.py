@@ -19,28 +19,9 @@ from matplotlib import rc
 import plotly.graph_objs as go
 from ipywidgets import Output
 
-import rpy2
-import rpy2.robjects.packages as rpackages
-import rpy2.robjects as robjects
-from rpy2.robjects.conversion import localconverter
-from rpy2.robjects import pandas2ri
-from rpy2.robjects.packages import importr, data
-
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes, subtype_piechart
 
 from visualize import atypicality, atypicality_boxes, staging_scatterplot
-
-# LOAD R PACKAGES
-utils = importr('utils')
-base = importr("base")
-datasets = importr('datasets')
-ggseg = importr("ggseg")
-ggplot2 = importr("ggplot2")
-dplyr = importr("dplyr")
-tidyr = importr("tidyr")
-htmlwidgets = importr('htmlwidgets')
-htmltools = importr('htmltools')
-ggseg3d = importr('ggseg3d')
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -196,6 +177,7 @@ def main():
         col_staging, col_staging_options = st.columns([3,1])
 
         diagnosis_labels = list(set(diagnosis))
+        diagnosis_labels.sort()
 
         color_list = ['#00ff00','#377eb8','#4daf4a','#e41a1c']
         color_diagnosis =[]
