@@ -1,3 +1,6 @@
+# RUN FILE FROM COMMAND LINE:
+# Rscript ggseg_snowphlake.R
+
 library(ggseg3d)
 library(ggseg)
 library(ggplot2)
@@ -9,12 +12,14 @@ library(plotly)
 
 
 # ========== CUSTOM GGSEG_3D =======================================
+# ggseg3d() plotting function with a few changes to adapt the coloring and colorscale
+# on the output htmls with cortical and subcortical graphs
+
 custom_ggseg <- function(.data=NULL, atlas="dk_3d",
                     surface = "LCBC", hemisphere = c("right","subcort"),
                     label = "region", text = NULL, colour = "colour",
                     palette = NULL, na.colour = "darkgrey", na.alpha = 1,
                     show.legend = TRUE, options.legend = NULL, ...) {
-  
   
   # Grab the atlas, even if it has been provided as character string
   atlas3d = get_atlas(atlas,
@@ -99,15 +104,22 @@ custom_ggseg <- function(.data=NULL, atlas="dk_3d",
 }
 
 # =========== ADD CUSTOM FUNCTIONS TO ENVIRONMENT ==============================
+# adding custom_ggseg() to ggseg3d namespace, so that it can access all of the other 
+# package functions
 
 environment(custom_ggseg) <- asNamespace('ggseg3d')
 
 #=========== INPUTS TO 3D SUBPLOTS ========================================================================================
-dk_data <- read.csv(file = 'data/dk_R_slider_Subtype 4.csv')
-aseg_data <- read.csv(file = 'data/aseg_R_slider_Subtype 4.csv')
+
+# Choose csv files with ordering and mappend brain region names
+dk_data <- read.csv(file = 'data/dk_R_Subtype 2.csv')
+aseg_data <- read.csv(file = 'data/aseg_R_Subtype 2.csv')
 
 # make a change for better sequentiol HEX values
 colors = c("indianred4",'indianred2','coral1','lightpink1','mistyrose1')
+
+# create visualisations for cortical and subcortical regions;
+# add scene parameter to specify the place of the graph in 3D plotly subplots
 
 dk = custom_ggseg(.data = dk_data,
              atlas = dk_3d,
@@ -118,7 +130,6 @@ dk = custom_ggseg(.data = dk_data,
              options.legend = list(title=list(text="Cortical"),dtick=0.1,
                               tickformatstops=list(dtickrange=c(0,1))),
              scene = 'scene')
-dk
 
 aseg = custom_ggseg(.data = aseg_data, 
                atlas = aseg_3d, 
@@ -130,12 +141,13 @@ aseg = custom_ggseg(.data = aseg_data,
                scene = 'scene2'
 )
 
-aseg
+# dk
+# aseg
 
 # ========= 3D SUBPLOTS =============================================================================================================================================
 
 fig2 <- subplot(dk, aseg)
-fig2 <- fig2 %>% layout(title = "Subtype 4 - 3D Visualization of the disease timeline",
+fig2 <- fig2 %>% layout(title = "Subtype 2 - 3D Visualization of the disease timeline",
                         scene = list(domain=list(x=c(0,1),y=c(0.5,1)),
                                      aspectmode='auto',
                                      xaxis=list(backgroundcolor='white')
@@ -143,9 +155,12 @@ fig2 <- fig2 %>% layout(title = "Subtype 4 - 3D Visualization of the disease tim
                         scene2 = list(domain=list(x=c(0,1),y=c(0,0.5)),
                                       aspectmode='auto'
                         )) 
-fig2 
+# fig2 
+
 
 # SAVE 3D PLOTS TO LOAD THEM INTO STREAMLIT 
+# saveWidget(fig2, "html_3D/Subtype_2.html", selfcontained = F, libdir = "sub2")
 
-saveWidget(fig2, "html_3D/slider/Subtype_4.html", selfcontained = F, libdir = "sub4")
+saveWidget(fig2, "Subtype_2.html", selfcontained = F, libdir = "sub2")
+
 
