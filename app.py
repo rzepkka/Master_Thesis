@@ -55,6 +55,7 @@ T, S, Sboot = load_inputs
 
 diagnosis = np.load('data/diagnosis.npy', allow_pickle=True)
 
+# Get labels for options in select boxes
 def get_labels(S):
     unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
     subtype_labels = []
@@ -69,6 +70,7 @@ def main():
     st.set_page_config(layout="wide")
     st.sidebar.title("Adjusting Plots")
 
+    # Connect .css file for styling the app components
     def local_css(file_name):
         with open(file_name) as f:
             st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -141,8 +143,6 @@ def main():
                                         slider = slider)       
                 st.pyplot(ggseg_aseg)
 
-
-
         # ======================= EVENT CENTERS ===============================================================================================================
 
         # list for additional subtypes to compare
@@ -173,8 +173,6 @@ def main():
                 subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
                 color_list.append(subtype_color)
 
-            # st.write(color_list)
-
         eventCenters = event_centers(T = T,
                                     S = S, 
                                     color_list = color_list,
@@ -193,13 +191,9 @@ def main():
         # ADD DIVIDER
         st.markdown('---')
 
-
         # ======================= PATIENT STAGING ===============================================================================================================
 
         col_staging, col_staging_options = st.columns([3,1])
-
-        # load diagnosis variable
-        # diagnosis = np.array(['Control' if np.isnan(subtype) else "FTD" for subtype in S['subtypes']])
 
         diagnosis_labels = list(set(diagnosis))
 
