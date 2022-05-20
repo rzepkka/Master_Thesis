@@ -87,6 +87,12 @@ def subtypes_piechart(S,diagnosis,diagnostic_labels_for_plotting,title = None,su
 # ============= PIE CHART =============================================================================================================================================================
 
 def subtype_piechart(S, subtype_labels=None):
+    """
+    Creates a pie chart of subtypes in the data   
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param subtype_lables: a list with names of the subtype labels (optional)
+    :return: plotly Pie Figure
+    """
     
     # Get subtype labels
     unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
@@ -118,17 +124,16 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
         subtype_labels = None, orderBy = None, width=1050, height=900, slider = None, fontsize=[34,18,14,22]):
     
     """
-    Creates event centers box plots for multiple subtypes
-    
+    Creates event centers box plot for multiple subtypes  
     :param T: Timeline object
-    :param S:
-    :param color_list: a list with color names corresponding to each subtype, len(color_list) = len(subtypes). Preferably hex values
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param color_list: a list with color names corresponding to each subtype, len(color_list) = len(subtypes); preferably hex values
     :param chosen_subtypes: a list with names of the subtypes to visualize
-    :param subtype_lables: a list with names of the subtype labels 
-    :param orderBy: string, name of the subtype to order the boxplots by; default None
-    :param width: chosen width of the returned plot
-    :param height: chosen height of the returned plot
-    :param slider: int, value of the slider from 2D visualizations
+    :param subtype_lables: a list with names of the subtype labels (optional)
+    :param orderBy: string, name of the subtype to order the boxplots by (optional)
+    :param width: chosen width of the returned plot (optional)
+    :param height: chosen height of the returned plot (optional)
+    :param slider: int, value of the slider from 2D visualizations (optional)
     :return: plotly box figure
     """
 
@@ -237,12 +242,16 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
 def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=900, 
                         fontsize=[34,18,14,22], opacity=0.8):
     """
-    Creates a barplot
-    :param S: dictionary, Snowphlake output
-    :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
+    Creates a barplot for diagnosis
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param diagnosis: np.array or list with diagnosis labels corresponding to records in S
     :param color_list: list with color hex values
-    :param num_bins: int, how many bins should be displayed
-    :param bin_width: int
+    :param num_bins: int, how many bins should be displayed (optional)
+    :param bin_width: int (optional)
+    :param width: int (optional)
+    :param height: int (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
+    :param opacity: float (optional)
     :return: plotly go Bar figure
     """  
     
@@ -253,7 +262,8 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
     counter = dict(Counter(diagnosis))
         
     # Get labels
-    labels = list(set(diagnosis))[::-1]
+    labels = list(set(diagnosis[diagnosis!='CN']))
+    labels.sort()
     
     # Get indexes
     diagnosis = np.array(diagnosis)
@@ -332,9 +342,12 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
 def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
     """
     Creates a boxplot
-    :param S: dictionary, Snowphlake output
+    :param S: subtyping dictionary, subtypes for each patient individually
     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
-    :param color_list: list with color hex values
+    :param color_list: list with color hex values (optional)
+    :param width: int (optional)
+    :param height: int (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
     :return: plotly go Box figure
     """
     
@@ -345,7 +358,8 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fon
     counter = dict(Counter(diagnosis))
         
     # Get labels
-    labels = list(set(diagnosis))[::-1]
+    labels = list(set(diagnosis[diagnosis!='CN']))
+    labels.sort()
     
     # Get indexes
     diagnosis = np.array(diagnosis)
@@ -410,11 +424,16 @@ def atypicality(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.0
                         fontsize=[34,18,14,22], opacity=0.8):
     """
     Creates a barplot
-    :param S: dictionary, Snowphlake output
+    :param S: subtyping dictionary, subtypes for each patient individually
     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
-    :param color_list: list with color hex values
+    :param color_list: list with color hex values (optional)
     :param num_bins: int, how many bins should be displayed
-    :param bin_width: int
+    :param bin_width: int (optional)
+    :param width: int (optional)
+    :param height: int (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
+    :param opacity: float (optional)
+
     :return: plotly go Bar figure
     """  
     
@@ -425,7 +444,6 @@ def atypicality(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.0
     counter = dict(Counter(diagnosis))
         
     # Get labels
-    # labels = list(set(diagnosis))
     labels = list(set(diagnosis[diagnosis!='CN']))
     labels.sort()
 
@@ -509,9 +527,12 @@ def atypicality(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.0
 def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
     """
     Creates a boxplot
-    :param S: dictionary, Snowphlake output
+    :param S: subtyping dictionary, subtypes for each patient individually
     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
     :param color_list: list with color hex values
+    :param width: int (optional)
+    :param height: int (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
     :return: plotly go Box figure
     """
     
@@ -587,8 +608,12 @@ def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400,
 
 def staging_scatterplot(S, diagnosis, color_list = ['#000000'], width=1100, height=800, fontsize=[34,18,14,22]):
     """
-    Creates a scatterplot of staging vs. atypicality
-    :param S: dictionary, Snowphlake output
+    Creates a scatterplot of staging ~ atypicality
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param color_list: list with color hex values (optional)
+    :param width: int (optional)
+    :param height: int (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
     :return: plotly scatterplot
     """     
     labels = list(set(diagnosis[diagnosis!='CN']))
@@ -644,12 +669,12 @@ def staging_scatterplot(S, diagnosis, color_list = ['#000000'], width=1100, heig
 def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
 
     """
-    Creates a dictionary, which can be used as input to ggseg.plot_dk() function
-    :param T: timeline object from snowphlake
-    :param S: dictionary from snowphlake
+    Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
+    :param T: Timeline object
+    :param S: subtyping dictionary, subtypes for each patient individually
     :param subtype_labels: a list with names of the subtypes (optional)
     :param subtype: name or index of the subtype to visualise (optional)  
-    :param slider: int
+    :param slider: int (optional)
     :returns a figures by plt.show() -> ggseg.plot_dk() 
     """
     
@@ -676,11 +701,11 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
 
     """
     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
-    :param T: timeline object from snowphlake
-    :param S: dictionary from snowphlake
+    :param T: Timeline object
+    :param S: subtyping dictionary, subtypes for each patient individually
     :param subtype_labels: a list with names of the subtypes (optional)
     :param subtype: name or index of the subtype to visualise (optional)  
-    :param slider: int
+    :param slider: int (optional)
     :returns a figures by plt.show() -> ggseg.plot_aseg()
     """
     if slider is None:  
