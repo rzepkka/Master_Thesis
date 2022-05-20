@@ -3,9 +3,14 @@ import scipy.stats
 import pandas as pd
 
 # ====================================== NEW DATA ==================================================================================================================
+# FUNCTIONS FOR T.BIOMARKER_LABELS WITH BRAIN REGIONS CONSIDERED SEPARATELY FOR LEFT AND RIGHT HEMISPHERE
 
 def mapping_dk(hemi = False):
-    # if hemi = True, regions are mapped separately to left and right hemisphere
+    """
+    Creates a mapping for larger brain regions
+    :param hemi: boolean; True if left and right hemisphere should be treated separately
+    :return: dictionary with DK-lables mapped to larger brain regions
+    """
     
     # LEFT
     list_cortical_left = ['Temporal_lobe_left','Superior_frontal_gyrus_left',
@@ -97,8 +102,8 @@ def dk_dict(T,S, mapped_dict, subtype_labels = None, subtype = None):
     
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function
-    :param T: dataframe from dk_dataframe() function
-    :param S: chosen subtype
+    :param T: Timeline object
+    :param S: subtyping dictionary, subtypes for each patient individually
     :param mapped_dict: a dictionary with key: values --> T.biomarker_labels: list(DK-labels)
     :param subtype: name or index of the subtype from subtype_lables (optional, choses first available subtype as default)  
     :param subtype_labels: a list with names of the subtypes (optional)
@@ -145,8 +150,8 @@ def aseg_dict(T, S, subtype_labels = None, subtype = None, hemi = False):
     
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() function
-    :param T: dataframe from dk_dataframe() function
-    :param S: chosen subtype
+    :param T: Timeline object
+    :param S: subtyping dictionary, subtypes for each patient individually
     :param subtype_labels: a list with names of the subtypes (optional)
     :param subtype: name or index of the subtype from subtype_lables (optional, choses first available subtype as default)  
     :return: dictionary with scores for each DK region for chosen subtype
@@ -183,15 +188,15 @@ def aseg_dict(T, S, subtype_labels = None, subtype = None, hemi = False):
         dic_aseg = dict(zip(regions, values))
         
         
-    return dic_aseg
+    return dic_aseg 
 
-# ====================================== DK-ATLAS ==================================================================================================================
-
+# ====================================== PREVIOUS DATA ==================================================================================================================
+# FUNCTIONS FOR T.BIOMARKER_LABELS WITH BRAIN REGIONS CONSIDERED SEPARATELY FOR LEFT AND RIGHT HEMISPHERE
 
 def dk_regions_2D(T):
     """
     Creates a dictionary of DK-atlas labels grouped into larger regions corresponding to T.biomarker_labels
-    :param T: Timeline object from snowphlake
+    :param T: Timeline object
     :return: dictionary, key:value => T.biomarker_labels: [dk labels]
     """   
     org_cortical_mapping_left = [['lh_bankssts_volume','lh_transversetemporal_volume',
