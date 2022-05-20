@@ -173,6 +173,8 @@ def main():
                 subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
                 color_list.append(subtype_color)
 
+            # st.write(color_list)
+
         eventCenters = event_centers(T = T,
                                     S = S, 
                                     color_list = color_list,
@@ -183,6 +185,8 @@ def main():
                                     height = chosen_height,
                                     slider = slider,
                                     fontsize = font_list)
+
+    
         with col_event_centers:
             st.plotly_chart(eventCenters)
 

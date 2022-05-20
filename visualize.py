@@ -183,7 +183,7 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
                  x="Score", 
                  y="Region", 
                  color = 'Subtype',
-                    
+                color_discrete_map=color_map,
                  title=f"Event Centers", width=width, height=height, 
                  labels={"Score": "Disease Stage",  "Region": "Region Names"})
     
@@ -522,7 +522,8 @@ def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400,
     counter = dict(Counter(diagnosis))
         
     # Get labels
-    labels = list(set(diagnosis))
+    labels = list(set(diagnosis[diagnosis!='CN']))
+    labels.sort()
     
     # Get indexes
     diagnosis = np.array(diagnosis)
