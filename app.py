@@ -203,7 +203,7 @@ def main():
 
         diagnosis_labels = list(set(diagnosis))
 
-        color_list = ['#4daf4a','#377eb8','#e41a1c', '#00ff00']
+        color_list = ['#00ff00','#377eb8','#4daf4a','#e41a1c']
         color_diagnosis =[]
 
         with col_staging:
