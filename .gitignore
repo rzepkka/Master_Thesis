@@ -22,3 +22,4 @@ __pycache__/mapping_2D.cpython-39.pyc
 .DS_Store
 notebook_examples/.DS_Store
 notebook_examples/.ipynb_checkpoints/mapping_2D_slider-checkpoint.ipynb
+data/.DS_Store
