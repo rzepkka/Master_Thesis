@@ -86,6 +86,57 @@ def subtypes_piechart(S,diagnosis,diagnostic_labels_for_plotting,title = None,su
 
 # ============= PIE CHART =============================================================================================================================================================
 
+def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None):
+    """
+    Creates a pie chart of subtypes in the data   
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param diagnosis: np.array or list with diagnosis labels corresponding to records in S
+    :param subtype_lables: a list with names of the subtype labels (optional)
+    :param chosen_subtypes: a list with diagnosis labels to consider in the plot
+    :return: plotly Pie Figure
+    """
+    
+    # Get subtype labels
+    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+    if subtype_labels is None:
+        subtype_labels = []
+        for i in range(len(unique_subtypes)):
+            subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
+            
+    subtypes = list(S['subtypes'])
+    
+    # Get diagnosis lables (explode controls)
+    diagnosis_labels = list(set(diagnosis))
+    diagnosis_labels.remove('CN')
+    diagnosis_labels.sort()
+    
+    if chosen_subtypes is None:
+        chosen_subtypes=diagnosis_labels
+
+    df = {'Diagnosis':diagnosis, 'Subtype':subtypes}
+    df = pd.DataFrame(df)
+        
+    # Create DataFrame for quering to plotting
+    df_subtypes = subtype_labels*len(diagnosis_labels)
+    df_diagnosis = [d for d in diagnosis_labels for i in range(len(subtype_labels))]
+    counts = list(df.groupby(['Diagnosis','Subtype']).size())
+    df = pd.DataFrame({'Diagnosis':df_diagnosis, 'Subtype':df_subtypes, 'Counts': counts})
+
+    # Query diagnosis for plotting
+    df_plot = df[df['Diagnosis'].isin(chosen_subtypes)]
+
+    fig = px.pie(df_plot, values='Counts', names='Subtype', title='Subtypes')
+
+    fig.update_traces(textposition='inside', textinfo='value+percent')   
+    
+    fig.update_layout(title=f'{chosen_subtypes}',
+                  title_x=0.5,
+                  title_font_size=24,
+                  legend_font_size=18)
+
+    return fig
+
+
 def subtype_piechart(S, subtype_labels=None):
     """
     Creates a pie chart of subtypes in the data   
