@@ -21,7 +21,7 @@ from ipywidgets import Output
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes, subtype_piechart
 
-from visualize import atypicality, atypicality_boxes, staging_scatterplot
+from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -69,8 +69,19 @@ def main():
 
     if chosen_plot_type == 'Disease timeline':
 
-        plot_piechart = subtype_piechart(S=S)
-        st.plotly_chart(plot_piechart)
+        col_piechart, col_piechart_select = st.columns([5.2,3])
+
+        with col_piechart_select:
+            diagnosis_labels = list(set(diagnosis))
+            diagnosis_labels.remove('CN')
+            choose_pieplot = st.multiselect('Select diagnosis', diagnosis_labels, default=diagnosis_labels)
+
+
+        with col_piechart:
+            plot_piechart = piechart_multiple(S=S,
+                                            diagnosis=diagnosis,
+                                            chosen_subtypes=choose_pieplot)
+            st.plotly_chart(plot_piechart)
 
         # SELECTION
         # options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
