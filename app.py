@@ -200,6 +200,7 @@ def main():
 
         with col_staging_options:
             st.subheader('Style the graphs') 
+            barmode = st.radio('Select barmode:', ['group','stack'])
             opacity = st.number_input('Select opacity value:', value=0.8)
             title_font = st.number_input('Title font:',value=34)
             title_axes = st.number_input('Axis labels font:',value=18)
@@ -213,7 +214,7 @@ def main():
             with col_staging_options:
 
                 num_bins = st.number_input('Select the number of bins', value = 10)
-                bin_width = st.number_input('Select bin width:', value = 0.04)
+                bin_width = st.number_input('Select bin width:', value = 0.02)
 
                 for idx, label in enumerate(diagnosis_labels):
                         if label != 'CN':
@@ -229,7 +230,8 @@ def main():
                                         width = chosen_width,
                                         height = chosen_height,
                                         fontsize=font_list,
-                                        opacity=opacity)
+                                        opacity=opacity,
+                                        barmode=barmode)
 
                 # BOX
                 box_staging = staging_boxes(S=S,
