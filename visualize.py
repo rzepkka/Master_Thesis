@@ -136,39 +136,6 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
 
     return fig
 
-
-def subtype_piechart(S, subtype_labels=None):
-    """
-    Creates a pie chart of subtypes in the data   
-    :param S: subtyping dictionary, subtypes for each patient individually
-    :param subtype_lables: a list with names of the subtype labels (optional)
-    :return: plotly Pie Figure
-    """
-    
-    # Get subtype labels
-    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-    if subtype_labels is None:
-        subtype_labels = []
-        for i in range(len(unique_subtypes)):
-            subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
-    
-    # Count number of each subtype
-    counter = dict(Counter(S['subtypes'][~np.isnan(S['subtypes'])]))
-    counter = collections.OrderedDict(sorted(counter.items()))
-    
-    # data for plotting
-    values = list(counter.values())
-    labels = list(subtype_labels)
-    
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='value+percent')]) # , pull=[0, 0, 0.2, 0]
-        
-    fig.update_layout(title="Subtypes Pie Chart",
-                      title_x=0.5,
-                      title_font_size=24,
-                      legend_font_size=18)
-    
-    return fig
-
 # ============= EVENT CENTERS =============================================================================================================================================================
 
 def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
@@ -273,11 +240,12 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
                       hovermode=False)
 
     fig.update_layout(legend_font_size=font_legend,
-                    legend=dict(
-                        yanchor="top",
-                        y=0.90,
-                        xanchor="right",
-                        x=0.95))
+                    # legend=dict(
+                    #     yanchor="top",
+                    #     y=0.90,
+                    #     xanchor="right",
+                    #     x=0.95)
+                    )
 
     fig.add_vline(x=slider, line_width=2, line_dash="dash", line_color="red",
                   annotation_text=f"Slider value = {slider}",
@@ -574,7 +542,6 @@ def atypicality(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.0
     return fig
 
 
-
 def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
     """
     Creates a boxplot
@@ -715,7 +682,7 @@ def staging_scatterplot(S, diagnosis, color_list = ['#000000'], width=1100, heig
 
     return fig  
 
-# ============= 2D PLOTTING OLD =============================================================================================================================================================
+# ============= 2D PLOTTING =============================================================================================================================================================
 
 def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
 

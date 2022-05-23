@@ -19,7 +19,7 @@ from matplotlib import rc
 import plotly.graph_objs as go
 from ipywidgets import Output
 
-from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes, subtype_piechart
+from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 
 from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple
 
