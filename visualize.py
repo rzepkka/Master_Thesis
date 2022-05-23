@@ -237,15 +237,8 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
                                    dtick = 0.1),
                       title_font_size=font_title,
                       title_x=0.5,
-                      hovermode=False)
-
-    fig.update_layout(legend_font_size=font_legend,
-                    # legend=dict(
-                    #     yanchor="top",
-                    #     y=0.90,
-                    #     xanchor="right",
-                    #     x=0.95)
-                    )
+                      hovermode=False,
+                      legend_font_size=font_legend)
 
     fig.add_vline(x=slider, line_width=2, line_dash="dash", line_color="red",
                   annotation_text=f"Slider value = {slider}",
@@ -338,11 +331,6 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
         ),
         barmode='group',
         legend_font_size=font_legend,
-        legend=dict(
-            yanchor="top",
-            y=0.95,
-            xanchor="right",
-            x=0.95),
         autosize = False,
         width=width,
         height=height
@@ -416,11 +404,6 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fon
                 dtick = 0.1
             ),
             legend_font_size=font_legend,
-            # legend=dict(
-            #     yanchor="top",
-            #     y=0.97,
-            #     xanchor="right",
-            #     x=0.97),
             showlegend=False,
             autosize = False,
             width=width,
@@ -521,11 +504,6 @@ def atypicality(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.0
         ),
         barmode='group',
         legend_font_size=font_legend,
-        legend=dict(
-            yanchor="top",
-            y=0.95,
-            xanchor="right",
-            x=0.95),
         autosize = False,
         width=width,
         height=height
@@ -598,11 +576,6 @@ def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400,
                 dtick = 5
             ),
             legend_font_size=font_legend,
-            legend=dict(
-                yanchor="top",
-                y=0.97,
-                xanchor="right",
-                x=0.97),
             showlegend=False,
             autosize = False,
             width=width,
@@ -662,11 +635,6 @@ def staging_scatterplot(S, diagnosis, color_list = ['#000000'], width=1100, heig
         ),
         barmode='group',
         legend_font_size=font_legend,
-        # legend=dict(
-        #     yanchor="top",
-        #     y=0.95,
-        #     xanchor="right",
-        #     x=0.95),
         autosize = False,
         width=width,
         height=height
