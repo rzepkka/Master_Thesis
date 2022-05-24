@@ -74,7 +74,7 @@ def main():
         with col_piechart_select:
             diagnosis_labels = list(set(diagnosis))
             diagnosis_labels.remove('CN')
-            choose_pieplot = st.multiselect('Select diagnosis', diagnosis_labels, default=diagnosis_labels)
+            choose_pieplot = st.multiselect('Diagnoses included int the piechart:', diagnosis_labels, default=diagnosis_labels)
 
 
         with col_piechart:
@@ -105,7 +105,7 @@ def main():
             st.sidebar.warning('Feature not added yet')
 
         color_list = []
-        default_color_list = ['#0000ff', '#880000', '#ffa07a', '#04977d', '#fd8ef3']  
+        default_color_list = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']  
 
         # ======================= 2D ===============================================================================================================
         
