@@ -1,0 +1,102 @@
+{
+  "temporal_lobe": [
+    "bankssts_left",
+    "transversetemporal_left",
+    "superiortemporal_left",
+    "temporalpole_left",
+    "entorhinal_left",
+    "middletemporal_left",
+    "inferiortemporal_left",
+    "fusiform_left",
+    "bankssts_right",
+    "transversetemporal_right",
+    "superiortemporal_right",
+    "temporalpole_right",
+    "entorhinal_right",
+    "middletemporal_right",
+    "inferiortemporal_right",
+    "fusiform_right"
+  ],
+  "superior_frontal_gyrus": [
+    "superiorfrontal_left",
+    "frontalpole_left",
+    "superiorfrontal_right",
+    "frontalpole_right"
+  ],
+  "middle_frontal_gyrus": [
+    "caudalmiddlefrontal_left",
+    "rostralmiddlefrontal_left",
+    "caudalmiddlefrontal_right",
+    "rostralmiddlefrontal_right"
+  ],
+  "inferior_frontal_gyrus": [
+    "parsopercularis_left",
+    "parsorbitalis_left",
+    "parstriangularis_left",
+    "parsopercularis_right",
+    "parsorbitalis_right",
+    "parstriangularis_right"
+  ],
+  "gyrus_rectus": [
+    "medialorbitofrontal_left",
+    "medialorbitofrontal_right"
+  ],
+  "orbitofrontal_gyri": [
+    "lateralorbitofrontal_left",
+    "lateralorbitofrontal_right"
+  ],
+  "precentral_gyrus": [
+    "precentral_left",
+    "paracentral_left",
+    "precentral_right",
+    "paracentral_right"
+  ],
+  "postcentral_gyrus": [
+    "postcentral_left",
+    "postcentral_right"
+  ],
+  "superior_parietal_gyrus": [
+    "superiorparietal_left",
+    "precuneus_left",
+    "superiorparietal_right",
+    "precuneus_right",
+    "cuneus_left",
+    "pericalcarine_left",
+    "cuneus_right",
+    "pericalcarine_right"
+  ],
+  "inferolateral_remainder_of_parietal_lobe": [
+    "inferiorparietal_left",
+    "supramarginal_left",
+    "inferiorparietal_right",
+    "supramarginal_right"
+  ],
+  "lateral_remainder_of_occipital_lobe": [
+    "lateraloccipital_left",
+    "lateraloccipital_right"
+  ],
+  "lingual_gyrus": [
+    "lingual_left",
+    "lingual_right"
+  ],
+  "insula": [
+    "insula_left",
+    "insula_right"
+  ],
+  "gyrus_cinguli_anterior_part": [
+    "caudalanteriorcingulate_left",
+    "rostralanteriorcingulate_left",
+    "caudalanteriorcingulate_right",
+    "rostralanteriorcingulate_right"
+  ],
+  "gyrus_cinguli_posterior_part": [
+    "posteriorcingulate_left",
+    "isthmuscingulate_left",
+    "posteriorcingulate_right",
+    "isthmuscingulate_right"
+  ],
+  "parahippocampal_and_ambient_gyri": [
+    "parahippocampal_left",
+    "parahippocampal_right"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "left-thalamus": ["Left-Thamalus"],
+"left-caudate": ["Left-Caudate"],
+  "left-putamen": ["Left-Putamen"],
+  "left-hippocampus": ["Left-Hippocampus"],
+  "left-amygdala": ["Left-Amygdala"],
+  "right-thalamus": ["Right-Thamalus"],
+  "right-caudate": ["Right-Caudate"],
+  "right-putamen": ["Right-Putamen"],
+  "right-hippocampus": ["Right-Hippocampus"],
+  "right-amygdala": ["Right-Amygdala"]
+}

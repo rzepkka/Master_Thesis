@@ -1,0 +1,94 @@
+{
+  "temporal_lobe_left": [
+    "bankssts_left",
+    "transversetemporal_left",
+    "superiortemporal_left",
+    "temporalpole_left",
+    "entorhinal_left",
+    "middletemporal_left",
+    "inferiortemporal_left",
+    "fusiform_left",
+    "parahippocampal_left"
+  ],
+  "frontal_lobe_left": [
+    "superiorfrontal_left",
+    "frontalpole_left",
+    "caudalmiddlefrontal_left",
+    "rostralmiddlefrontal_left",
+    "parsopercularis_left",
+    "parsorbitalis_left",
+    "parstriangularis_left",
+    "medialorbitofrontal_left",
+    "lateralorbitofrontal_left",
+    "precentral_left",
+    "paracentral_left"
+  ],
+  "parietal_lobe_left": [
+    "postcentral_left",
+    "superiorparietal_left",
+    "precuneus_left",
+    "inferiorparietal_left",
+    "supramarginal_left"
+  ],
+  "occipital_lobe_left": [
+    "lateraloccipital_left",
+    "cuneus_left",
+    "pericalcarine_left",
+    "lingual_left"
+  ],
+  "cingulate_lobe_left": [
+    "caudalanteriorcingulate_left",
+    "rostralanteriorcingulate_left",
+    "posteriorcingulate_left",
+    "isthmuscingulate_left"
+  ],
+  "insula_left": [
+    "insula_left"
+  ],
+  "temporal_lobe_right": [
+    "bankssts_right",
+    "transversetemporal_right",
+    "superiortemporal_right",
+    "temporalpole_right",
+    "entorhinal_right",
+    "middletemporal_right",
+    "inferiortemporal_right",
+    "fusiform_right",
+    "parahippocampal_right"
+  ],
+  "frontal_lobe_right": [
+    "superiorfrontal_right",
+    "frontalpole_right",
+    "caudalmiddlefrontal_right",
+    "rostralmiddlefrontal_right",
+    "parsopercularis_right",
+    "parsorbitalis_right",
+    "parstriangularis_right",
+    "medialorbitofrontal_right",
+    "lateralorbitofrontal_right",
+    "precentral_right",
+    "paracentral_right"
+  ],
+  "parietal_lobe_right": [
+    "postcentral_right",
+    "superiorparietal_right",
+    "precuneus_right",
+    "inferiorparietal_right",
+    "supramarginal_right"
+  ],
+  "occipital_lobe_right": [
+    "lateraloccipital_right",
+    "cuneus_right",
+    "pericalcarine_right",
+    "lingual_right"
+  ],
+  "cingulate_lobe_right": [
+    "caudalanteriorcingulate_right",
+    "rostralanteriorcingulate_right",
+    "posteriorcingulate_right",
+    "isthmuscingulate_right"
+  ],
+  "insula_right": [
+    "insula_right"
+  ]
+}
