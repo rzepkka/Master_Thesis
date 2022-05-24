@@ -194,7 +194,7 @@ def main():
         color_diagnosis =[]
 
         with col_staging:
-            chosen_plot = st.selectbox('Select plot:',['Patient Staging', 'Atypicality', 'Scatterplot'])
+            chosen_plot = st.selectbox('Select plot:',['Patient Staging', 'Scatterplot'])
 
         #  ================== PATIENT STAGING =================================================================================================================
 
@@ -244,39 +244,7 @@ def main():
                 st.plotly_chart(plot_staging)
                 st.plotly_chart(box_staging)  
 
-        elif chosen_plot =='Atypicality':   
-
-            with col_staging_options:
-
-                num_bins = st.number_input('Select the number of bins', value = 15)
-                bin_width = st.number_input('Select bin width:', value = 1.2)
-
-                for idx, label in enumerate(diagnosis_labels):
-                    if label != 'CN':
-                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
-                        color_diagnosis.append(color)
-
-                plot_atypicality = atypicality(S=S,
-                                diagnosis=diagnosis, 
-                                color_list = color_diagnosis,
-                                num_bins=num_bins, 
-                                bin_width=bin_width,
-                                width = chosen_width,
-                                height = chosen_height,
-                                fontsize=font_list,
-                                opacity=opacity)
-
-
-                box_atypicality = atypicality_boxes(S=S,
-                                        diagnosis=diagnosis,
-                                        color_list=color_diagnosis,
-                                        width=chosen_width,
-                                        fontsize=font_list)
-
-            with col_staging:
-                    st.plotly_chart(plot_atypicality)
-                    st.plotly_chart(box_atypicality)
-
+      
         else:
 
             with col_staging_options:
