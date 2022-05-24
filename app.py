@@ -200,7 +200,6 @@ def main():
 
         with col_staging_options:
             st.subheader('Style the graphs') 
-            barmode = st.radio('Select barmode:', ['group','stack'])
             opacity = st.number_input('Select opacity value:', value=0.8)
             title_font = st.number_input('Title font:',value=34)
             title_axes = st.number_input('Axis labels font:',value=18)
@@ -221,6 +220,9 @@ def main():
                             color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
                             color_diagnosis.append(color)
 
+            with col_staging:
+                barmode = st.radio('Select barmode:', ['group','stack'])
+
                 # BARPLOT
                 plot_staging = patient_staging(S=S,
                                         diagnosis=diagnosis, 
@@ -240,27 +242,34 @@ def main():
                                         width=chosen_width,
                                         fontsize=font_list)
 
-            with col_staging:
+
                 st.plotly_chart(plot_staging)
                 st.plotly_chart(box_staging)  
 
       
-        else:
+        if chosen_plot =='Scatterplot':
+
+            color_list = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']  
 
             with col_staging_options:
 
-                for idx, label in enumerate(diagnosis_labels):
-                    if label != 'CN':
-                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
-                        color_diagnosis.append(color)
+                for idx, label in enumerate(labels):
+                    color = st.text_input(f'Color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
+                    color_diagnosis.append(color)
+
+
+            with col_staging:
+                diagnosis_labels = list(set(diagnosis))
+                diagnosis_labels.remove('CN')
+                choose_scatterplot = st.multiselect('Diagnoses included in the scatterplot:', diagnosis_labels, default=diagnosis_labels)
 
                 plot_scatter = staging_scatterplot(S=S,
                                                 diagnosis=diagnosis,
+                                                chosen_subtypes=choose_scatterplot,
                                                 color_list=color_diagnosis,
                                                 width = chosen_width,
-                                                height = chosen_height,)
+                                                height = chosen_height)
 
-            with col_staging:
                 st.plotly_chart(plot_scatter)
 
         # ADD DIVIDER
