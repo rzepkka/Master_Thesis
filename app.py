@@ -11,6 +11,7 @@ import os
 import webbrowser
 from collections import Counter
 import collections
+import json
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
@@ -34,7 +35,19 @@ read_input_file.close()
 
 T, S, Sboot = load_inputs
 
+# LOAD DIAGNOSIS VARIABLE
 diagnosis = np.load('data/diagnosis.npy', allow_pickle=True)
+
+# LOAD JSON FILES FOR MAPPING BRAIN REGIONS
+f = open('data/DK_2D_combined.json')
+DK_2D_combined = json.load(f)
+f.close()
+
+f = open('data/ASEG_combined.json')
+ASEG_combined = json.load(f)
+f.close()
+
+
 
 # Get labels for options in select boxes
 def get_labels(S):
@@ -123,7 +136,8 @@ def main():
         
             with col_cortical:
                 ggseg_dk = plot_dk_atlas(T = T, 
-                                        S = S, 
+                                        S = S,
+                                        map_dk=DK_2D_combined,
                                         subtype = subtype_visualize, 
                                         slider = slider)
                 st.pyplot(ggseg_dk)
@@ -131,6 +145,7 @@ def main():
             with col_subcortical:     
                 ggseg_aseg = plot_aseg_atlas(T = T, 
                                         S = S, 
+                                        map_aseg=ASEG_combined,
                                         subtype = subtype_visualize, 
                                         slider = slider)       
                 st.pyplot(ggseg_aseg)

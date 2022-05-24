@@ -682,7 +682,7 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
 
 # ============= 2D PLOTTING =============================================================================================================================================================
 
-def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
+def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None):     
 
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
@@ -692,20 +692,16 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
     :param subtype: name or index of the subtype to visualise (optional)  
     :param slider: int (optional)
     :returns a figures by plt.show() -> ggseg.plot_dk() 
-    """
-    
-    # Change hemi when changing files
-    mapped_dict = mapping_dk(hemi = False)    
+    """   
     
     if slider is None:
-        dk = dk_dict(T, S, mapped_dict = mapped_dict, subtype = subtype)  
+        dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)  
     else:
-        dk_ = dk_dict(T, S, mapped_dict = mapped_dict, subtype = subtype)
+        dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
         dk = {k: v for k, v in dk_.items() if v <= slider}
         
     
     if subtype is None:
-        # subtype = 'default = 0'
         pass
     else:
         return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
@@ -713,7 +709,7 @@ def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
                   background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 24)
 
 
-def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
+def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None):     
 
     """
     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
@@ -725,9 +721,9 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
     :returns a figures by plt.show() -> ggseg.plot_aseg()
     """
     if slider is None:  
-        aseg = aseg_dict(T,S, subtype = subtype)
+        aseg = aseg_dict(T,S, map_aseg,subtype = subtype)
     else:
-        aseg_ = aseg_dict(T,S, subtype = subtype)
+        aseg_ = aseg_dict(T,S, map_aseg, subtype = subtype)
         aseg = {k: v for k, v in aseg_.items() if v <= slider}
 
     if subtype is None:
@@ -737,71 +733,6 @@ def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):
         return ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
                 vminmax = [0,1],
                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
-
-# ============= 2D PLOTTING OLD =============================================================================================================================================================
-
-# def plot_dk_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
-    """
-    Creates a dictionary, which can be used as input to ggseg.plot_dk() function
-    :param T: timeline object from snowphlake
-    :param S: dictionary from snowphlake
-    :param subtype_labels: a list with names of the subtypes (optional)
-    :param subtype: name or index of the subtype to visualise (optional)  
-    :param slider: int
-    :returns a figures by plt.show() -> ggseg.plot_dk() 
-    """
-    mapped_dict = dk_regions_2D(T)    
-    
-    if slider is None:
-        dk = dk_dict_2D(T, S, mapped_dict = mapped_dict, subtype = subtype)  
-    else:
-        dk_ = dk_dict_2D(T, S, mapped_dict = mapped_dict, subtype = subtype)
-        dk = {k: v for k, v in dk_.items() if v <= slider}
-           
-    if subtype is None:
-        # subtype = 'default = 0'
-        pass
-    else:
-        return ggseg.plot_dk(dk, cmap='Reds_r', 
-                        figsize=(6,6),
-                        vminmax = [0,1],
-                        background='black', 
-                        edgecolor='white', 
-                        bordercolor='gray', 
-                        title=f'Cortical regions',
-                        fontsize = 24)
-
-
-# def plot_aseg_atlas(T,S, subtype_labels = None, subtype = None, slider = None):     
-    """
-    Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
-    :param T: timeline object from snowphlake
-    :param S: dictionary from snowphlake
-    :param subtype_labels: a list with names of the subtypes (optional)
-    :param subtype: name or index of the subtype to visualise (optional)  
-    :param slider: int
-    :returns a figures by plt.show() -> ggseg.plot_aseg()
-    """
-    if slider is None:  
-        aseg = aseg_dict_2D(T,S, subtype = subtype)
-    else:
-        aseg_ = aseg_dict_2D(T,S, subtype = subtype)
-        aseg = {k: v for k, v in aseg_.items() if v <= slider}
-
-    if subtype is None:
-        # subtype = 'Subtype 0'
-        pass 
-    else:
-        return ggseg.plot_aseg(aseg, 
-                            cmap='Reds_r', 
-                            figsize=(6,6),
-                            vminmax = [0,1],
-                            background='black', 
-                            edgecolor='white', 
-                            bordercolor='gray', 
-                            title=f'Subcortical regions', 
-                            fontsize = 18)
-
 
 
 
