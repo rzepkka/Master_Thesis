@@ -12,8 +12,8 @@ from collections import Counter
 from plotly.subplots import make_subplots
 import collections
 
-from mapping_2D import mapping_dk, dk_dict, aseg_dict
-from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
+from mapping_2D import dk_dict, aseg_dict
+# from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
 
 
 def subtype_metrics(T):
@@ -679,58 +679,6 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
 
     return fig  
 
-# def staging_scatterplot(S, diagnosis, color_list = ['#000000'], width=1100, height=800, fontsize=[34,18,14,22]):
-#     """
-#     Creates a scatterplot of staging ~ atypicality
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param color_list: list with color hex values (optional)
-#     :param width: int (optional)
-#     :param height: int (optional)
-#     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
-#     :return: plotly scatterplot
-#     """     
-#     labels = list(set(diagnosis[diagnosis!='CN']))
-#     staging = list(S['staging'])
-#     atypical = list(S['atypicality'])
-#     diagnosis = list(diagnosis)
-    
-#     df = pd.DataFrame(list(zip(staging, atypical,diagnosis)),
-#                columns =['Stage', 'Atypicality','Diagnosis'])
-#     df = df[df['Diagnosis'] != 'CN']
-
-#     color_map = {labels[i]: color_list[i] for i in range(len(color_list))}
-#     font_title, font_axes, font_ticks, font_legend = fontsize
-
-
-#     fig = px.scatter(df, x='Stage', y='Atypicality', color='Diagnosis', color_discrete_map=color_map)
-
-#     fig.update_layout(
-#         title="Staging ~ Atypicality",
-#         title_font_size=font_title,
-#         title_x=0.5,
-#         xaxis_title="Stage",
-#         yaxis_title="Atypicality",
-#         xaxis = dict(
-#             tickmode = 'linear',
-#             tick0 = 0.0,
-#             dtick = 2
-#         ),
-#         barmode='group',
-#         legend_font_size=font_legend,
-#         autosize = False,
-#         width=width,
-#         height=height
-#     )
-    
-#     fig.update_xaxes(range=[np.min(atypical)-1.5, np.max(atypical)])
-    
-#     fig.update_yaxes(title_font_size = font_axes, 
-#                     tickfont_size=font_ticks)
-    
-#     fig.update_xaxes(title_font_size = font_axes, 
-#                     tickfont_size = font_ticks)
-
-#     return fig  
 
 # ============= 2D PLOTTING =============================================================================================================================================================
 
