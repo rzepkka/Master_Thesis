@@ -1,0 +1,94 @@
+{
+  "temporal_lobe_left": [
+    "bankssts left",
+    "transverse temporal left",
+    "superior temporal left",
+    "temporal pole left",
+    "entorhinal left",
+    "middle temporal left",
+    "inferior temporal left",
+    "fusiform left",
+    "parahippocampal left"
+  ],
+  "frontal_lobe_left": [
+    "superior frontal left",
+    "frontal pole left",
+    "caudal middle frontal left",
+    "rostral middle frontal left",
+    "pars opercularis left",
+    "pars orbitalis left",
+    "pars triangularis left",
+    "medial orbitofrontal left",
+    "lateral orbitofrontal left",
+    "precentral left",
+    "paracentral left"
+  ],
+  "parietal_lobe_left": [
+    "postcentral left",
+    "superior parietal left",
+    "precuneus left",
+    "inferior parietal left",
+    "supramarginal left"
+  ],
+  "occipital_lobe_left": [
+    "lateral occipital left",
+    "cuneus left",
+    "pericalcarine left",
+    "lingual left"
+  ],
+  "cingulate_lobe_left": [
+    "caudal anterior cingulate left",
+    "rostral anterior cingulate left",
+    "posterior cingulate left",
+    "isthmus cingulate left"
+  ],
+  "insula_left": [
+    "insula left"
+  ],
+  "temporal_lobe_right": [
+    "bankssts right",
+    "transverse temporal right",
+    "superior temporal right",
+    "temporal pole right",
+    "entorhinal right",
+    "middle temporal right",
+    "inferior temporal right",
+    "fusiform right",
+    "parahippocampal right"
+  ],
+  "frontal_lobe_right": [
+    "superior frontal right",
+    "frontal pole right",
+    "caudal middle frontal right",
+    "rostral middle frontal right",
+    "pars opercularis right",
+    "pars orbitalis right",
+    "pars triangularis right",
+    "medial orbitofrontal right",
+    "lateral orbitofrontal right",
+    "precentral right",
+    "paracentral right"
+  ],
+  "parietal_lobe_right": [
+    "postcentral right",
+    "superior parietal right",
+    "precuneus right",
+    "inferior parietal right",
+    "supramarginal right"
+  ],
+  "occipital_lobe_right": [
+    "lateral occipital right",
+    "cuneus right",
+    "pericalcarine right",
+    "lingual right"
+  ],
+  "cingulate_lobe_right": [
+    "caudal anterior cingulate right",
+    "rostral anterior cingulate right",
+    "posterior cingulate right",
+    "isthmus cingulate right"
+  ],
+  "insula_right": [
+    "insula right"
+  ]
+}
