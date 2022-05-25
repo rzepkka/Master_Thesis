@@ -80,3 +80,83 @@ temp_folder/dk_R_Subtype 1.csv
 temp_folder/dk_R_Subtype 2.csv
 temp_folder/dk_R_Subtype 3.csv
 __pycache__/mapping_3D.cpython-39.pyc
+tests/html_3D/sub0/crosstalk-1.2.0/css/crosstalk.min.css
+tests/html_3D/sub0/crosstalk-1.2.0/js/crosstalk.js
+tests/html_3D/sub0/crosstalk-1.2.0/js/crosstalk.js.map
+tests/html_3D/sub0/crosstalk-1.2.0/js/crosstalk.min.js
+tests/html_3D/sub0/crosstalk-1.2.0/js/crosstalk.min.js.map
+tests/html_3D/sub0/crosstalk-1.2.0/scss/crosstalk.scss
+tests/html_3D/sub0/htmlwidgets-1.5.4/htmlwidgets.js
+tests/html_3D/sub0/jquery-3.5.1/jquery-AUTHORS.txt
+tests/html_3D/sub0/jquery-3.5.1/jquery.js
+tests/html_3D/sub0/jquery-3.5.1/jquery.min.js
+tests/html_3D/sub0/jquery-3.5.1/jquery.min.map
+tests/html_3D/sub0/plotly-binding-4.10.0/plotly.js
+tests/html_3D/sub0/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css
+tests/html_3D/sub0/plotly-main-2.5.1/plotly-latest.min.js
+tests/html_3D/sub0/typedarray-0.1/typedarray.min.js
+tests/html_3D/sub1/crosstalk-1.2.0/css/crosstalk.min.css
+tests/html_3D/sub1/crosstalk-1.2.0/js/crosstalk.js
+tests/html_3D/sub1/crosstalk-1.2.0/js/crosstalk.js.map
+tests/html_3D/sub1/crosstalk-1.2.0/js/crosstalk.min.js
+tests/html_3D/sub1/crosstalk-1.2.0/js/crosstalk.min.js.map
+tests/html_3D/sub1/crosstalk-1.2.0/scss/crosstalk.scss
+tests/html_3D/sub1/htmlwidgets-1.5.4/htmlwidgets.js
+tests/html_3D/sub1/jquery-3.5.1/jquery-AUTHORS.txt
+tests/html_3D/sub1/jquery-3.5.1/jquery.js
+tests/html_3D/sub1/jquery-3.5.1/jquery.min.js
+tests/html_3D/sub1/jquery-3.5.1/jquery.min.map
+tests/html_3D/sub1/plotly-binding-4.10.0/plotly.js
+tests/html_3D/sub1/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css
+tests/html_3D/sub1/plotly-main-2.5.1/plotly-latest.min.js
+tests/html_3D/sub1/typedarray-0.1/typedarray.min.js
+tests/html_3D/sub2/crosstalk-1.2.0/css/crosstalk.min.css
+tests/html_3D/sub2/crosstalk-1.2.0/js/crosstalk.js
+tests/html_3D/sub2/crosstalk-1.2.0/js/crosstalk.js.map
+tests/html_3D/sub2/crosstalk-1.2.0/js/crosstalk.min.js
+tests/html_3D/sub2/crosstalk-1.2.0/js/crosstalk.min.js.map
+tests/html_3D/sub2/crosstalk-1.2.0/scss/crosstalk.scss
+tests/html_3D/sub2/htmlwidgets-1.5.4/htmlwidgets.js
+tests/html_3D/sub2/jquery-3.5.1/jquery-AUTHORS.txt
+tests/html_3D/sub2/jquery-3.5.1/jquery.js
+tests/html_3D/sub2/jquery-3.5.1/jquery.min.js
+tests/html_3D/sub2/jquery-3.5.1/jquery.min.map
+tests/html_3D/sub2/plotly-binding-4.10.0/plotly.js
+tests/html_3D/sub2/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css
+tests/html_3D/sub2/plotly-main-2.5.1/plotly-latest.min.js
+tests/html_3D/sub2/typedarray-0.1/typedarray.min.js
+tests/html_3D/sub3/crosstalk-1.2.0/css/crosstalk.min.css
+tests/html_3D/sub3/crosstalk-1.2.0/js/crosstalk.js
+tests/html_3D/sub3/crosstalk-1.2.0/js/crosstalk.js.map
+tests/html_3D/sub3/crosstalk-1.2.0/js/crosstalk.min.js
+tests/html_3D/sub3/crosstalk-1.2.0/js/crosstalk.min.js.map
+tests/html_3D/sub3/crosstalk-1.2.0/scss/crosstalk.scss
+tests/html_3D/sub3/htmlwidgets-1.5.4/htmlwidgets.js
+tests/html_3D/sub3/jquery-3.5.1/jquery-AUTHORS.txt
+tests/html_3D/sub3/jquery-3.5.1/jquery.js
+tests/html_3D/sub3/jquery-3.5.1/jquery.min.js
+tests/html_3D/sub3/jquery-3.5.1/jquery.min.map
+tests/html_3D/sub3/plotly-binding-4.10.0/plotly.js
+tests/html_3D/sub3/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css
+tests/html_3D/sub3/plotly-main-2.5.1/plotly-latest.min.js
+tests/html_3D/sub3/typedarray-0.1/typedarray.min.js
+tests/html_3D/Subtype_0.html
+tests/html_3D/Subtype_1.html
+tests/html_3D/Subtype_2.html
+tests/html_3D/Subtype_3.html
+tests/R/custom_ggseg.R
+tests/R/data/aseg_R_Subtype 0.csv
+tests/R/data/aseg_R_Subtype 1.csv
+tests/R/data/aseg_R_Subtype 2.csv
+tests/R/data/aseg_R_Subtype 3.csv
+tests/R/data/dk_R_Subtype 0.csv
+tests/R/data/dk_R_Subtype 1.csv
+tests/R/data/dk_R_Subtype 2.csv
+tests/R/data/dk_R_Subtype 3.csv
+tests/R/R_calling.R
+tests/R/tests.R
+tests/requirements.txt
+tests/rpy2_snowphlake.ipynb
+notebook_examples/.ipynb_checkpoints/rpy2_snowphlake-checkpoint.ipynb
+notebook_examples/.ipynb_checkpoints/rpy2-checkpoint.ipynb
+__pycache__/app_setup.cpython-39.pyc
