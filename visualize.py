@@ -57,14 +57,14 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
     # Query diagnosis for plotting
     df_plot = df[df['Diagnosis'].isin(chosen_subtypes)]
 
-    fig = px.pie(df_plot, values='Counts', names='Subtype', title='Subtypes')
+    fig = px.pie(df_plot, values='Counts', names='Subtype')
 
     fig.update_traces(textposition='inside', textinfo='value+percent')   
     
-    fig.update_layout(title=f'{chosen_subtypes}',
-                  title_x=0.5,
-                  title_font_size=24,
-                  legend_font_size=18)
+    fig.update_layout(title_x=0.5,
+                    title_font_size=24,
+                    title=f'Numbers of cases in the cohort',
+                    legend_font_size=18)
 
     return fig
 
