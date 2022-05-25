@@ -177,8 +177,8 @@ def safe_html(labels):
           
       robjects.r('''
       
-      dk_data <- read.csv(file = paste('/Users/macos/Documents/GitHub/Master_Thesis/temp_folder/dk_R_Subtype ',i,'.csv', sep=''))
-      aseg_data <- read.csv(file = paste('/Users/macos/Documents/GitHub/Master_Thesis/temp_folder/aseg_R_Subtype ',i,'.csv', sep=''))   
+      dk_data <- read.csv(file = paste('temp_folder/dk_R_Subtype ',i,'.csv', sep=''))
+      aseg_data <- read.csv(file = paste('temp_folder/aseg_R_Subtype ',i,'.csv', sep=''))   
 
       ''')
       
