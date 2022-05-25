@@ -1,0 +1,26 @@
+{
+  "thalamus": [
+    "Right-Thalamus-Proper",
+    "Left-Thalamus-Proper"
+  ],
+  "caudate": [
+    "Right-Caudate",
+    "Left-Caudate"
+  ],
+  "putamen": [
+    "Right-Putamen",
+    "Left-Putamen"
+  ],
+  "hippocampus": [
+    "Right-Hippocampus",
+    "Left-Hippocampus"
+  ],
+  "amygdala": [
+    "Right-Amygdala",
+    "Left-Amygdala"
+  ],
+  "accumbens-area": [
+    "Right-Accumbens-area",
+    "Left-Accumbens-area"
+  ]
+}
