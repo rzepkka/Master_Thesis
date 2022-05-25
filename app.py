@@ -16,19 +16,20 @@ import json
 import matplotlib.pyplot as plt
 from matplotlib import rc
 
-#
 import plotly.graph_objs as go
 from ipywidgets import Output
+
+from app_setup import get_labels
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 
 from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple
 
+
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-
+# ===================== LOAD FILES ==============================================================================================================================
 # LOAD PICKLE FILE
-# read_input_file = open('data/ADC_FTLD_subtypes_agecorrected_zscore_final.pickle','rb')
 read_input_file = open('data/EDADS_subtype_timelines_agecorrected_opt.pickle','rb')
 load_inputs = pickle.load(read_input_file)
 read_input_file.close()
@@ -40,25 +41,17 @@ diagnosis = np.load('data/diagnosis.npy', allow_pickle=True)
 
 # LOAD JSON FILES FOR MAPPING BRAIN REGIONS
 f = open('data/DK_2D_combined.json')
-DK_2D_combined = json.load(f)
+map_dk = json.load(f)
 f.close()
 
-f = open('data/ASEG_combined.json')
-ASEG_combined = json.load(f)
+f = open('data/ASEG_2D_combined.json')
+map_aseg = json.load(f)
 f.close()
-
-
 
 # Get labels for options in select boxes
-def get_labels(S):
-    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-    subtype_labels = []
-    for i in range(len(unique_subtypes)):
-        subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
-    return subtype_labels
-
 labels = get_labels(S=S)
 
+# ===================== APP ==============================================================================================================================
 def main():
 
     st.set_page_config(layout="wide")
@@ -70,10 +63,8 @@ def main():
             st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
     local_css("style.css")
 
-    st.header('Disease progression timeline')
-
     # SELECT PLOT
-    plot_type_list = ['Disease timeline']
+    plot_type_list = ['Disease timeline','Project overview']
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
 
     # CHOOSE WIDTH AND HEIGHT
@@ -82,22 +73,20 @@ def main():
 
     if chosen_plot_type == 'Disease timeline':
 
+        st.header('Disease progression timeline')
+
         col_piechart, col_piechart_select = st.columns([5.2,3])
 
-        with col_piechart_select:
+        with col_piechart:
             diagnosis_labels = list(set(diagnosis))
             diagnosis_labels.remove('CN')
-            choose_pieplot = st.multiselect('Diagnoses included int the piechart:', diagnosis_labels, default=diagnosis_labels)
-
-
-        with col_piechart:
+            choose_pieplot = st.multiselect('Diagnoses included in the piechart:', diagnosis_labels, default=diagnosis_labels)
             plot_piechart = piechart_multiple(S=S,
                                             diagnosis=diagnosis,
                                             chosen_subtypes=choose_pieplot)
             st.plotly_chart(plot_piechart)
 
         # SELECTION
-        # options = ['Subtype 0','Subtype 1', 'Subtype 2', 'Subtype 3', 'Subtype 4']
         num_subtypes = len(labels)
  
         subtype_list = []
@@ -108,14 +97,22 @@ def main():
         subtype_list.append(subtype_visualize)
 
         # BUTTONS
-        html_file = subtype_visualize.replace(" ","_")
+        html_file = subtype_visualize
+        # html_file = subtype_visualize.replace(" ","_")
 
         if st.sidebar.button('Open 3D visualization in a new tab'):
-            filename = "file://"+os.getcwd()+ f"/html_3D/{html_file}.html"
-            webbrowser.open(filename, new = 2)
 
-        if st.sidebar.button('Download 3D visualisation as HTML file'):
-            st.sidebar.warning('Feature not added yet')
+            try:
+                filename = "file://"+os.getcwd()+ f"/temp_folder/{html_file}.html"
+                webbrowser.open(filename)
+
+            except FileNotFoundError:
+                st.sidebar.error('File not found')
+                st.sidebar.error('Please run app_setup file before trying to download 3D visualisations')
+
+
+        # if st.sidebar.button('Download 3D visualisation as HTML file'):
+        #     st.sidebar.warning('Feature not added yet')
 
         color_list = []
         default_color_list = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']  
@@ -137,7 +134,7 @@ def main():
             with col_cortical:
                 ggseg_dk = plot_dk_atlas(T = T, 
                                         S = S,
-                                        map_dk=DK_2D_combined,
+                                        map_dk=map_dk,
                                         subtype = subtype_visualize, 
                                         slider = slider)
                 st.pyplot(ggseg_dk)
@@ -145,7 +142,7 @@ def main():
             with col_subcortical:     
                 ggseg_aseg = plot_aseg_atlas(T = T, 
                                         S = S, 
-                                        map_aseg=ASEG_combined,
+                                        map_aseg=map_aseg,
                                         subtype = subtype_visualize, 
                                         slider = slider)       
                 st.pyplot(ggseg_aseg)
@@ -289,6 +286,9 @@ def main():
 
         # ADD DIVIDER
         st.markdown('---')
+
+    else:
+        st.subheader('Project presentation will be here')
 
 main()
 
