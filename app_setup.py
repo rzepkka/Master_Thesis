@@ -43,6 +43,7 @@ map_aseg = json.load(f)
 f.close()
 
 
+
 # =================== 4. RUN MAPPING FUNCTIONS - dk_3D() AND aseg_3D() FOR EACH Subtype AND SAVE DATA IN temp_folder
 save_subtype_data(T, S, map_dk, map_aseg)
 
@@ -57,14 +58,14 @@ utils.chooseCRANmirror(ind=1)
 
 # import libraries, set colors
 robjects.r('''
-	library(ggseg3d)
-	library(ggseg)
-	library(ggplot2)
-	library(dplyr)
-	library(tidyr)
-	library(htmltools)
-	library(htmlwidgets)
-	library(plotly)
+	library(ggseg3d, quietly = T)
+	library(ggseg, quietly = T)
+	library(ggplot2, quietly = T)
+	library(dplyr, quietly = T)
+	library(tidyr, quietly = T)
+	library(htmltools, quietly = T)
+	library(htmlwidgets, quietly = T)
+	library(plotly, quietly = T)
 
 	options(warn=-1)
 
@@ -171,62 +172,64 @@ environment(custom_ggseg) <- asNamespace('ggseg3d')
 ''')
 
 # Save html files for each subtype
-for i in range(len(labels)):
-    robjects.globalenv['i'] = i
-        
-    robjects.r('''
-    
-    dk_data <- read.csv(file = paste('/Users/macos/Documents/GitHub/Master_Thesis/temp_folder/dk_R_Subtype ',i,'.csv', sep=''))
-    aseg_data <- read.csv(file = paste('/Users/macos/Documents/GitHub/Master_Thesis/temp_folder/aseg_R_Subtype ',i,'.csv', sep=''))   
 
-    ''')
-    
-    
-    output = robjects.r('''
+def safe_html(labels):
+  for i in range(len(labels)):
+      robjects.globalenv['i'] = i
+          
+      robjects.r('''
       
-    dk = custom_ggseg(.data = dk_data,
-             atlas = dk_3d,
-             hemisphere = c('left','right'),
-             colour = "p",
-             palette = colors,
-             text = "p",
-             options.legend = list(title=list(text="Cortical"),dtick=0.1,
-                              tickformatstops=list(dtickrange=c(0,1))),
-             scene = 'scene')
+      dk_data <- read.csv(file = paste('/Users/macos/Documents/GitHub/Master_Thesis/temp_folder/dk_R_Subtype ',i,'.csv', sep=''))
+      aseg_data <- read.csv(file = paste('/Users/macos/Documents/GitHub/Master_Thesis/temp_folder/aseg_R_Subtype ',i,'.csv', sep=''))   
 
-    aseg = custom_ggseg(.data = aseg_data, 
-                   atlas = aseg_3d, 
-                   colour = "p", 
-                   palette = colors,
-                   text = "p", 
-                   options.legend = list(title=list(text="Subcortical"),dtick=0.1,
-                                         tickformatstops=list(dtickrange=c(0,1))),
-                   scene = 'scene2'
-    )
-    
-    fig <- subplot(dk, aseg)
-    fig <- fig %>% layout(title = paste('Subtype', i),
-                            scene = list(domain=list(x=c(0,1),y=c(0.5,1)),
-                                         aspectmode='auto',
-                                         xaxis=list(backgroundcolor='white')
-                            ),
-                            scene2 = list(domain=list(x=c(0,1),y=c(0,0.5)),
-                                          aspectmode='auto'
-                            )) 
-                              
-    fig
-   
-   ''')
-    
-    
-    htmlwidgets.saveWidget(output, f"temp_folder/Subtype {i}.html", selfcontained = False, libdir = f"sub {i}")
+      ''')
+      
+      
+      output = robjects.r('''
+        
+      dk = custom_ggseg(.data = dk_data,
+               atlas = dk_3d,
+               hemisphere = c('left','right'),
+               colour = "p",
+               palette = colors,
+               text = "p",
+               options.legend = list(title=list(text="Cortical"),dtick=0.1,
+                                tickformatstops=list(dtickrange=c(0,1))),
+               scene = 'scene')
+
+      aseg = custom_ggseg(.data = aseg_data, 
+                     atlas = aseg_3d, 
+                     colour = "p", 
+                     palette = colors,
+                     text = "p", 
+                     options.legend = list(title=list(text="Subcortical"),dtick=0.1,
+                                           tickformatstops=list(dtickrange=c(0,1))),
+                     scene = 'scene2'
+      )
+      
+      fig <- subplot(dk, aseg)
+      fig <- fig %>% layout(title = paste('Subtype', i),
+                              scene = list(domain=list(x=c(0,1),y=c(0.5,1)),
+                                           aspectmode='auto',
+                                           xaxis=list(backgroundcolor='white')
+                              ),
+                              scene2 = list(domain=list(x=c(0,1),y=c(0,0.5)),
+                                            aspectmode='auto'
+                              )) 
+                                
+      fig
+     
+     ''')
+      
+      
+      htmlwidgets.saveWidget(output, f"temp_folder/Subtype {i}.html", selfcontained = False, libdir = f"sub {i}")
 
 
-print('All HTML files successfully saved in: /temp_folder')
-print('Run Streamlit APP by calling ">> streamlit run app.py" from command line')
+  print('All HTML files successfully saved in: /temp_folder')
+  print('Run Streamlit APP by calling ">> streamlit run app.py" from command line')
 
 
-
+safe_html(labels)
 
 
 
