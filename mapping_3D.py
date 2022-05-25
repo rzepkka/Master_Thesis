@@ -2,6 +2,38 @@ import numpy as np
 import scipy.stats 
 import pandas as pd
 
+def save_subtype_data(T, S, map_dk, map_aseg):  
+    """
+    Saves all subtypes data in separate .csv files for DK and ASEG atlas
+    :param T: Timeline object
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param map_dk: dictionary from loaded JSON file, key: values --> T.biomarker_labels: list(DK-labels)
+    :param map_aseg: dictionary from loaded JSON file, key: values --> T.biomarker_labels: list(ASEG-labels)
+    :return: info if data was saved
+    """
+    
+    # Get subtype labels
+    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+    subtype_labels = []
+    for i in range(len(unique_subtypes)):
+        subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))  
+        
+    # Save each file as csv
+    for label in subtype_labels:
+        
+        dk = dk_3D(T, S, 
+                   mapped_dict = map_dk, 
+                   subtype = label)
+        
+        aseg = aseg_3D(T, S, 
+                       mapped_dict = map_aseg, 
+                       subtype = label)
+
+        dk.to_csv(f'temp_folder/dk_R_{label}.csv', index = False)
+        aseg.to_csv(f'temp_folder/aseg_R_{label}.csv', index = False)    
+        
+    print('All suptype files saved in: /temp_folder')
+
 
 # ====================================== DK-ATLAS ==================================================================================================================
 
