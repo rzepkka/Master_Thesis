@@ -19,7 +19,7 @@ from matplotlib import rc
 import plotly.graph_objs as go
 from ipywidgets import Output
 
-from app_setup import get_labels
+# from app_setup import get_labels
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 
@@ -49,7 +49,16 @@ map_aseg = json.load(f)
 f.close()
 
 # Get labels for options in select boxes
+def get_labels(S):
+      unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+      subtype_labels = []
+      for i in range(len(unique_subtypes)):
+          subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
+      return subtype_labels
+      
 labels = get_labels(S=S)
+
+# Setup the APP - saving all files 
 
 # ===================== APP ==============================================================================================================================
 def main():

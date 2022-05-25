@@ -14,6 +14,12 @@ from rpy2.robjects import pandas2ri
 
 from mapping_3D import dk_3D, aseg_3D, save_subtype_data
 
+def get_labels(S):
+      unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+      subtype_labels = []
+      for i in range(len(unique_subtypes)):
+          subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
+      return subtype_labels
 
 # =================== 1. LOAD PICKLE FILE ========================================================================================================================================================
 read_input_file = open('data/EDADS_subtype_timelines_agecorrected_opt.pickle','rb')
@@ -23,15 +29,8 @@ read_input_file.close()
 T, S, Sboot = load_inputs
 
 # =================== 2. GET SUBTYPE LABELS=====================================================================================================================================
-def get_labels(S):
-    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-    subtype_labels = []
-    for i in range(len(unique_subtypes)):
-        subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
-    return subtype_labels
 
 labels = get_labels(S=S)
-
 
 # =================== 3. LOAD JSON FILES FOR BRAIN REGION MAPPINGS ===============================================================================================
 f = open('data/DK_3D_combined.json')
@@ -41,7 +40,6 @@ f.close()
 f = open('data/ASEG_3D_combined.json')
 map_aseg = json.load(f)
 f.close()
-
 
 
 # =================== 4. RUN MAPPING FUNCTIONS - dk_3D() AND aseg_3D() FOR EACH Subtype AND SAVE DATA IN temp_folder
@@ -54,18 +52,18 @@ save_subtype_data(T, S, map_dk, map_aseg)
 utils = importr('utils')
 base = importr("base")
 htmlwidgets = importr('htmlwidgets')
-utils.chooseCRANmirror(ind=1)
+# utils.chooseCRANmirror(ind=1)
 
 # import libraries, set colors
 robjects.r('''
-	library(ggseg3d, quietly = T)
-	library(ggseg, quietly = T)
-	library(ggplot2, quietly = T)
-	library(dplyr, quietly = T)
-	library(tidyr, quietly = T)
-	library(htmltools, quietly = T)
-	library(htmlwidgets, quietly = T)
-	library(plotly, quietly = T)
+	library(ggseg3d)
+	library(ggseg)
+	library(ggplot2)
+	library(dplyr)
+	library(tidyr)
+	library(htmltools)
+	library(htmlwidgets)
+	library(plotly)
 
 	options(warn=-1)
 
@@ -225,8 +223,9 @@ def safe_html(labels):
       htmlwidgets.saveWidget(output, f"temp_folder/Subtype {i}.html", selfcontained = False, libdir = f"sub {i}")
 
 
-  print('All HTML files successfully saved in: /temp_folder')
-  print('Run Streamlit APP by calling ">> streamlit run app.py" from command line')
+  print('PROGRESS: All HTML files successfully saved in: /temp_folder')
+  print('CONTINUE running Streamlit APP by calling ">> streamlit run app.py" from command line')
+
 
 
 safe_html(labels)
