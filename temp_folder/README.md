@@ -5,4 +5,4 @@ Files created by running
 Files created:
 - .csv --> mapped brain regions
 - .html --> 3D visualisations
-- "sub" fpolder --> data for 3D graphs
+- "sub" folders --> data for 3D graphs
