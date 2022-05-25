@@ -161,3 +161,5 @@ notebook_examples/.ipynb_checkpoints/rpy2_snowphlake-checkpoint.ipynb
 notebook_examples/.ipynb_checkpoints/rpy2-checkpoint.ipynb
 __pycache__/app_setup.cpython-39.pyc
 .RData 2
+tests/mapping_2D.ipynb
+tests/mapping_3D.ipynb
