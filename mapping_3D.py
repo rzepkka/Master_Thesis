@@ -32,7 +32,7 @@ def save_subtype_data(T, S, map_dk, map_aseg):
         dk.to_csv(f'temp_folder/dk_R_{label}.csv', index = False)
         aseg.to_csv(f'temp_folder/aseg_R_{label}.csv', index = False)    
         
-    print('All suptype files saved in: /temp_folder')
+    print('PROGRESS: All suptype files saved in: /temp_folder')
 
 
 # ====================================== DK-ATLAS ==================================================================================================================
