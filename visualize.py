@@ -35,9 +35,12 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
         for i in range(len(unique_subtypes)):
             subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
             
+    subtype_labels.append("unknown")
+            
     subtypes = list(S['subtypes'])
+    subtypes = ['unknown' if np.isnan(s) else s for s in subtypes]
     
-    # Get diagnosis lables (explode controls)
+    # Get diagnosis lables (exclude controls)
     diagnosis_labels = list(set(diagnosis))
     diagnosis_labels.remove('CN')
     diagnosis_labels.sort()
@@ -47,6 +50,7 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
 
     df = {'Diagnosis':diagnosis, 'Subtype':subtypes}
     df = pd.DataFrame(df)
+    df = df[df['Diagnosis']!='CN']
         
     # Create DataFrame for quering to plotting
     df_subtypes = subtype_labels*len(diagnosis_labels)
@@ -57,14 +61,15 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
     # Query diagnosis for plotting
     df_plot = df[df['Diagnosis'].isin(chosen_subtypes)]
 
-    fig = px.pie(df_plot, values='Counts', names='Subtype')
+    fig = px.pie(df_plot, values='Counts', names='Subtype', title='Subtypes')
 
+    # style the plot
     fig.update_traces(textposition='inside', textinfo='value+percent')   
     
-    fig.update_layout(title_x=0.5,
-                    title_font_size=24,
-                    title=f'Numbers of cases in the cohort',
-                    legend_font_size=18)
+    fig.update_layout(title=f'{chosen_subtypes}',
+                  title_x=0.5,
+                  title_font_size=24,
+                  legend_font_size=18)
 
     return fig
 
