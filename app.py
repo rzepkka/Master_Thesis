@@ -55,7 +55,7 @@ def get_labels(S):
       for i in range(len(unique_subtypes)):
           subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
       return subtype_labels
-      
+
 labels = get_labels(S=S)
 
 # Setup the APP - saving all files 
@@ -103,32 +103,11 @@ def main():
         col_select, col_select_blank = st.columns([5.2,3])
         with col_select:
             subtype_visualize = st.selectbox('Select a subtype to visualize:',labels)       
-        subtype_list.append(subtype_visualize)
-
-        # BUTTONS
-        html_file = subtype_visualize
-        # html_file = subtype_visualize.replace(" ","_")
-
-        if st.sidebar.button('Open 3D visualization in a new tab'):
-
-            try:
-                filename = "file://"+os.getcwd()+ f"/temp_folder/{html_file}.html"
-                webbrowser.open(filename)
-
-            except FileNotFoundError:
-                st.sidebar.error('File not found')
-                st.sidebar.error('Please run app_setup file before trying to download 3D visualisations')
-
-
-        # if st.sidebar.button('Download 3D visualisation as HTML file'):
-        #     st.sidebar.warning('Feature not added yet')
-
-        color_list = []
-        default_color_list = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']  
+        subtype_list.append(subtype_visualize) 
 
         # ======================= 2D ===============================================================================================================
         
-        col_cortical, col_subcortical, col_blank = st.columns([2,3.2,3])
+        col_cortical, col_subcortical, col_button = st.columns([2,3.2,3])
 
         if subtype_visualize != None:
 
@@ -155,6 +134,27 @@ def main():
                                         subtype = subtype_visualize, 
                                         slider = slider)       
                 st.pyplot(ggseg_aseg)
+
+            # BUTTONS
+            html_file = subtype_visualize
+            # html_file = subtype_visualize.replace(" ","_")
+
+            color_list = []
+            default_color_list = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd'] 
+
+            with col_button:
+                if st.button('Open 3D visualization in a new tab'):
+                    try:
+                        filename = "file://"+os.getcwd()+ f"/temp_folder/{html_file}.html"
+                        webbrowser.open(filename)
+
+                    except FileNotFoundError:
+                        st.sidebar.error('File not found')
+                        st.sidebar.error('Please run app_setup file before trying to download 3D visualisations')
+
+                # if st.sidebar.button('Download 3D visualisation as HTML file'):
+                #     st.warning('Feature not added yet')
+
 
         # ======================= EVENT CENTERS ===============================================================================================================
 
