@@ -280,9 +280,9 @@ def main():
 
 
             with col_staging:
-                diagnosis_labels = list(set(diagnosis))
-                diagnosis_labels.remove('CN')
-                choose_scatterplot = st.multiselect('Diagnoses included in the scatterplot:', diagnosis_labels, default=diagnosis_labels)
+                # diagnosis_labels = list(set(diagnosis))
+                # diagnosis_labels.remove('CN')
+                choose_scatterplot = st.multiselect('Diagnoses included in the scatterplot:', labels, default=labels)
 
                 plot_scatter = staging_scatterplot(S=S,
                                                 diagnosis=diagnosis,

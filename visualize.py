@@ -289,104 +289,6 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
     return fig
 
 
-# def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width=0.02, width=1200, height=900, 
-#                         fontsize=[34,18,14,22], opacity=0.8, barmode = 'group'):
-#     """
-#     Creates a barplot for diagnosis
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param diagnosis: np.array or list with diagnosis labels corresponding to records in S
-#     :param color_list: list with color hex values
-#     :param num_bins: int, how many bins should be displayed (optional)
-#     :param bin_width: int (optional)
-#     :param width: int (optional)
-#     :param height: int (optional)
-#     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
-#     :param opacity: float (optional)
-#     :param barmode: string, 'group' or 'stack'
-#     :return: plotly go Bar figure
-#     """  
-    
-#     # Convert NaNs to 0.0
-#     staging = np.array([np.float64(0.0) if np.isnan(stage) else stage for stage in S['staging']])
-   
-#     # Count number of each subtype occurences
-#     counter = dict(Counter(diagnosis))
-        
-#     # Get labels
-#     labels = list(set(diagnosis[diagnosis!='CN']))
-#     labels.sort()
-    
-#     # Get indexes
-#     diagnosis = np.array(diagnosis)
-#     staging = np.array(staging)
-    
-#     # Get indexes for each diagnostic label
-#     idx_list = []
-#     for l in labels:
-#         if l!='CN':
-#             idx = np.where(diagnosis==l)
-#             idx = idx[0]
-#             idx_list.append(idx)
-            
-             
-      
-#     # Bar settings
-#     freq,binc=np.histogram(staging,bins=num_bins)
-#     bin_width = np.repeat(bin_width, num_bins)
-          
-#     # color_list = color_list
-        
-#     num_bins = num_bins
-#     bar_width = np.repeat(0.02, num_bins)
-#     counter = dict(Counter(diagnosis))
-
-#     fig = go.Figure()
-
-#     for count, idx in enumerate(idx_list):
-#         freq,binc=np.histogram(staging[idx],bins=binc) # , range = (0.,1.)
-#         freq = (1.*freq)/len(staging)
-#         label = labels[count]
-
-#         fig.add_trace(go.Bar(
-#                     x=binc,
-#                     y=freq,
-#                     name=f'{label} (n = {counter[label]})', 
-#                     width=bin_width,
-#                     marker_color=color_list[count],
-#                     opacity=opacity
-#         )) 
-                
-#     font_title, font_axes, font_ticks, font_legend = fontsize
-
-#     fig.update_layout(
-#         title="Patient Staging",
-#         title_font_size=font_title,
-#         title_x=0.5,
-#         xaxis_title="Disease Stage",
-#         yaxis_title="Frequency of occurences",
-#         xaxis = dict(
-#             tickmode = 'linear',
-#             tick0 = 0.0,
-#             dtick = 0.1
-#         ),
-#         barmode=barmode,
-#         legend_font_size=font_legend,
-#         autosize = False,
-#         width=width,
-#         height=height
-#     )
-    
-#     fig.update_xaxes(range=[-0.05, 1.0])
-    
-#     fig.update_yaxes(title_font_size = font_axes, 
-#                     tickfont_size=font_ticks)
-    
-#     fig.update_xaxes(title_font_size = font_axes, 
-#                     tickfont_size = font_ticks)
-
-#     return fig
-
-
 
 def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
     """
@@ -638,12 +540,92 @@ def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400,
 
 # ============= SCATTEEPLOT =============================================================================================================================================================
 
+# def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = None, color_list = ['#000000'], width=1100, height=800, fontsize=[34,18,14,22]):
+#     """
+#     Creates a scatterplot of staging ~ atypicality
+#     :param S: subtyping dictionary, subtypes for each patient individually
+#     :param subtype_labels: list with label name for the subtypes (optional)
+#     :param chosen_subtypes: a list with diagnosis labels to consider in the plot
+#     :param color_list: list with color hex values (optional)
+#     :param width: int (optional)
+#     :param height: int (optional)
+#     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
+#     :return: plotly scatterplot
+#     """     
+    
+#     # Get subtype labels
+#     unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+#     if subtype_labels is None:
+#         subtype_labels = []
+#         for i in range(len(unique_subtypes)):
+#             subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
+            
+#     subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
+    
+#     # Get diagnosis lables (exclude controls)
+#     diagnosis_labels = list(set(diagnosis))
+#     diagnosis_labels.remove('CN')
+#     diagnosis_labels.sort()
+
+#     if chosen_subtypes is None:
+#         chosen_subtypes=diagnosis_labels
+       
+#     # Create DataFrame
+#     staging = list(S['staging'])
+#     atypical = list(S['atypicality'])
+#     diagnosis = list(diagnosis)
+#     subtype = list(S['subtypes'])
+    
+#     df = pd.DataFrame(list(zip(staging, atypical,subtype, diagnosis)),
+#                columns =['Stage', 'Atypicality','Subtype','Diagnosis'])
+#     df = df[df['Diagnosis'] != 'CN']
+#     df['Subtype'] = df['Subtype'].apply(lambda x: x if np.isnan(x) else subtype_map[x])
+#     df = df.dropna(axis=0, subset=['Subtype'])
+
+#     color_map = {subtype_labels[i]: color_list[i] for i in range(len(color_list))}
+
+#     font_title, font_axes, font_ticks, font_legend = fontsize
+    
+
+#     df_plot = df[df['Diagnosis'].isin(chosen_subtypes)]
+    
+#     fig = px.scatter(df_plot, x='Stage', y='Atypicality', color='Subtype', color_discrete_map=color_map)
+
+#     fig.update_layout(
+#         title="Staging ~ Atypicality",
+#         title_font_size=font_title,
+#         title_x=0.5,
+#         xaxis_title="Stage",
+#         yaxis_title="Atypicality",
+#         xaxis = dict(
+#             tickmode = 'linear',
+#             tick0 = 0.0,
+#             dtick = 2
+#         ),
+#         barmode='group',
+#         legend_font_size=font_legend,
+#         autosize = False,
+#         width=width,
+#         height=height
+#     )
+    
+#     fig.update_xaxes(range=[np.min(atypical)-1.5, np.max(atypical)])
+    
+#     fig.update_yaxes(title_font_size = font_axes, 
+#                     tickfont_size=font_ticks)
+    
+#     fig.update_xaxes(title_font_size = font_axes, 
+#                     tickfont_size = font_ticks)
+
+#     return fig  
+
+
 def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = None, color_list = ['#000000'], width=1100, height=800, fontsize=[34,18,14,22]):
     """
     Creates a scatterplot of staging ~ atypicality
     :param S: subtyping dictionary, subtypes for each patient individually
     :param subtype_labels: list with label name for the subtypes (optional)
-    :param chosen_subtypes: a list with diagnosis labels to consider in the plot
+    :param chosen_subtypes: a list with subtype labels to consider in the plot
     :param color_list: list with color hex values (optional)
     :param width: int (optional)
     :param height: int (optional)
@@ -679,16 +661,17 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
     df = df[df['Diagnosis'] != 'CN']
     df['Subtype'] = df['Subtype'].apply(lambda x: x if np.isnan(x) else subtype_map[x])
     df = df.dropna(axis=0, subset=['Subtype'])
-
-    color_map = {subtype_labels[i]: color_list[i] for i in range(len(color_list))}
-
-    font_title, font_axes, font_ticks, font_legend = fontsize
     
+#     color_map = {subtype_labels[i]: color_list[i] for i in range(len(color_list))}
+    color_map = {diagnosis_labels[i]: color_list[i] for i in range(len(diagnosis_labels))}
 
-    df_plot = df[df['Diagnosis'].isin(chosen_subtypes)]
+    font_title, font_axes, font_ticks, font_legend = fontsize    
+
+    df_plot = df[df['Subtype'].isin(chosen_subtypes)] # df['Diagnosis']
     
-    fig = px.scatter(df_plot, x='Stage', y='Atypicality', color='Subtype', color_discrete_map=color_map)
+    fig = px.scatter(df_plot, x='Stage', y='Atypicality', color='Diagnosis', color_discrete_map=color_map) # color='Subtype'
 
+    # style the plot
     fig.update_layout(
         title="Staging ~ Atypicality",
         title_font_size=font_title,
@@ -707,13 +690,14 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
         height=height
     )
     
-    fig.update_xaxes(range=[np.min(atypical)-1.5, np.max(atypical)])
+    fig.update_xaxes(range=[np.min(atypical)-1.5, 
+                            np.max(atypical)],
+                     title_font_size = font_axes, 
+                    tickfont_size = font_ticks
+                    )
     
     fig.update_yaxes(title_font_size = font_axes, 
                     tickfont_size=font_ticks)
-    
-    fig.update_xaxes(title_font_size = font_axes, 
-                    tickfont_size = font_ticks)
 
     return fig  
 
