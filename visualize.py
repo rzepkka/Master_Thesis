@@ -35,10 +35,17 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
         for i in range(len(unique_subtypes)):
             subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
             
-    subtype_labels.append("unknown")
+    # Set colors
+    default_colors = ['#d2fafc','#62a2f5','#66cfff','#0e4287','#5894ed','#1217a3']
+    color_map = {subtype_labels[i] : default_colors[i] for i in range(len(subtype_labels))}
+    color_map['Outliers']='#8e9191'
+    print(color_map)
+            
+    subtype_labels.append("Outliers")
+    
             
     subtypes = list(S['subtypes'])
-    subtypes = ['unknown' if np.isnan(s) else s for s in subtypes]
+    subtypes = ['Outliers' if np.isnan(s) else s for s in subtypes]
     
     # Get diagnosis lables (exclude controls)
     diagnosis_labels = list(set(diagnosis))
@@ -61,20 +68,19 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
     # Query diagnosis for plotting
     df_plot = df[df['Diagnosis'].isin(chosen_subtypes)]
 
-    fig = px.pie(df_plot, values='Counts', names='Subtype', title='Subtypes')
+    fig = px.pie(df_plot, values='Counts', names='Subtype', title='Subtypes',color='Subtype',
+                color_discrete_map=color_map)
 
     # style the plot
     fig.update_traces(textposition='inside', textinfo='value+percent')   
     
-    fig.update_layout(title = "",
-                # title=f'{chosen_subtypes}',
+    fig.update_layout(title='',
                   title_x=0.5,
                   title_font_size=24,
-                  legend_font_size=18,
-                  # legend={'traceorder':'normal'}
-                  )
+                  legend_font_size=18)
 
     return fig
+
 
 # ============= EVENT CENTERS =============================================================================================================================================================
 
