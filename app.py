@@ -12,6 +12,8 @@ import webbrowser
 from collections import Counter
 import collections
 import json
+import re
+
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
@@ -184,7 +186,15 @@ def main():
 
             for idx, subtype in enumerate(subtype_list):
                 subtype_color = st.text_input(f'Select color for {subtype}', value = f'{default_color_list[idx]}',placeholder='e.g. #000000')
-                color_list.append(subtype_color)
+
+                match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', subtype_color)
+
+                if match:
+                    color_list.append(subtype_color)
+                else:
+                    color_list.append(default_color_list[idx])
+                    st.error('Please specify a valid hex volor value, e.g. #000000.')
+
 
         eventCenters = event_centers(T = T,
                                     S = S, 
@@ -211,7 +221,7 @@ def main():
         diagnosis_labels = list(set(diagnosis))
         diagnosis_labels.sort()
 
-        color_list = ['#e41a1c','#377eb8','#0000ff','#00D612']
+        color_list = ['#e41a1c','#377eb8','#0000ff','#00D612','#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']
         color_diagnosis =[]
 
         with col_staging:
@@ -239,7 +249,16 @@ def main():
                 for idx, label in enumerate(diagnosis_labels):
                         if label != 'CN':
                             color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
-                            color_diagnosis.append(color)
+
+
+                            match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
+
+                            if match:
+                                color_diagnosis.append(color)
+                            else:
+                                color_diagnosis.append(color_list[idx])
+                                st.error('Please specify a valid hex volor value, e.g. #000000.')
+                            
 
             with col_staging:
                 barmode = st.radio('Select barmode:', ['group','stack'])
