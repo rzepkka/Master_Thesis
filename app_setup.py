@@ -54,6 +54,11 @@ base = importr("base")
 htmlwidgets = importr('htmlwidgets')
 # utils.chooseCRANmirror(ind=1)
 
+directory = 'temp_folder'
+filelist = glob.glob(os.path.join(directory, "*"))
+for f in filelist:
+    os.remove(f)
+
 # import libraries, set colors
 robjects.r('''
 	library(ggseg3d)
