@@ -13,6 +13,8 @@ from collections import Counter
 import collections
 import json
 import re
+import glob
+from PIL import Image
 
 
 import matplotlib.pyplot as plt
@@ -25,7 +27,7 @@ from ipywidgets import Output
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 
-from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple
+from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg
 
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -57,6 +59,15 @@ def get_labels(S):
       for i in range(len(unique_subtypes)):
           subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
       return subtype_labels
+
+# Create 2D gifs
+def make_gif(frame_folder, subtype, atlas):
+    file_list = glob.glob(f'{frame_folder}/*.png')
+    file_list.sort()
+    frames = [Image.open(image) for image in file_list]
+    frame_one = frames[0]
+    frame_one.save(f"animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
+               save_all=True, duration=200, loop=0) 
 
 labels = get_labels(S=S)
 
@@ -113,6 +124,12 @@ def main():
 
         if subtype_visualize != None:
 
+            # Clear folder
+            directory = 'video'
+            filelist = glob.glob(os.path.join(directory, "*"))
+            for f in filelist:
+                os.remove(f)
+
             col_slider, col_slider_blank = st.columns([5.2,3])
             with col_slider:
                 slider = st.slider(label = 'Choose regions to display', 
@@ -127,6 +144,7 @@ def main():
                                         map_dk=map_dk,
                                         subtype = subtype_visualize, 
                                         slider = slider)
+
                 st.pyplot(ggseg_dk)
 
             with col_subcortical:     
@@ -154,8 +172,63 @@ def main():
                         st.sidebar.error('File not found')
                         st.sidebar.error('Please run app_setup file before trying to download 3D visualisations')
 
-                # if st.sidebar.button('Download 3D visualisation as HTML file'):
-                #     st.warning('Feature not added yet')
+# ======================= ANIMATIONS ===============================================================================================================
+
+                # DK animation
+                if st.button('Generate 2D animation for cortical regions'):
+
+                    # Clear folder
+                    directory = 'video'
+                    filelist = glob.glob(os.path.join(directory, "*"))
+                    for f in filelist:
+                        os.remove(f)
+
+                    video_slider = np.linspace(0,1,50)
+
+                    for value in video_slider:
+                        filename = f"DK-{subtype_visualize}-{value}"
+                        
+                        plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
+                                      subtype = subtype_visualize, 
+                                      slider=value,
+                                      save=True, 
+                                      filename=filename)  # , save=True
+
+                    make_gif("video", subtype_visualize,'DK')
+
+                    with col_cortical:
+                        st.image(f"animations/DK-{subtype_visualize}.gif")
+                    with col_subcortical:
+                        st.image(f"animations/ASEG-{subtype_visualize}.gif")
+
+                # ASEG animation
+                if st.button('Generate 2D animation for subcortical regions'):
+
+                    # Clear folder
+                    directory = 'video'
+                    filelist = glob.glob(os.path.join(directory, "*"))
+                    for f in filelist:
+                        os.remove(f)
+
+                    video_slider = np.linspace(0,1,50)
+
+                    for value in video_slider:
+                        filename = f"ASEG-{subtype_visualize}-{value}"
+                        
+                        plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
+                                      subtype = subtype_visualize, 
+                                      slider=value,
+                                      save=True, 
+                                      filename=filename)  # , save=True
+
+                    make_gif("video", subtype_visualize,'ASEG')
+
+                    with col_subcortical:
+                        st.image(f"animations/ASEG-{subtype_visualize}.gif")
+                    with col_cortical:
+                        st.image(f"animations/DK-{subtype_visualize}.gif")
+
+
 
 
         # ======================= EVENT CENTERS ===============================================================================================================
@@ -247,18 +320,18 @@ def main():
                 bin_width = st.number_input('Select bin width:', value = 0.02)
 
                 for idx, label in enumerate(diagnosis_labels):
-                        if label != 'CN':
-                            color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
+                    if label != 'CN':
+                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
 
 
-                            match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
+                        match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
 
-                            if match:
-                                color_diagnosis.append(color)
-                            else:
-                                color_diagnosis.append(color_list[idx])
-                                st.error('Please specify a valid hex volor value, e.g. #000000.')
-                            
+                        if match:
+                            color_diagnosis.append(color)
+                        else:
+                            color_diagnosis.append(color_list[idx])
+                            st.error('Please specify a valid hex volor value, e.g. #000000.')
+                        
 
             with col_staging:
                 barmode = st.radio('Select barmode:', ['group','stack'])

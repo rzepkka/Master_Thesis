@@ -11,6 +11,8 @@ import ggseg
 from collections import Counter
 from plotly.subplots import make_subplots
 import collections
+import glob
+from PIL import Image
 
 from mapping_2D import dk_dict, aseg_dict
 # from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
@@ -546,86 +548,6 @@ def atypicality_boxes(S, diagnosis, color_list='#000000', width=950, height=400,
 
 # ============= SCATTEEPLOT =============================================================================================================================================================
 
-# def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = None, color_list = ['#000000'], width=1100, height=800, fontsize=[34,18,14,22]):
-#     """
-#     Creates a scatterplot of staging ~ atypicality
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param subtype_labels: list with label name for the subtypes (optional)
-#     :param chosen_subtypes: a list with diagnosis labels to consider in the plot
-#     :param color_list: list with color hex values (optional)
-#     :param width: int (optional)
-#     :param height: int (optional)
-#     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
-#     :return: plotly scatterplot
-#     """     
-    
-#     # Get subtype labels
-#     unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-#     if subtype_labels is None:
-#         subtype_labels = []
-#         for i in range(len(unique_subtypes)):
-#             subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
-            
-#     subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
-    
-#     # Get diagnosis lables (exclude controls)
-#     diagnosis_labels = list(set(diagnosis))
-#     diagnosis_labels.remove('CN')
-#     diagnosis_labels.sort()
-
-#     if chosen_subtypes is None:
-#         chosen_subtypes=diagnosis_labels
-       
-#     # Create DataFrame
-#     staging = list(S['staging'])
-#     atypical = list(S['atypicality'])
-#     diagnosis = list(diagnosis)
-#     subtype = list(S['subtypes'])
-    
-#     df = pd.DataFrame(list(zip(staging, atypical,subtype, diagnosis)),
-#                columns =['Stage', 'Atypicality','Subtype','Diagnosis'])
-#     df = df[df['Diagnosis'] != 'CN']
-#     df['Subtype'] = df['Subtype'].apply(lambda x: x if np.isnan(x) else subtype_map[x])
-#     df = df.dropna(axis=0, subset=['Subtype'])
-
-#     color_map = {subtype_labels[i]: color_list[i] for i in range(len(color_list))}
-
-#     font_title, font_axes, font_ticks, font_legend = fontsize
-    
-
-#     df_plot = df[df['Diagnosis'].isin(chosen_subtypes)]
-    
-#     fig = px.scatter(df_plot, x='Stage', y='Atypicality', color='Subtype', color_discrete_map=color_map)
-
-#     fig.update_layout(
-#         title="Staging ~ Atypicality",
-#         title_font_size=font_title,
-#         title_x=0.5,
-#         xaxis_title="Stage",
-#         yaxis_title="Atypicality",
-#         xaxis = dict(
-#             tickmode = 'linear',
-#             tick0 = 0.0,
-#             dtick = 2
-#         ),
-#         barmode='group',
-#         legend_font_size=font_legend,
-#         autosize = False,
-#         width=width,
-#         height=height
-#     )
-    
-#     fig.update_xaxes(range=[np.min(atypical)-1.5, np.max(atypical)])
-    
-#     fig.update_yaxes(title_font_size = font_axes, 
-#                     tickfont_size=font_ticks)
-    
-#     fig.update_xaxes(title_font_size = font_axes, 
-#                     tickfont_size = font_ticks)
-
-#     return fig  
-
-
 def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = None, color_list = ['#000000'], width=1100, height=800, fontsize=[34,18,14,22]):
     """
     Creates a scatterplot of staging ~ atypicality
@@ -668,7 +590,6 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
     df['Subtype'] = df['Subtype'].apply(lambda x: x if np.isnan(x) else subtype_map[x])
     df = df.dropna(axis=0, subset=['Subtype'])
     
-#     color_map = {subtype_labels[i]: color_list[i] for i in range(len(color_list))}
     color_map = {diagnosis_labels[i]: color_list[i] for i in range(len(diagnosis_labels))}
 
     font_title, font_axes, font_ticks, font_legend = fontsize    
@@ -710,7 +631,33 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
 
 # ============= 2D PLOTTING =============================================================================================================================================================
 
-def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None):     
+# def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None):     
+
+#     """
+#     Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
+#     :param T: Timeline object
+#     :param S: subtyping dictionary, subtypes for each patient individually
+#     :param subtype_labels: a list with names of the subtypes (optional)
+#     :param subtype: name or index of the subtype to visualise (optional)  
+#     :param slider: int (optional)
+#     :returns a figures by plt.show() -> ggseg.plot_dk() 
+#     """   
+    
+#     if slider is None:
+#         dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)  
+#     else:
+#         dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
+#         dk = {k: v for k, v in dk_.items() if v <= slider}
+        
+    
+#     if subtype is None:
+#         pass
+#     else:
+#         return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
+#                   vminmax = [0,1],
+#                   background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 24)
+
+def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
 
     """
     Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
@@ -727,17 +674,54 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
     else:
         dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
         dk = {k: v for k, v in dk_.items() if v <= slider}
-        
+    
+
     
     if subtype is None:
+        # subtype = 'default = 0'
         pass
-    else:
-        return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
+    
+    # save the images for animation
+    elif save is True:
+                
+        custom_dk(dk, cmap='Reds_r', figsize=(6,6),
                   vminmax = [0,1],
-                  background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 24)
+                  background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 24,
+                 filename=filename)          
+    
+    else:
+         return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
+              vminmax = [0,1],
+              background='black', edgecolor='white', bordercolor='gray', 
+                title=f'{subtype}',fontsize = 24)
 
 
-def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None):     
+# def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None):     
+
+#     """
+#     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
+#     :param T: Timeline object
+#     :param S: subtyping dictionary, subtypes for each patient individually
+#     :param subtype_labels: a list with names of the subtypes (optional)
+#     :param subtype: name or index of the subtype to visualise (optional)  
+#     :param slider: int (optional)
+#     :returns a figures by plt.show() -> ggseg.plot_aseg()
+#     """
+#     if slider is None:  
+#         aseg = aseg_dict(T,S, map_aseg,subtype = subtype)
+#     else:
+#         aseg_ = aseg_dict(T,S, map_aseg, subtype = subtype)
+#         aseg = {k: v for k, v in aseg_.items() if v <= slider}
+
+#     if subtype is None:
+#         # subtype = 'Subtype 0'
+#         pass 
+#     else:
+#         return ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
+#                 vminmax = [0,1],
+#                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
+
+def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
 
     """
     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
@@ -757,12 +741,107 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
     if subtype is None:
         # subtype = 'Subtype 0'
         pass 
+    
+    elif save is True:
+        
+        custom_aseg(aseg, cmap='Reds_r', figsize=(6,6),
+                  vminmax = [0,1],
+                  background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 24,
+                 filename=filename)      
+        
     else:
-        return ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
+        ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
                 vminmax = [0,1],
                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
 
+# Customized function to save plt
 
+def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
+             figsize=(15, 15), bordercolor='w', vminmax=[], title='',
+             fontsize=15, filename="file"):
+    
+    import ggseg
+    import matplotlib.pyplot as plt
+    import os.path as op
+    from glob import glob
+    from ggseg import _create_figure_, _render_regions_, _get_cmap_, _render_data_, _add_colorbar_
+
+    wd = op.join(op.dirname(ggseg.__file__), 'data', 'dk')
+
+    # A figure is created by the joint dimensions of the whole-brain outlines
+    whole_reg = ['lateral_left', 'medial_left', 'lateral_right',
+                 'medial_right']
+    files = [open(op.join(wd, e)).read() for e in whole_reg]
+    ax = _create_figure_(files, figsize, background, title, fontsize, edgecolor)
+
+    # Each region is outlined
+    reg = glob(op.join(wd, '*'))
+    files = [open(e).read() for e in reg]
+    _render_regions_(files, ax, bordercolor, edgecolor)
+
+    # For every region with a provided value, we draw a patch with the color
+    # matching the normalized scale
+    cmap, norm = _get_cmap_(cmap, data.values(), vminmax=vminmax)
+    _render_data_(data, wd, cmap, norm, ax, edgecolor)
+
+    # DKT regions with no provided values are rendered in gray
+    data_regions = list(data.keys())
+    dkt_regions = [op.splitext(op.basename(e))[0] for e in reg]
+    NA = set(dkt_regions).difference(data_regions).difference(whole_reg)
+    files = [open(op.join(wd, e)).read() for e in NA]
+    _render_regions_(files, ax, 'gray', edgecolor)
+
+    # A colorbar is added
+    _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
+
+    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.2)
+    plt.close()
+
+
+def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
+              figsize=(15, 5), bordercolor='w', vminmax=[],
+              title='', fontsize=15, filename=""):
+    import matplotlib.pyplot as plt
+    import os.path as op
+    from glob import glob
+    import ggseg
+    from ggseg import _create_figure_, _render_regions_, _get_cmap_, _render_data_, _add_colorbar_
+
+    wd = op.join(op.dirname(ggseg.__file__), 'data', 'aseg')
+    reg = [op.basename(e) for e in glob(op.join(wd, '*'))]
+
+    # Select data from known regions (prevents colorbar from going wild)
+    known_values = []
+    for k, v in data.items():
+        if k in reg:
+            known_values.append(v)
+
+    whole_reg = ['Coronal', 'Sagittal']
+    files = [open(op.join(wd, e)).read() for e in whole_reg]
+
+    # A figure is created by the joint dimensions of the whole-brain outlines
+    ax = _create_figure_(files, figsize, background,  title, fontsize, edgecolor)
+
+    # Each region is outlined
+    reg = glob(op.join(wd, '*'))
+    files = [open(e).read() for e in reg]
+    _render_regions_(files, ax, bordercolor, edgecolor)
+
+    # For every region with a provided value, we draw a patch with the color
+    # matching the normalized scale
+    cmap, norm = _get_cmap_(cmap, known_values, vminmax=vminmax)
+    _render_data_(data, wd, cmap, norm, ax, edgecolor)
+
+    # The following regions are ignored/displayed in gray
+    NA = ['Cerebellum-Cortex', 'Cerebellum-White-Matter', 'Brain-Stem']
+    files = [open(op.join(wd, e)).read() for e in NA]
+    _render_regions_(files, ax, '#111111', edgecolor)
+
+    # A colorbar is added
+    _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
+
+    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.2)
+    plt.close()
 
 
 
