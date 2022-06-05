@@ -1,21 +1,7 @@
 #!/usr/bin/env Rscript
 args = commandArgs(trailingOnly=TRUE)
 
-# my_function <- function(name){
-#   print(paste("Hello ", name))
-# }
- 
-# x <- args[1]
-# # x<-'Julia'
-# sprintf("%s is best", x)
-# 
-# my_function(x)  
-  
-# print(args[1])
-
-
-
-# ==================== GGSEG =============================================================================================================================
+# ==================== CUSTOM GGSEG =============================================================================================================================
 suppressMessages(library(ggseg3d))
 suppressMessages(library(ggseg))
 suppressMessages(library(ggplot2))
@@ -26,7 +12,6 @@ suppressMessages(library(htmlwidgets))
 suppressMessages(library(plotly))
 
 options(warn=-1)
-colors = c("indianred4",'indianred2','coral1','lightpink1','mistyrose1')  
 
 custom_ggseg <- function(.data=NULL, atlas="dk_3d",
                          surface = "LCBC", hemisphere = c("right","subcort"),
@@ -118,8 +103,10 @@ custom_ggseg <- function(.data=NULL, atlas="dk_3d",
 
 environment(custom_ggseg) <- asNamespace('ggseg3d')
 
+# Set colors
+colors = c("indianred4",'indianred2','coral1','lightpink1','mistyrose1')  
 
-# ==================== SAVING =============================================================================================================================
+# ==================== SAVING FILES TO: /TEMP_FOLDER =============================================================================================================================
 i = strtoi(args[1])
 dk_data <- read.csv(file = paste('temp_folder/dk_R_Subtype ',i,'.csv', sep=''))
 aseg_data <- read.csv(file = paste('temp_folder/aseg_R_Subtype ',i,'.csv', sep=''))
