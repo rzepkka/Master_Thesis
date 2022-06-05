@@ -196,21 +196,11 @@ def main():
 
                     make_gif("video", subtype_visualize,'DK')
 
-                    with col_cortical:
-                        st.image(f"animations/DK-{subtype_visualize}.gif")
-                    with col_subcortical:
-                        st.image(f"animations/ASEG-{subtype_visualize}.gif")
-
-                # ASEG animation
-                if st.button('Generate 2D animation for subcortical regions'):
-
                     # Clear folder
                     directory = 'video'
                     filelist = glob.glob(os.path.join(directory, "*"))
                     for f in filelist:
                         os.remove(f)
-
-                    video_slider = np.linspace(0,1,50)
 
                     for value in video_slider:
                         filename = f"ASEG-{subtype_visualize}-{value}"
@@ -223,10 +213,38 @@ def main():
 
                     make_gif("video", subtype_visualize,'ASEG')
 
-                    with col_subcortical:
-                        st.image(f"animations/ASEG-{subtype_visualize}.gif")
+
                     with col_cortical:
                         st.image(f"animations/DK-{subtype_visualize}.gif")
+                    with col_subcortical:
+                        st.image(f"animations/ASEG-{subtype_visualize}.gif")
+
+                # ASEG animation
+                # if st.button('Generate 2D animation for subcortical regions'):
+
+                #     # Clear folder
+                #     directory = 'video'
+                #     filelist = glob.glob(os.path.join(directory, "*"))
+                #     for f in filelist:
+                #         os.remove(f)
+
+                #     video_slider = np.linspace(0,1,50)
+
+                #     for value in video_slider:
+                #         filename = f"ASEG-{subtype_visualize}-{value}"
+                        
+                #         plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
+                #                       subtype = subtype_visualize, 
+                #                       slider=value,
+                #                       save=True, 
+                #                       filename=filename)  # , save=True
+
+                #     make_gif("video", subtype_visualize,'ASEG')
+
+                #     with col_subcortical:
+                #         st.image(f"animations/ASEG-{subtype_visualize}.gif")
+                #     with col_cortical:
+                #         st.image(f"animations/DK-{subtype_visualize}.gif")
 
 
 
