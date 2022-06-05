@@ -41,7 +41,6 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
     default_colors = ['#d2fafc','#62a2f5','#66cfff','#0e4287','#5894ed','#1217a3']
     color_map = {subtype_labels[i] : default_colors[i] for i in range(len(subtype_labels))}
     color_map['Outliers']='#8e9191'
-    print(color_map)
             
     subtype_labels.append("Outliers")
     
