@@ -3,11 +3,9 @@ args = commandArgs(trailingOnly=TRUE)
 
 # ==================== CUSTOM GGSEG =============================================================================================================================
 suppressMessages(library(ggseg3d))
-suppressMessages(library(ggseg))
 suppressMessages(library(ggplot2))
 suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
-suppressMessages(library(htmltools))
 suppressMessages(library(htmlwidgets))
 suppressMessages(library(plotly))
 
