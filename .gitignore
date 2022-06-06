@@ -359,3 +359,6 @@ video/README.md
 video/README.md
 *.md
 tests/piechart_nan.ipynb
+notebook_examples/.ipynb_checkpoints/subtypes_probabilities-checkpoint.ipynb
+notebook_examples/subtypes_probabilities.ipynb
+tests/rpy2.ipynb
