@@ -630,32 +630,6 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
 
 # ============= 2D PLOTTING =============================================================================================================================================================
 
-# def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None):     
-
-#     """
-#     Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
-#     :param T: Timeline object
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param subtype_labels: a list with names of the subtypes (optional)
-#     :param subtype: name or index of the subtype to visualise (optional)  
-#     :param slider: int (optional)
-#     :returns a figures by plt.show() -> ggseg.plot_dk() 
-#     """   
-    
-#     if slider is None:
-#         dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)  
-#     else:
-#         dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
-#         dk = {k: v for k, v in dk_.items() if v <= slider}
-        
-    
-#     if subtype is None:
-#         pass
-#     else:
-#         return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
-#                   vminmax = [0,1],
-#                   background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 24)
-
 def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
 
     """
@@ -694,31 +668,6 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
               background='black', edgecolor='white', bordercolor='gray', 
                 title=f'{subtype}',fontsize = 24)
 
-
-# def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None):     
-
-#     """
-#     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
-#     :param T: Timeline object
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param subtype_labels: a list with names of the subtypes (optional)
-#     :param subtype: name or index of the subtype to visualise (optional)  
-#     :param slider: int (optional)
-#     :returns a figures by plt.show() -> ggseg.plot_aseg()
-#     """
-#     if slider is None:  
-#         aseg = aseg_dict(T,S, map_aseg,subtype = subtype)
-#     else:
-#         aseg_ = aseg_dict(T,S, map_aseg, subtype = subtype)
-#         aseg = {k: v for k, v in aseg_.items() if v <= slider}
-
-#     if subtype is None:
-#         # subtype = 'Subtype 0'
-#         pass 
-#     else:
-#         return ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
-#                 vminmax = [0,1],
-#                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
 
 def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
 
