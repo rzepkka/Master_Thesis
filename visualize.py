@@ -17,8 +17,98 @@ from PIL import Image
 from mapping_2D import dk_dict, aseg_dict
 # from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
 
+def get_labels(S):
+    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+    subtype_labels = []
+    for i in range(len(unique_subtypes)):
+      subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
+    return subtype_labels
+
+
+# ============= INDIVIDUAL PLOTS =============================================================================================================================================================
+
+
+def subtype_probabilities(S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
+    """
+    Creates a barplot for subtype probabilities
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param patient_id: ID of a patient to visualize
+    :param subtype_labels: list with label name for the subtypes (optional)
+    :param colort: hex color value (optional)
+    :param width: int (optional)
+    :param height: int (optional)
+    :return: plotly express bar figure
+    """  
+    
+    # Get subtype labels
+    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+    if subtype_labels is None:
+        subtype_labels = []
+        for i in range(len(unique_subtypes)):
+            subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
+            
+    subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
+    
+    subtypes = S['subtypes']
+    subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
+    
+    weights = S['subtypes_weights']
+    
+    # Create weight DataFrame
+    df_weights = pd.DataFrame(weights, columns=subtype_labels)
+    df_weights['Sum']=df_weights[subtype_labels].sum(axis = 1, skipna = True)
+    df_weights['Prediction'] = subtypes
+    
+    prediction = df_weights['Prediction'].loc[patient_id]
+    
+    # Count probabilities
+    df_prob = pd.DataFrame()
+    
+    # TO CHANHE WHEN I GET DATA
+    df_prob['Patient ID'] = df_weights.index
+    for s in subtype_labels:
+        df_prob[s]=round(df_weights[s]/df_weights['Sum']*100,2)
+        
+    data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]
+        
+    df = pd.DataFrame(data.values[0], data.columns)
+    df = df.rename(columns={0: "Probability"})
+    
+    fig = px.bar(df, x=df.index, y="Probability",
+            text=data.values[0],
+            text_auto=True,
+            width=width,
+            height=height)
+
+    # Styling 
+    font_title, font_axes, font_ticks, font_bars = fontlist
+
+    fig.update_layout(
+        title_text='Subtype probabilities', # title of plot
+        title_x=0.5,
+        title_font_size=font_title,
+        xaxis_title_text='Subtype', # xaxis label
+        yaxis_title_text='Probability (%)', # yaxis label
+        bargap=0.2, # gap between bars of adjacent location coordinates
+    )
+    
+    fig.update_traces(marker_color=color,
+                    textfont_size=font_bars,
+                    texttemplate='%{text} %')
+
+    fig.update_yaxes(title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
+
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
+
+    
+    return fig, prediction
+
+
 
 # ============= PIE CHART =============================================================================================================================================================
+
 
 def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None):
     """

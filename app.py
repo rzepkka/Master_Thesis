@@ -27,6 +27,8 @@ from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_sta
 
 from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg
 
+from visualize import subtype_probabilities
+
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -84,7 +86,7 @@ def main():
     local_css("style.css")
 
     # SELECT PLOT
-    plot_type_list = ['Disease timeline','Project overview']
+    plot_type_list = ['Disease timeline','Individual', 'Project overview']
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
 
     # CHOOSE WIDTH AND HEIGHT
@@ -374,6 +376,47 @@ def main():
 
         # ADD DIVIDER
         st.markdown('---')
+
+    elif chosen_plot_type == 'Individual':
+
+        st.header('Individual plots')
+
+        patient_id = int(st.text_input(f"Select patient's ID", value = 0,placeholder='id...'))
+
+
+        col_probabilities, col_probabilities_options = st.columns([3,1])
+
+
+        with col_probabilities_options:
+            st.subheader('Style the graphs') 
+            title_font = st.number_input('Title font:',value=34)
+            title_axes = st.number_input('Axis labels font:',value=18)
+            title_ticks = st.number_input('Ticks size font:',value=14)
+            title_bars = st.number_input('Annotation font:',value=22)
+            font_list = [title_font, title_axes, title_ticks, title_bars]
+
+
+            color = st.text_input(f'Select color for', value = '#636EFA',placeholder='e.g. #000000')
+
+            match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
+
+            if match:
+                pass
+            else:
+                color = '#636EFA'
+                st.error('Please specify a valid hex volor value, e.g. #000000.')
+
+        with col_probabilities:
+
+            plot_probabilities, prediction = subtype_probabilities(S=S,
+                                                                patient_id=patient_id,
+                                                                fontlist=font_list,
+                                                                color=color
+                                                                )
+
+            st.plotly_chart(plot_probabilities)
+            st.subheader(f"Patients prediction: {prediction}")
+        
 
     else:
         st.subheader('Project presentation will be here')
