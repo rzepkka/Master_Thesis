@@ -105,6 +105,50 @@ def subtype_probabilities(S, patient_id=0, subtype_labels = None, color=['#00000
     
     return fig, prediction
 
+def individual_staging(Sboot, patient_id, color='#000000', fontsize=18, width=900, height=400):
+    
+    """
+    Creates a boxplot
+    :param Sboot: bootstrap samples for individual patients
+    :param patient_id: patient id
+    :param color: hex color values (optional)
+    :param width: int (optional)
+    :param height: int (optional)
+    :return: plotly go Box figure
+    """
+        
+    boot = []
+    
+    for b in range(len(Sboot)):
+        boot.append(Sboot[b]['staging'][patient_id])
+        
+    fig = go.Figure()
+
+    fig.add_trace(go.Box(x=boot, 
+                         name='',
+                         fillcolor=color,
+                         line_color='#000000',
+                         opacity=0.8))
+    
+    # fig.update_xaxes(range=[-0.05, 1.0])
+
+    fig.update_layout(
+                xaxis_title="Disease Stage",
+    #             xaxis = dict(
+    #                 tickmode = 'linear',
+    #                 tick0 = 0.0,
+    #                 dtick = 0.05
+    #             ),
+                showlegend=False,
+                autosize = False,
+                width=width,
+                height=height
+            )
+    
+    fig.update_xaxes(title_font_size=fontsize)
+    
+    return fig
+
 
 
 # ============= PIE CHART =============================================================================================================================================================

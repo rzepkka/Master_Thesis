@@ -27,7 +27,7 @@ from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_sta
 
 from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg
 
-from visualize import subtype_probabilities
+from visualize import subtype_probabilities, individual_staging
 
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -401,7 +401,7 @@ def main():
             font_list = [title_font, title_axes, title_ticks, title_bars]
 
 
-            color = st.text_input(f'Select color for', value = '#636EFA',placeholder='e.g. #000000')
+            color = st.text_input(f'Select color', value = '#636EFA',placeholder='e.g. #000000')
 
             match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
 
@@ -421,8 +421,26 @@ def main():
                                                                 height = chosen_height
                                                                 )
 
-            st.plotly_chart(plot_probabilities)
             st.subheader(f"Patients prediction: {prediction}")
+
+
+            plot_probabilities, prediction = subtype_probabilities(S=S,
+                                                                patient_id=patient_id,
+                                                                fontlist=font_list,
+                                                                color=color,
+                                                                width = chosen_width,
+                                                                height = chosen_height
+                                                                )
+           
+            box_individual = individual_staging(Sboot=Sboot,
+                                                patient_id=patient_id,
+                                                color=color,
+                                                fontsize=font_list[1],
+                                                width=chosen_width
+                                                )
+
+            st.plotly_chart(plot_probabilities)
+            st.plotly_chart(box_individual)
         
 
     else:
