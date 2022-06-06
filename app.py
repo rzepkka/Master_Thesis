@@ -23,8 +23,6 @@ from matplotlib import rc
 import plotly.graph_objs as go
 from ipywidgets import Output
 
-# from app_setup import get_labels
-
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 
 from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg
