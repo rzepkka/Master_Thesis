@@ -89,13 +89,14 @@ def main():
     plot_type_list = ['Disease timeline','Individual', 'Project overview']
     chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
 
-    # CHOOSE WIDTH AND HEIGHT
-    chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1000, max_value=1130)
-    chosen_height = st.sidebar.number_input('Select height of the plot in px',value=800)
 
     if chosen_plot_type == 'Disease timeline':
 
         st.header('Disease progression timeline')
+
+        # CHOOSE WIDTH AND HEIGHT
+        chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1000, max_value=1130)
+        chosen_height = st.sidebar.number_input('Select height of the plot in px',value=800)
 
         col_piechart, col_piechart_select = st.columns([5.2,3])
 
@@ -381,6 +382,10 @@ def main():
 
         st.header('Individual plots')
 
+        # CHOOSE WIDTH AND HEIGHT
+        chosen_width = st.sidebar.number_input('Select width of the plot in px',value=900, max_value=1130)
+        chosen_height = st.sidebar.number_input('Select height of the plot in px',value=600)
+
         patient_id = int(st.text_input(f"Select patient's ID", value = 0,placeholder='id...'))
 
 
@@ -411,7 +416,9 @@ def main():
             plot_probabilities, prediction = subtype_probabilities(S=S,
                                                                 patient_id=patient_id,
                                                                 fontlist=font_list,
-                                                                color=color
+                                                                color=color,
+                                                                width = chosen_width,
+                                                                height = chosen_height
                                                                 )
 
             st.plotly_chart(plot_probabilities)
