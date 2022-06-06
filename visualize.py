@@ -745,7 +745,7 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
         
         custom_aseg(aseg, cmap='Reds_r', figsize=(6,6),
                   vminmax = [0,1],
-                  background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 24,
+                  background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 20,
                  filename=filename)      
         
     else:
@@ -796,6 +796,8 @@ def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
     plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.2)
     plt.close()
 
+    print('PROGRESS: Animations for cortinal regions created.')
+
 
 def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
               figsize=(15, 5), bordercolor='w', vminmax=[],
@@ -839,8 +841,10 @@ def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
     # A colorbar is added
     _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
 
-    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.2)
+    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.1)
     plt.close()
+
+    print('PROGRESS: Animations for subcortinal regions created.')
 
 
 
