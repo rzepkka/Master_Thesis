@@ -13,6 +13,7 @@ from plotly.subplots import make_subplots
 import collections
 import glob
 from PIL import Image
+import os
 
 from mapping_2D import dk_dict, aseg_dict
 # from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
@@ -929,6 +930,58 @@ def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
 
     print('PROGRESS: Animations for subcortinal regions created.')
 
+def plot_ggseg(T,S, map_dk, map_aseg, subtype_labels = None, subtype = None, slider = None, filename='file'): # slider = None, save = False, filename='file'
+    
+    import ggseg
+    """
+    Creates a dictionary, which can be used as input to ggseg.plot_dk() function
+    :param T: Timeline object
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param mapped_dict: a dictionary with key: values --> T.biomarker_labels: list(DK-labels)
+    :param subtype_labels: a list with names of the subtypes (optional)
+    :param subtype: name or index of the subtype from subtype_lables (optional, choses first available subtype as default)  
+    :return: two plots -> ggseg.plot_dk() and ggseg.plot_aseg()
+    """
+    
+    if slider is None:
+        dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)  
+        aseg = aseg_dict(T,S, mapped_dict = map_aseg, subtype = subtype)
+    else:
+        dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
+        dk = {k: v for k, v in dk_.items() if v <= slider}
+        aseg_ = aseg_dict(T,S, map_aseg, subtype = subtype)
+        aseg = {k: v for k, v in aseg_.items() if v <= slider}
+        
+
+    if subtype is None:
+        # subtype = 'Subtype 0'
+        pass 
+    
+    directory = 'video'
+    filelist = glob.glob(os.path.join(directory, "*"))
+    for f in filelist:
+        os.remove(f)
+
+    custom_dk(dk, cmap='Reds_r', figsize=(6,6),
+                  vminmax = [0,1],
+                  background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 24,
+                 filename=f'DK')    
+
+    custom_aseg(aseg, cmap='Reds_r', figsize=(6,6),
+                  vminmax = [0,1],
+                  background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 16,
+                 filename=f'ASEG')    
+    
+    image1 = Image.open('video/DK.png')
+    image2 = Image.open('video/ASEG.png')
+    image1_size = image1.size
+    width = image1_size[1]
+    image2 = image2.resize((2*width, width))
+    image2_size = image2.size
+    new_image = Image.new('RGB',(image1_size[0]+image2_size[0], image1_size[1]), (250,250,250))
+    new_image.paste(image1,(0,0))
+    new_image.paste(image2,(image1_size[0],0))
+    new_image.save(f"double_png/mergered-{slider}.png","PNG")
 
 
 

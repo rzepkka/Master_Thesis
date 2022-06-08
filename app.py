@@ -25,7 +25,7 @@ from ipywidgets import Output
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 
-from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg
+from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg, plot_ggseg
 
 from visualize import subtype_probabilities, individual_staging
 
@@ -187,13 +187,13 @@ def main():
                     video_slider = np.linspace(0,1,50)
 
                     for value in video_slider:
-                        filename = f"DK-{subtype_visualize}-{value}"
+                        filename = f"{subtype_visualize}-{value}"
                         
                         plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
                                       subtype = subtype_visualize, 
                                       slider=value,
                                       save=True, 
-                                      filename=filename)  # , save=True
+                                      filename=filename)
 
                     make_gif("video", subtype_visualize,'DK')
 
