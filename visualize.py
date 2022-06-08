@@ -14,6 +14,9 @@ import collections
 import glob
 from PIL import Image
 import os
+from random import gauss
+from scipy.stats import norm
+import scipy.stats 
 
 from mapping_2D import dk_dict, aseg_dict
 # from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
@@ -29,9 +32,10 @@ def get_labels(S):
 # ============= INDIVIDUAL PLOTS =============================================================================================================================================================
 
 
-def subtype_probabilities(S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
+def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
     """
     Creates a barplot for subtype probabilities
+    :param info: csv with patients' data
     :param S: subtyping dictionary, subtypes for each patient individually
     :param patient_id: ID of a patient to visualize
     :param subtype_labels: list with label name for the subtypes (optional)
@@ -41,72 +45,78 @@ def subtype_probabilities(S, patient_id=0, subtype_labels = None, color=['#00000
     :return: plotly express bar figure
     """  
     
-    # Get subtype labels
-    unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-    if subtype_labels is None:
-        subtype_labels = []
-        for i in range(len(unique_subtypes)):
-            subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
-            
-    subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
+    if patient_id not in list(info['PTID']) or patient_id is None:
+        return 'Wrong patient ID', 'No prediction'
+    else:
     
-    subtypes = S['subtypes']
-    subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
-    
-    weights = S['subtypes_weights']
-    
-    # Create weight DataFrame
-    df_weights = pd.DataFrame(weights, columns=subtype_labels)
-    df_weights['Sum']=df_weights[subtype_labels].sum(axis = 1, skipna = True)
-    df_weights['Prediction'] = subtypes
-    
-    prediction = df_weights['Prediction'].loc[patient_id]
-    
-    # Count probabilities
-    df_prob = pd.DataFrame()
-    
-    # TO CHANHE WHEN I GET DATA
-    df_prob['Patient ID'] = df_weights.index
-    for s in subtype_labels:
-        df_prob[s]=round(df_weights[s]/df_weights['Sum']*100,2)
-        
-    data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]
-        
-    df = pd.DataFrame(data.values[0], data.columns)
-    df = df.rename(columns={0: "Probability"})
-    
-    fig = px.bar(df, x=df.index, y="Probability",
-            text=data.values[0],
-            text_auto=True,
-            width=width,
-            height=height)
+        # Get subtype labels
+        unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+        if subtype_labels is None:
+            subtype_labels = []
+            for i in range(len(unique_subtypes)):
+                subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
 
-    # Styling 
-    font_title, font_axes, font_ticks, font_bars = fontlist
+        subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
 
-    fig.update_layout(
-        title_text='Subtype probabilities', # title of plot
-        title_x=0.5,
-        title_font_size=font_title,
-        xaxis_title_text='Subtype', # xaxis label
-        yaxis_title_text='Probability (%)', # yaxis label
-        bargap=0.2, # gap between bars of adjacent location coordinates
-    )
-    
-    fig.update_traces(marker_color=color,
-                    textfont_size=font_bars,
-                    texttemplate='%{text} %')
+        subtypes = S['subtypes']
+        subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
 
-    fig.update_yaxes(title_font_size = font_axes, 
-                    tickfont_size=font_ticks)
+        weights = S['subtypes_weights']
 
-    fig.update_xaxes(title_font_size = font_axes, 
-                    tickfont_size = font_ticks)
+        # Create weight DataFrame
+        df_weights = pd.DataFrame(weights, columns=subtype_labels)
+        df_weights['Sum']=df_weights[subtype_labels].sum(axis = 1, skipna = True)
+        df_weights['Prediction'] = subtypes
 
-    
-    return fig, prediction
+        prediction = df_weights['Prediction'].loc[patient_id]
 
-def individual_staging(Sboot, patient_id, color='#000000', fontsize=18, width=900, height=400):
+        # Count probabilities
+        df_prob = pd.DataFrame()
+
+        # TO CHANHE WHEN I GET DATA
+        df_prob['Patient ID'] = info['PTID']
+        for s in subtype_labels:
+            df_prob[s]=round(df_weights[s]/df_weights['Sum']*100,2)
+
+
+        data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]
+
+        df = pd.DataFrame(data.values[0], data.columns)
+        df = df.rename(columns={0: "Probability"})
+
+        fig = px.bar(df, x=df.index, y="Probability",
+                text=data.values[0],
+                text_auto=True,
+                width=width,
+                height=height)
+
+        # Styling 
+        font_title, font_axes, font_ticks, font_bars = fontlist
+
+        fig.update_layout(
+            title_text='Subtype probabilities', # title of plot
+            title_x=0.5,
+            title_font_size=font_title,
+            xaxis_title_text='Subtype', # xaxis label
+            yaxis_title_text='Probability (%)', # yaxis label
+            bargap=0.2, # gap between bars of adjacent location coordinates
+        )
+
+        fig.update_traces(marker_color=color,
+                        textfont_size=font_bars,
+                        texttemplate='%{text} %')
+
+        fig.update_yaxes(title_font_size = font_axes, 
+                        tickfont_size=font_ticks)
+
+        fig.update_xaxes(title_font_size = font_axes, 
+                        tickfont_size = font_ticks)
+
+
+        return fig, prediction
+
+
+def individual_staging(data, Sboot, patient_id, color='#000000', fontsize=18, width=900, height=400):
     
     """
     Creates a boxplot
@@ -121,7 +131,9 @@ def individual_staging(Sboot, patient_id, color='#000000', fontsize=18, width=90
     boot = []
     
     for b in range(len(Sboot)):
-        boot.append(Sboot[b]['staging'][patient_id])
+        boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
+        
+    print(boot)
         
     fig = go.Figure()
 
@@ -135,11 +147,6 @@ def individual_staging(Sboot, patient_id, color='#000000', fontsize=18, width=90
 
     fig.update_layout(
                 xaxis_title="Disease Stage",
-    #             xaxis = dict(
-    #                 tickmode = 'linear',
-    #                 tick0 = 0.0,
-    #                 dtick = 0.05
-    #             ),
                 showlegend=False,
                 autosize = False,
                 width=width,
@@ -150,6 +157,137 @@ def individual_staging(Sboot, patient_id, color='#000000', fontsize=18, width=90
     
     return fig
 
+def biomarker_distribution(data, T, subtype, patient_id=None):
+    """
+    Creates bimodal distribution plots for each biomarker, for chosen subtype; 
+    vertical line corresponds to the patient-specific information
+    :param data: csv with patients' data
+    :param T: pSnowphlake timeline object
+    :param subtype: chosen disease subtype
+    :param patient_id: chosen patient (optional)
+    :return: plotly go Box figure
+    """
+    
+    titles = [label.lower().replace("_"," ") for label in list(T.biomarker_labels)]
+    num_rows = int(np.ceil(len(titles)/3))
+    num_cols = 3
+
+
+    fig = make_subplots(rows=num_rows, cols = num_cols, subplot_titles=titles)
+
+    labels = T.biomarker_labels
+
+    biomarker=0
+    for row in range(1,num_rows+1):
+        for col in range(1, num_cols+1):
+
+            if biomarker >= len(labels):
+                break
+
+
+            Dallis = data[labels[biomarker]]
+
+            x_grid = np.linspace(np.min(data[labels[biomarker]]), np.max(data[labels[biomarker]]),1000)
+
+            # CASES
+            mu_cases = T.mixture_model.cases[biomarker]['mu'][0][subtype]
+            sigma_cases = T.mixture_model.cases[biomarker]['std'][0][subtype]
+
+            norm_pre = scipy.stats.norm(loc=mu_cases, scale=sigma_cases)
+            likeli_pre=norm_pre.pdf(x_grid)
+
+            likeli_pre=likeli_pre*(T.mixture_model.mixing[biomarker][subtype])
+
+
+
+            # CONTROLS
+            mu_controls = T.mixture_model.controls[biomarker]['mu'][0]
+            sigma_controls = T.mixture_model.controls[biomarker]['std'][0]
+
+            norm_post = scipy.stats.norm(loc=mu_controls, scale=sigma_controls)
+            likeli_post=norm_post.pdf(x_grid)
+            likeli_post=likeli_post*(1-T.mixture_model.mixing[biomarker][subtype])
+
+            # TOTAL
+            likeli_tot=likeli_pre+likeli_post
+
+            # SCALING
+            h=np.histogram(Dallis,50)   # values, bins
+            maxh=np.nanmax(h[0])
+
+            likeli_tot_corres = np.zeros(len(h[1])-1)
+            bin_size=h[1][1]-h[1][0]
+
+            for k in range(len(h[1])-1):
+                bin_loc=h[1][k]+bin_size
+                idx=np.argmin(np.abs(x_grid-bin_loc))
+                likeli_tot_corres[k] = likeli_tot[idx]
+
+            max_scaling=maxh/np.max(likeli_tot)
+
+            scaling_opt=1; opt_score=np.inf
+            if max_scaling>1:
+                scale_range=np.arange(1,max_scaling+1,max_scaling/1000.)
+            else:
+                scale_range=np.arange(1,(10/max_scaling)+1,max_scaling/1000.)
+                scale_range=np.reciprocal(scale_range)
+
+            for s in scale_range:
+                l2norm=(likeli_tot_corres*s - h[0])**2
+                idx_nonzero=h[0]>0
+                l2norm=l2norm[idx_nonzero]
+                score=np.sum(l2norm)
+                if score < opt_score:
+                    opt_score=score
+                    scaling_opt=s;
+
+            likeli_pre=likeli_pre*scaling_opt;
+            likeli_post=likeli_post*scaling_opt;
+            likeli_tot=likeli_pre+likeli_post;
+
+
+            fig.add_trace(go.Histogram(x=Dallis, marker_color='#90b7f5'), row=row, col=col)
+
+
+
+            fig.add_trace(go.Scatter(x=x_grid, y=likeli_pre,
+                                mode='lines',
+                                name='Cases',
+                                line=dict(color='red', width=2)
+                                    ), row=row, col=col)
+
+            fig.add_trace(go.Scatter(x=x_grid, y=likeli_post,
+                                mode='lines',
+                                name='Controls',
+                                line=dict(color='green', width=2)
+                                    ), row=row, col=col)
+
+            fig.add_trace(go.Scatter(x=x_grid, y = likeli_tot,
+                                    mode='lines',
+                                    name='Mix',
+                                    line=dict(color='black', width=2)
+                                    ), row=row, col=col)
+
+            if patient_id not in list(data['PTID']) or patient_id is None:
+                pass
+            else:
+                patient = np.array(data[labels[biomarker]][data['PTID']==patient_id])[0]
+                fig.add_vline(x=patient, line_width=2, line_dash="dash", line_color="red", row=row, col=col)
+
+
+
+            biomarker+=1
+        
+
+    # STYLING
+    fig.update_layout(title = f'Biomarker Distribution for Subtype {subtype}',
+                    title_x=0.5,
+                    title_font_size=24,
+                     height=1600,
+                     width=1000,
+                    showlegend=False)
+        
+    return fig
 
 
 # ============= PIE CHART =============================================================================================================================================================

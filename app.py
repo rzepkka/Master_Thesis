@@ -27,7 +27,7 @@ from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_sta
 
 from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg, plot_ggseg
 
-from visualize import subtype_probabilities, individual_staging
+from visualize import subtype_probabilities, individual_staging, biomarker_distribution
 
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -380,6 +380,8 @@ def main():
 
     elif chosen_plot_type == 'Individual':
 
+        data = pd.read_csv("data/EDADS_data.csv")
+
         st.header('Individual plots')
 
         # CHOOSE WIDTH AND HEIGHT
@@ -387,7 +389,6 @@ def main():
         chosen_height = st.sidebar.number_input('Select height of the plot in px',value=600)
 
         patient_id = int(st.text_input(f"Select patient's ID", value = 0,placeholder='id...'))
-
 
         col_probabilities, col_probabilities_options = st.columns([3,1])
 
@@ -413,7 +414,8 @@ def main():
 
         with col_probabilities:
 
-            plot_probabilities, prediction = subtype_probabilities(S=S,
+            plot_probabilities, prediction = subtype_probabilities(info=data,
+                                                                S=S,
                                                                 patient_id=patient_id,
                                                                 fontlist=font_list,
                                                                 color=color,
@@ -423,24 +425,32 @@ def main():
 
             st.subheader(f"Patients prediction: {prediction}")
 
-
-            plot_probabilities, prediction = subtype_probabilities(S=S,
-                                                                patient_id=patient_id,
-                                                                fontlist=font_list,
-                                                                color=color,
-                                                                width = chosen_width,
-                                                                height = chosen_height
-                                                                )
            
-            box_individual = individual_staging(Sboot=Sboot,
+
+            if patient_id in list(data['PTID']):
+
+                box_individual = individual_staging(data=data,
+                                                Sboot=Sboot,
                                                 patient_id=patient_id,
                                                 color=color,
                                                 fontsize=font_list[1],
                                                 width=chosen_width
                                                 )
+                
+                st.plotly_chart(plot_probabilities)
+                st.plotly_chart(box_individual)
 
-            st.plotly_chart(plot_probabilities)
-            st.plotly_chart(box_individual)
+            if prediction not in  ['Outlier', 'No prediction']:
+                subtype = int(prediction[-1])
+            else:
+                subtype = 0
+
+            plot_distribution = biomarker_distribution(data=data,
+                                        T=T,
+                                        subtype=subtype,
+                                        patient_id=patient_id)
+
+        st.plotly_chart(plot_distribution)
         
 
     else:
