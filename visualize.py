@@ -32,6 +32,90 @@ def get_labels(S):
 # ============= INDIVIDUAL PLOTS =============================================================================================================================================================
 
 
+# def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
+#     """
+#     Creates a barplot for subtype probabilities
+#     :param info: csv with patients' data
+#     :param S: subtyping dictionary, subtypes for each patient individually
+#     :param patient_id: ID of a patient to visualize
+#     :param subtype_labels: list with label name for the subtypes (optional)
+#     :param colort: hex color value (optional)
+#     :param width: int (optional)
+#     :param height: int (optional)
+#     :return: plotly express bar figure
+#     """  
+    
+#     if patient_id not in list(info['PTID']) or patient_id is None:
+#         return 'Wrong patient ID', 'No prediction'
+#     else:
+    
+#         # Get subtype labels
+#         unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+#         if subtype_labels is None:
+#             subtype_labels = []
+#             for i in range(len(unique_subtypes)):
+#                 subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
+
+#         subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
+
+#         subtypes = S['subtypes']
+#         subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
+
+#         weights = S['subtypes_weights']
+
+#         # Create weight DataFrame
+#         df_weights = pd.DataFrame(weights, columns=subtype_labels)
+#         df_weights['Sum']=df_weights[subtype_labels].sum(axis = 1, skipna = True)
+#         df_weights['Prediction'] = subtypes
+
+#         prediction = df_weights['Prediction'].loc[patient_id]
+
+#         # Count probabilities
+#         df_prob = pd.DataFrame()
+
+#         # TO CHANHE WHEN I GET DATA
+#         df_prob['Patient ID'] = info['PTID']
+#         for s in subtype_labels:
+#             df_prob[s]=round(df_weights[s]/df_weights['Sum']*100,2)
+
+
+#         data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]
+
+#         df = pd.DataFrame(data.values[0], data.columns)
+#         df = df.rename(columns={0: "Probability"})
+
+#         fig = px.bar(df, x=df.index, y="Probability",
+#                 text=data.values[0],
+#                 text_auto=True,
+#                 width=width,
+#                 height=height,
+#                 opacity=0.8)
+
+#         # Styling 
+#         font_title, font_axes, font_ticks, font_bars = fontlist
+
+#         fig.update_layout(
+#             title_text='Subtype probabilities', # title of plot
+#             title_x=0.5,
+#             title_font_size=font_title,
+#             xaxis_title_text='Subtype', # xaxis label
+#             yaxis_title_text='Probability (%)', # yaxis label
+#             bargap=0.2, # gap between bars of adjacent location coordinates
+#         )
+
+#         fig.update_traces(marker_color=color,
+#                         textfont_size=font_bars,
+#                         texttemplate='%{text} %')
+
+#         fig.update_yaxes(title_font_size = font_axes, 
+#                         tickfont_size=font_ticks)
+
+#         fig.update_xaxes(title_font_size = font_axes, 
+#                         tickfont_size = font_ticks)
+
+
+#         return fig, prediction
+
 def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
     """
     Creates a barplot for subtype probabilities
@@ -67,8 +151,8 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
         df_weights = pd.DataFrame(weights, columns=subtype_labels)
         df_weights['Sum']=df_weights[subtype_labels].sum(axis = 1, skipna = True)
         df_weights['Prediction'] = subtypes
-
-        prediction = df_weights['Prediction'].loc[patient_id]
+        
+    
 
         # Count probabilities
         df_prob = pd.DataFrame()
@@ -78,8 +162,11 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
         for s in subtype_labels:
             df_prob[s]=round(df_weights[s]/df_weights['Sum']*100,2)
 
-
+            
         data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]
+        
+        
+        prediction = np.array(df_weights['Prediction'][df_prob['Patient ID']==patient_id])[0]
 
         df = pd.DataFrame(data.values[0], data.columns)
         df = df.rename(columns={0: "Probability"})
@@ -157,6 +244,7 @@ def individual_staging(data, Sboot, patient_id, color='#000000', fontsize=18, wi
     
     return fig
 
+
 def biomarker_distribution(data, T, subtype, patient_id=None):
     """
     Creates bimodal distribution plots for each biomarker, for chosen subtype; 
@@ -177,13 +265,17 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
 
     labels = T.biomarker_labels
 
+
     biomarker=0
     for row in range(1,num_rows+1):
         for col in range(1, num_cols+1):
 
             if biomarker >= len(labels):
                 break
-
+            
+            if biomarker == (len(labels)-1):
+                showlegend=True
+            else: showlegend=False
 
             Dallis = data[labels[biomarker]]
 
@@ -246,48 +338,56 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
             likeli_tot=likeli_pre+likeli_post;
 
 
-            fig.add_trace(go.Histogram(x=Dallis, marker_color='#90b7f5'), row=row, col=col)
+            fig.add_trace(go.Histogram(x=Dallis, marker_color='#90b7f5',
+                                       name='EDADS',
+                                      showlegend=showlegend), row=row, col=col)
 
 
 
             fig.add_trace(go.Scatter(x=x_grid, y=likeli_pre,
                                 mode='lines',
                                 name='Cases',
-                                line=dict(color='red', width=2)
+                                line=dict(color='red', width=2),
+                                showlegend=showlegend,
                                     ), row=row, col=col)
 
             fig.add_trace(go.Scatter(x=x_grid, y=likeli_post,
                                 mode='lines',
                                 name='Controls',
-                                line=dict(color='green', width=2)
+                                line=dict(color='green', width=2),
+                                showlegend=showlegend,
                                     ), row=row, col=col)
 
             fig.add_trace(go.Scatter(x=x_grid, y = likeli_tot,
                                     mode='lines',
                                     name='Mix',
-                                    line=dict(color='black', width=2)
+                                    line=dict(color='black', width=2),
+                                     showlegend=showlegend,
                                     ), row=row, col=col)
 
             if patient_id not in list(data['PTID']) or patient_id is None:
-                pass
+                continue
             else:
                 patient = np.array(data[labels[biomarker]][data['PTID']==patient_id])[0]
                 fig.add_vline(x=patient, line_width=2, line_dash="dash", line_color="red", row=row, col=col)
 
-
+#             if biomarker == (len(labels)-1):
+                
 
             biomarker+=1
         
 
     # STYLING
-    fig.update_layout(title = f'Biomarker Distribution for Subtype {subtype}',
+    fig.update_layout(title = 'Biomarker Distribution',
                     title_x=0.5,
                     title_font_size=24,
                      height=1600,
                      width=1000,
-                    showlegend=False)
-        
+#                     showlegend=False
+                     )
+            
     return fig
+
 
 
 # ============= PIE CHART =============================================================================================================================================================

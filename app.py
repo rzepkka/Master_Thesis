@@ -382,7 +382,7 @@ def main():
 
         data = pd.read_csv("data/EDADS_data.csv")
 
-        st.header('Individual plots')
+        st.header('Patient-specific information')
 
         # CHOOSE WIDTH AND HEIGHT
         chosen_width = st.sidebar.number_input('Select width of the plot in px',value=900, max_value=1130)
@@ -402,7 +402,7 @@ def main():
             font_list = [title_font, title_axes, title_ticks, title_bars]
 
 
-            color = st.text_input(f'Select color', value = '#636EFA',placeholder='e.g. #000000')
+            color = st.text_input(f'Select color', value = '#1f77b4',placeholder='e.g. #000000')
 
             match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
 
@@ -414,7 +414,14 @@ def main():
 
         with col_probabilities:
 
-            plot_probabilities, prediction = subtype_probabilities(info=data,
+            # st.subheader(f"Patients diagnosis: {data['Diagnosis'][data['PTID']==patient_id][0]}")
+            # st.subheader(f"Patients prediction: {prediction}")
+
+           
+
+            if patient_id in list(data['PTID']):
+
+                plot_probabilities, prediction = subtype_probabilities(info=data,
                                                                 S=S,
                                                                 patient_id=patient_id,
                                                                 fontlist=font_list,
@@ -423,11 +430,9 @@ def main():
                                                                 height = chosen_height
                                                                 )
 
-            st.subheader(f"Patients prediction: {prediction}")
-
-           
-
-            if patient_id in list(data['PTID']):
+                d = np.array(data['Diagnosis'][data['PTID']==patient_id])[0]
+                st.subheader(f"Patients diagnosis: {d}")
+                st.subheader(f"Patients prediction: {prediction}")
 
                 box_individual = individual_staging(data=data,
                                                 Sboot=Sboot,
@@ -436,21 +441,36 @@ def main():
                                                 fontsize=font_list[1],
                                                 width=chosen_width
                                                 )
-                
+
                 st.plotly_chart(plot_probabilities)
                 st.plotly_chart(box_individual)
 
-            if prediction not in  ['Outlier', 'No prediction']:
-                subtype = int(prediction[-1])
-            else:
-                subtype = 0
+                if prediction not in  ['Outlier', 'No prediction']:
+                    subtype = int(prediction[-1])
+                else:
+                    subtype = 0
 
-            plot_distribution = biomarker_distribution(data=data,
-                                        T=T,
+                plot_distribution = biomarker_distribution(data=data,
+                                            T=T,
                                         subtype=subtype,
                                         patient_id=patient_id)
 
-        st.plotly_chart(plot_distribution)
+                st.plotly_chart(plot_distribution)
+
+            else: 
+                st.info("Provide an existing patient's ID")
+
+        #     if prediction not in  ['Outlier', 'No prediction']:
+        #         subtype = int(prediction[-1])
+        #     else:
+        #         subtype = 0
+
+        #     plot_distribution = biomarker_distribution(data=data,
+        #                                 T=T,
+        #                                 subtype=subtype,
+        #                                 patient_id=patient_id)
+
+        # st.plotly_chart(plot_distribution)
         
 
     else:
