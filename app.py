@@ -25,7 +25,7 @@ from ipywidgets import Output
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 
-from visualize import atypicality, atypicality_boxes, staging_scatterplot, piechart_multiple, custom_dk, custom_aseg, plot_ggseg
+from visualize import piechart_multiple, custom_dk, custom_aseg
 
 from visualize import subtype_probabilities, individual_staging, biomarker_distribution
 
