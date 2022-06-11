@@ -86,11 +86,12 @@ def main():
     local_css("style.css")
 
     # SELECT PLOT
-    plot_type_list = ['Disease timeline','Individual', 'Project overview']
-    chosen_plot_type = st.sidebar.selectbox("Select Plot", plot_type_list)
+    plot_type_list = ['Disease timeline for AD','Patient-specific information']
+    chosen_plot_type = st.sidebar.radio("Menu", plot_type_list)
 
+    # st.radio('Select barmode:', ['group','stack'])
 
-    if chosen_plot_type == 'Disease timeline':
+    if chosen_plot_type == 'Disease timeline for AD':
 
         st.header('Disease progression timeline')
 
@@ -287,9 +288,6 @@ def main():
         color_list = ['#e41a1c','#377eb8','#0000ff','#00D612','#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']
         color_diagnosis =[]
 
-        with col_staging:
-            chosen_plot = st.selectbox('Select plot:',['Patient Staging', 'Scatterplot'])
-
         #  ================== PATIENT STAGING =================================================================================================================
 
         with col_staging_options:
@@ -302,83 +300,58 @@ def main():
             font_list = [title_font, title_axes, title_ticks, title_legend]
 
 
-        if chosen_plot =='Patient Staging':
+        # if chosen_plot =='Patient Staging':
 
-            with col_staging_options:
+        with col_staging_options:
 
-                num_bins = st.number_input('Select the number of bins', value = 10)
-                bin_width = st.number_input('Select bin width:', value = 0.02)
+            num_bins = st.number_input('Select the number of bins', value = 10)
+            bin_width = st.number_input('Select bin width:', value = 0.02)
 
-                for idx, label in enumerate(diagnosis_labels):
-                    if label != 'CN':
-                        color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
-
-
-                        match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
-
-                        if match:
-                            color_diagnosis.append(color)
-                        else:
-                            color_diagnosis.append(color_list[idx])
-                            st.error('Please specify a valid hex volor value, e.g. #000000.')
-                        
-
-            with col_staging:
-                barmode = st.radio('Select barmode:', ['group','stack'])
-
-                # BARPLOT
-                plot_staging = patient_staging(S=S,
-                                        diagnosis=diagnosis, 
-                                        color_list = color_diagnosis,
-                                        num_bins=num_bins, 
-                                        bin_width=bin_width,
-                                        width = chosen_width,
-                                        height = chosen_height,
-                                        fontsize=font_list,
-                                        opacity=opacity,
-                                        barmode=barmode)
-
-                # BOX
-                box_staging = staging_boxes(S=S,
-                                        diagnosis=diagnosis,
-                                        color_list=color_diagnosis,
-                                        width=chosen_width,
-                                        fontsize=font_list)
+            for idx, label in enumerate(diagnosis_labels):
+                if label != 'CN':
+                    color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
 
 
-                st.plotly_chart(plot_staging)
-                st.plotly_chart(box_staging)  
+                    match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
 
-      
-        if chosen_plot =='Scatterplot':
+                    if match:
+                        color_diagnosis.append(color)
+                    else:
+                        color_diagnosis.append(color_list[idx])
+                        st.error('Please specify a valid hex volor value, e.g. #000000.')
+                    
 
-            color_list = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']  
+        with col_staging:
+            barmode = st.radio('Select barmode:', ['group','stack'])
 
-            with col_staging_options:
+            # BARPLOT
+            plot_staging = patient_staging(S=S,
+                                    diagnosis=diagnosis, 
+                                    color_list = color_diagnosis,
+                                    num_bins=num_bins, 
+                                    bin_width=bin_width,
+                                    width = chosen_width,
+                                    height = chosen_height,
+                                    fontsize=font_list,
+                                    opacity=opacity,
+                                    barmode=barmode)
 
-                for idx, label in enumerate(labels):
-                    color = st.text_input(f'Color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
-                    color_diagnosis.append(color)
+            # BOX
+            box_staging = staging_boxes(S=S,
+                                    diagnosis=diagnosis,
+                                    color_list=color_diagnosis,
+                                    width=chosen_width,
+                                    fontsize=font_list)
 
 
-            with col_staging:
-                # diagnosis_labels = list(set(diagnosis))
-                # diagnosis_labels.remove('CN')
-                choose_scatterplot = st.multiselect('Diagnoses included in the scatterplot:', labels, default=labels)
+            st.plotly_chart(plot_staging)
+            st.plotly_chart(box_staging)  
 
-                plot_scatter = staging_scatterplot(S=S,
-                                                diagnosis=diagnosis,
-                                                chosen_subtypes=choose_scatterplot,
-                                                color_list=color_diagnosis,
-                                                width = chosen_width,
-                                                height = chosen_height)
-
-                st.plotly_chart(plot_scatter)
 
         # ADD DIVIDER
         st.markdown('---')
 
-    elif chosen_plot_type == 'Individual':
+    elif chosen_plot_type == 'Patient-specific information':
 
         data = pd.read_csv("data/EDADS_data.csv")
 
