@@ -700,6 +700,8 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
               background='black', edgecolor='white', bordercolor='gray', 
                 title=f'{subtype}',fontsize = 24)
 
+         print(dk)
+
 
 def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
 
@@ -733,7 +735,6 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
         ggseg.plot_aseg(aseg, cmap='Reds_r', figsize=(6,6),
                 vminmax = [0,1],
                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
-
 
 def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
              figsize=(15, 15), bordercolor='w', vminmax=[], title='',

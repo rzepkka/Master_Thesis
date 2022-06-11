@@ -159,42 +159,6 @@ def main():
 
             elif chosen_2D == 'Animation':
 
-                # Clear folder
-                directory = 'temp_folder/snapshots/'
-                filelist = glob.glob(os.path.join(directory, "*"))
-                for f in filelist:
-                    os.remove(f)
-
-                video_slider = np.linspace(0,1,50)
-
-                for value in video_slider:
-                    filename = f"DK-{subtype_visualize}-{value}"
-                    
-                    plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
-                                  subtype = subtype_visualize, 
-                                  slider=value,
-                                  save=True, 
-                                  filename=filename)
-
-                make_gif("temp_folder/snapshots/", subtype_visualize,'DK')
-
-                # Clear folder
-                directory = 'temp_folder/snapshots/'
-                filelist = glob.glob(os.path.join(directory, "*"))
-                for f in filelist:
-                    os.remove(f)
-
-                for value in video_slider:
-                    filename = f"ASEG-{subtype_visualize}-{value}"
-                    
-                    plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
-                                  subtype = subtype_visualize, 
-                                  slider=value,
-                                  save=True, 
-                                  filename=filename)  # , save=True
-
-                make_gif("temp_folder/snapshots/", subtype_visualize,'ASEG')
-
 
                 with col_cortical:
                     st.image(f"temp_folder/2D_animations/DK-{subtype_visualize}.gif")
