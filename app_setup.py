@@ -68,47 +68,47 @@ def make_gif(frame_folder, subtype, atlas):
                save_all=True, duration=200, loop=0) 
 
 
-def generate_animations(labels):
+# def generate_animations(T=T, S=S, labels, map_dk, map_aseg):
 
-    for subtype in labels:
+#     for subtype in labels:
 
-        # Clear folder
-        directory = 'temp_folder/snapshots'
-        filelist = glob.glob(os.path.join(directory, "*"))
-        for f in filelist:
-            os.remove(f)
+#         # Clear folder
+#         directory = 'temp_folder/snapshots'
+#         filelist = glob.glob(os.path.join(directory, "*"))
+#         for f in filelist:
+#             os.remove(f)
 
-        video_slider = np.linspace(0,1,50)
+#         video_slider = np.linspace(0,1,50)
 
-        for value in video_slider:
-            filename = f"DK-{subtype}-{value}"
+#         for value in video_slider:
+#             filename = f"DK-{subtype}-{value}"
 
-            plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
-                          subtype = subtype, 
-                          slider=value,
-                          save=True, 
-                          filename=filename)
+#             plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
+#                           subtype = subtype, 
+#                           slider=value,
+#                           save=True, 
+#                           filename=filename)
 
-        make_gif("temp_folder/snapshots", subtype,'DK')
+#         make_gif("temp_folder/snapshots", subtype,'DK')
 
-        # # Clear folder
-        # directory = 'temp_folder/snapshots'
-        # filelist = glob.glob(os.path.join(directory, "*"))
-        # for f in filelist:
-        #     os.remove(f)
+#         # Clear folder
+#         directory = 'temp_folder/snapshots'
+#         filelist = glob.glob(os.path.join(directory, "*"))
+#         for f in filelist:
+#             os.remove(f)
 
-        # for value in video_slider:
-        #     filename = f"ASEG-{subtype}-{value}"
+#         for value in video_slider:
+#             filename = f"ASEG-{subtype}-{value}"
 
-        #     plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
-        #                   subtype = subtype, 
-        #                   slider=value,
-        #                   save=True, 
-        #                   filename=filename)
+#             plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
+#                           subtype = subtype, 
+#                           slider=value,
+#                           save=True, 
+#                           filename=filename)
 
-        # make_gif("temp_folder/snapshots", subtype,'ASEG')
+#         make_gif("temp_folder/snapshots", subtype,'ASEG')
 
-        print(f'PROGRESS: animations for {subtype} SUCCESSFULLY saved to folder: temp_folder/2D_animations')
+#         print(f'PROGRESS: animations for {subtype} SUCCESSFULLY saved to folder: temp_folder/2D_animations')
 
 
 
@@ -117,20 +117,11 @@ def generate_animations(labels):
 
 # =================== SET-UP ========================================================================================================================
 
-# save_subtype_data(T, S, map_dk, map_aseg)
+save_subtype_data(T, S, map_dk, map_aseg)
 
-# safe_html(labels, command, path2script)
+safe_html(labels, command, path2script)
 
-# generate_animations(labels)
-
-print(labels)
-
-plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
-                          subtype = 'Subtype 1', 
-                          slider=0.9,
-                          save=True, 
-                          filename='sub')
-
+# generate_animations(T=T, S=S, labels=labels, map_dk=map_dk, map_aseg=map_aseg, filename='sub')
 
 print('CONTINUE running Streamlit APP by calling ">> streamlit run app.py" from command line')
 

@@ -127,12 +127,6 @@ def main():
 
         if subtype_visualize != None:
 
-            # Clear folder
-            # directory = 'temp_folder'
-            # filelist = glob.glob(os.path.join(directory, "*"))
-            # for f in filelist:
-            #     os.remove(f)
-
             col_slider, col_slider_blank = st.columns([5.2,3])
             with col_slider:
                 slider = st.slider(label = 'Choose regions to display', 
@@ -161,10 +155,12 @@ def main():
                                             slider = slider)       
                     st.pyplot(ggseg_aseg)
 
+# ======================= ANIMATIONS ===============================================================================================================
+
             elif chosen_2D == 'Animation':
 
                 # Clear folder
-                directory = 'video'
+                directory = 'temp_folder/snapshots/'
                 filelist = glob.glob(os.path.join(directory, "*"))
                 for f in filelist:
                     os.remove(f)
@@ -172,7 +168,7 @@ def main():
                 video_slider = np.linspace(0,1,50)
 
                 for value in video_slider:
-                    filename = f"{subtype_visualize}-{value}"
+                    filename = f"DK-{subtype_visualize}-{value}"
                     
                     plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
                                   subtype = subtype_visualize, 
@@ -180,10 +176,10 @@ def main():
                                   save=True, 
                                   filename=filename)
 
-                make_gif("video", subtype_visualize,'DK')
+                make_gif("temp_folder/snapshots/", subtype_visualize,'DK')
 
                 # Clear folder
-                directory = 'video'
+                directory = 'temp_folder/snapshots/'
                 filelist = glob.glob(os.path.join(directory, "*"))
                 for f in filelist:
                     os.remove(f)
@@ -197,26 +193,17 @@ def main():
                                   save=True, 
                                   filename=filename)  # , save=True
 
-                make_gif("video", subtype_visualize,'ASEG')
+                make_gif("temp_folder/snapshots/", subtype_visualize,'ASEG')
 
 
                 with col_cortical:
-                    st.image(f"animations/DK-{subtype_visualize}.gif")
+                    st.image(f"temp_folder/2D_animations/DK-{subtype_visualize}.gif")
                 with col_subcortical:
-                    st.image(f"animations/ASEG-{subtype_visualize}.gif")
-            
-
-                
-                # with col_cortical:
-                #     st.image(f"temp_folder/2D_animations/DK-{subtype_visualize}.gif")
-                # with col_subcortical:
-                #     st.image(f"temp_folder/2D_animations/ASEG-{subtype_visualize}.gif")
-
+                    st.image(f"temp_folder/2D_animations/ASEG-{subtype_visualize}.gif")
 
 
             # BUTTONS
             html_file = subtype_visualize
-            # html_file = subtype_visualize.replace(" ","_")
 
             color_list = []
             default_color_list = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd'] 
@@ -230,55 +217,6 @@ def main():
                     except FileNotFoundError:
                         st.sidebar.error('File not found')
                         st.sidebar.error('Please run app_setup file before trying to download 3D visualisations')
-
-# ======================= ANIMATIONS ===============================================================================================================
-
-                # DK animation
-                # chosen_2D = st.radio('2D display', ['Static','Animation'])
-
-                # if chosen_2D == 'Static':
-
-                    # # Clear folder
-                    # directory = 'video'
-                    # filelist = glob.glob(os.path.join(directory, "*"))
-                    # for f in filelist:
-                    #     os.remove(f)
-
-                    # video_slider = np.linspace(0,1,50)
-
-                    # for value in video_slider:
-                    #     filename = f"{subtype_visualize}-{value}"
-                        
-                    #     plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
-                    #                   subtype = subtype_visualize, 
-                    #                   slider=value,
-                    #                   save=True, 
-                    #                   filename=filename)
-
-                    # make_gif("video", subtype_visualize,'DK')
-
-                    # # Clear folder
-                    # directory = 'video'
-                    # filelist = glob.glob(os.path.join(directory, "*"))
-                    # for f in filelist:
-                    #     os.remove(f)
-
-                    # for value in video_slider:
-                    #     filename = f"ASEG-{subtype_visualize}-{value}"
-                        
-                    #     plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
-                    #                   subtype = subtype_visualize, 
-                    #                   slider=value,
-                    #                   save=True, 
-                    #                   filename=filename)  # , save=True
-
-                    # make_gif("video", subtype_visualize,'ASEG')
-
-
-                    # with col_cortical:
-                    #     st.image(f"animations/DK-{subtype_visualize}.gif")
-                    # with col_subcortical:
-                    #     st.image(f"animations/ASEG-{subtype_visualize}.gif")
 
 
         # ======================= EVENT CENTERS ===============================================================================================================
@@ -358,8 +296,6 @@ def main():
             title_legend = st.number_input('Legend font:',value=22)
             font_list = [title_font, title_axes, title_ticks, title_legend]
 
-
-        # if chosen_plot =='Patient Staging':
 
         with col_staging_options:
 
@@ -445,11 +381,7 @@ def main():
                 st.error('Please specify a valid hex volor value, e.g. #000000.')
 
         with col_probabilities:
-
-            # st.subheader(f"Patients diagnosis: {data['Diagnosis'][data['PTID']==patient_id][0]}")
-            # st.subheader(f"Patients prediction: {prediction}")
-
-           
+        
 
             if patient_id in list(data['PTID']):
 
@@ -482,6 +414,8 @@ def main():
                 else:
                     subtype = 0
 
+                st.markdown('---')
+
                 plot_distribution = biomarker_distribution(data=data,
                                             T=T,
                                         subtype=subtype,
@@ -491,18 +425,6 @@ def main():
 
             else: 
                 st.info("Provide an existing patient's ID")
-
-        #     if prediction not in  ['Outlier', 'No prediction']:
-        #         subtype = int(prediction[-1])
-        #     else:
-        #         subtype = 0
-
-        #     plot_distribution = biomarker_distribution(data=data,
-        #                                 T=T,
-        #                                 subtype=subtype,
-        #                                 patient_id=patient_id)
-
-        # st.plotly_chart(plot_distribution)
         
 
     else:

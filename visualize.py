@@ -920,44 +920,6 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
 
 # ============= 2D PLOTTING =============================================================================================================================================================
 
-# def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
-
-#     """
-#     Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
-#     :param T: Timeline object
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param subtype_labels: a list with names of the subtypes (optional)
-#     :param subtype: name or index of the subtype to visualise (optional)  
-#     :param slider: int (optional)
-#     :returns a figures by plt.show() -> ggseg.plot_dk() 
-#     """   
-    
-#     if slider is None:
-#         dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)  
-#     else:
-#         dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
-#         dk = {k: v for k, v in dk_.items() if v <= slider}
-    
-
-    
-#     if subtype is None:
-#         # subtype = 'default = 0'
-#         pass
-    
-#     # save the images for animation
-#     elif save is True:
-                
-#         custom_dk(dk, cmap='Reds_r', figsize=(6,6),
-#                   vminmax = [0,1],
-#                   background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 24,
-#                  filename=filename)          
-    
-#     else:
-#          return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
-#               vminmax = [0,1],
-#               background='black', edgecolor='white', bordercolor='gray', 
-#                 title=f'{subtype}',fontsize = 24)
-
 def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
 
     """
@@ -1030,52 +992,8 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
                 vminmax = [0,1],
                 background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}', fontsize = 18)
 
-# Customized function to save plt
 
-# def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
-#              figsize=(15, 15), bordercolor='w', vminmax=[], title='',
-#              fontsize=15, filename="file"):
-    
-#     import ggseg
-#     import matplotlib.pyplot as plt
-#     import os.path as op
-#     from glob import glob
-#     from ggseg import _create_figure_, _render_regions_, _get_cmap_, _render_data_, _add_colorbar_
 
-#     wd = op.join(op.dirname(ggseg.__file__), 'data', 'dk')
-
-#     # A figure is created by the joint dimensions of the whole-brain outlines
-#     whole_reg = ['lateral_left', 'medial_left', 'lateral_right',
-#                  'medial_right']
-#     files = [open(op.join(wd, e)).read() for e in whole_reg]
-#     ax = _create_figure_(files, figsize, background, title, fontsize, edgecolor)
-
-#     # Each region is outlined
-#     reg = glob(op.join(wd, '*'))
-#     files = [open(e).read() for e in reg]
-#     _render_regions_(files, ax, bordercolor, edgecolor)
-
-#     # For every region with a provided value, we draw a patch with the color
-#     # matching the normalized scale
-#     cmap, norm = _get_cmap_(cmap, data.values(), vminmax=vminmax)
-#     _render_data_(data, wd, cmap, norm, ax, edgecolor)
-
-#     # DKT regions with no provided values are rendered in gray
-#     data_regions = list(data.keys())
-#     dkt_regions = [op.splitext(op.basename(e))[0] for e in reg]
-#     NA = set(dkt_regions).difference(data_regions).difference(whole_reg)
-#     files = [open(op.join(wd, e)).read() for e in NA]
-#     _render_regions_(files, ax, 'gray', edgecolor)
-
-#     # A colorbar is added
-#     _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
-
-#     plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.2)
-#     plt.close()
-
-    # print('PROGRESS: Animations for cortinal regions created.')
-
-    # Customized function to save plt
 
 def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
              figsize=(15, 15), bordercolor='w', vminmax=[], title='',
@@ -1115,12 +1033,11 @@ def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
     # A colorbar is added
     _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
 
-    # plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.20)
-    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.20)
+    plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.20)
+    # plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.20)
 
     plt.close()
     
-
 
 def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
               figsize=(15, 5), bordercolor='w', vminmax=[],
@@ -1164,8 +1081,8 @@ def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
     # A colorbar is added
     _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
 
-    # plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.1)
-    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.1)
+    plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.1)
+    # plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.1)
 
     plt.close()
 
@@ -1223,6 +1140,10 @@ def plot_ggseg(T,S, map_dk, map_aseg, subtype_labels = None, subtype = None, sli
     new_image.paste(image1,(0,0))
     new_image.paste(image2,(image1_size[0],0))
     new_image.save(f"double_png/mergered-{slider}.png","PNG")
+
+# ============= 2D SAVING ==================================================================================================================================
+
+
 
 
 
