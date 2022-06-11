@@ -349,6 +349,7 @@ def main():
 
             if patient_id in list(data['PTID']):
 
+
                 plot_probabilities, prediction = subtype_probabilities(info=data,
                                                                 S=S,
                                                                 patient_id=patient_id,
@@ -362,13 +363,14 @@ def main():
                 st.subheader(f"Patients diagnosis: {d}")
                 st.subheader(f"Patients prediction: {prediction}")
 
+                color_list = ['#e41a1c','#377eb8','#4daf4a','#FFA500']
+
                 box_individual = individual_staging(data=data,
+                                                S=S,
                                                 Sboot=Sboot,
                                                 patient_id=patient_id,
-                                                color=color,
-                                                fontsize=font_list[1],
-                                                width=chosen_width
-                                                )
+                                                diagnosis=diagnosis,
+                                                color_list=color_list)
 
                 st.plotly_chart(plot_probabilities)
                 st.plotly_chart(box_individual)

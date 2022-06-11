@@ -118,47 +118,135 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
         return fig, prediction
 
 
-def individual_staging(data, Sboot, patient_id, color='#000000', fontsize=18, width=900, height=400):
+# def individual_staging(data, Sboot, patient_id, color='#000000', fontsize=18, width=900, height=400):
     
+#     """
+#     Creates a boxplot
+#     :param Sboot: bootstrap samples for individual patients
+#     :param patient_id: patient id
+#     :param color: hex color values (optional)
+#     :param width: int (optional)
+#     :param height: int (optional)
+#     :return: plotly go Box figure
+#     """
+        
+#     boot = []
+    
+#     for b in range(len(Sboot)):
+#         boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
+        
+#     print(boot)
+        
+#     fig = go.Figure()
+
+#     fig.add_trace(go.Box(x=boot, 
+#                          name='',
+#                          fillcolor=color,
+#                          line_color='#000000',
+#                          opacity=0.8))
+    
+#     # fig.update_xaxes(range=[-0.05, 1.0])
+
+#     fig.update_layout(
+#                 xaxis_title="Disease Stage",
+#                 showlegend=False,
+#                 autosize = False,
+#                 width=width,
+#                 height=height
+#             )
+
+#     fig.update_xaxes(range=[0.0, 1.0])
+    
+#     fig.update_xaxes(title_font_size=fontsize)
+    
+#     return fig
+
+def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
     """
     Creates a boxplot
-    :param Sboot: bootstrap samples for individual patients
-    :param patient_id: patient id
-    :param color: hex color values (optional)
+    :param S: subtyping dictionary, subtypes for each patient individually
+    :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
+    :param color_list: list with color hex values (optional)
     :param width: int (optional)
     :param height: int (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
     :return: plotly go Box figure
     """
-        
-    boot = []
     
+    # Convert NaNs to 0.0
+    staging = np.array([np.float64(0.0) if np.isnan(stage) else stage for stage in S['staging']])
+   
+    # Count number of each subtype occurences
+    counter = dict(Counter(diagnosis))
+        
+    # Get labels
+    labels = list(set(diagnosis[diagnosis!='CN']))
+    labels.sort()
+    
+    # Get indexes
+    diagnosis = np.array(diagnosis)
+    staging = np.array(staging)
+    
+    # Get indexes for each diagnostic label
+    idx_list = []
+    for l in labels:
+        if l!='CN':
+            idx = np.where(diagnosis==l)
+            idx = idx[0]
+            idx_list.append(idx)
+            
+            
+           
+    fig = go.Figure()
+    
+    # ADD PATIENT-SPECIFIC
+    boot=[]
     for b in range(len(Sboot)):
         boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
         
-    print(boot)
         
-    fig = go.Figure()
-
     fig.add_trace(go.Box(x=boot, 
-                         name='',
-                         fillcolor=color,
+                         name='Patient',
+                         fillcolor=color_list[-1],
                          line_color='#000000',
                          opacity=0.8))
+
+    for count, idx in enumerate(idx_list):
+        fig.add_trace(go.Box(x=staging[idx], name=labels[count],
+                             fillcolor=color_list[count],
+                            line_color='#000000',
+                            opacity=0.4))
     
-    # fig.update_xaxes(range=[-0.05, 1.0])
+    
+
+    fig.update_xaxes(range=[-0.05, 1.0])
+
+    font_title, font_axes, font_ticks, font_legend = fontsize
 
     fig.update_layout(
-                xaxis_title="Disease Stage",
-                showlegend=False,
-                autosize = False,
-                width=width,
-                height=height
-            )
+            # title="Staging - Boxplots",
+            title_font_size=font_title,
+            title_x=0.5,
+            xaxis_title="Disease Stage",
+            yaxis_title="Diagnosis",
+            xaxis = dict(
+                tickmode = 'linear',
+                tick0 = 0.0,
+                dtick = 0.1
+            ),
+            legend_font_size=font_legend,
+            showlegend=False,
+            autosize = False,
+            width=width,
+            height=height
+        )
+    
+    fig.update_yaxes(title_font_size = font_axes, 
+                    tickfont_size=font_ticks)
+    
+    fig.update_xaxes(title_font_size = font_axes, 
+                    tickfont_size = font_ticks)
 
-    fig.update_xaxes(range=[0.0, 1.0])
-    
-    fig.update_xaxes(title_font_size=fontsize)
-    
     return fig
 
 
