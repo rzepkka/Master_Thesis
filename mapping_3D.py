@@ -1,6 +1,10 @@
 import numpy as np
 import scipy.stats 
 import pandas as pd
+import os, glob
+from PIL import Image
+
+
 
 def save_subtype_data(T, S, map_dk, map_aseg):  
     """
@@ -27,12 +31,20 @@ def save_subtype_data(T, S, map_dk, map_aseg):
         
         aseg = aseg_3D(T, S, 
                        mapped_dict = map_aseg, 
-                       subtype = label)
+                       subtype = label) 
 
-        dk.to_csv(f'temp_folder/dk_R_{label}.csv', index = False)
-        aseg.to_csv(f'temp_folder/aseg_R_{label}.csv', index = False)    
+        dk.to_csv(f'temp_folder/csv/dk_R_{label}.csv', index = False)
+        aseg.to_csv(f'temp_folder/csv/aseg_R_{label}.csv', index = False)    
         
-    print('PROGRESS: All suptype files saved in: /temp_folder')
+    print('PROGRESS: All suptype files saved in: /temp_folder/csv')
+
+
+def safe_html(labels, command, path2script):
+    for i in range(len(labels)):
+        i=str(i)
+        output = subprocess.run([command, path2script,i])
+
+    print('PROGRESS: All HTML files successfully saved in: /temp_folder')
 
 
 # ====================================== DK-ATLAS ==================================================================================================================

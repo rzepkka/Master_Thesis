@@ -19,7 +19,6 @@ from scipy.stats import norm
 import scipy.stats 
 
 from mapping_2D import dk_dict, aseg_dict
-# from mapping_2D import dk_regions_2D, dk_dict_2D, aseg_dict_2D
 
 def get_labels(S):
     unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
@@ -31,90 +30,6 @@ def get_labels(S):
 
 # ============= INDIVIDUAL PLOTS =============================================================================================================================================================
 
-
-# def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
-#     """
-#     Creates a barplot for subtype probabilities
-#     :param info: csv with patients' data
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param patient_id: ID of a patient to visualize
-#     :param subtype_labels: list with label name for the subtypes (optional)
-#     :param colort: hex color value (optional)
-#     :param width: int (optional)
-#     :param height: int (optional)
-#     :return: plotly express bar figure
-#     """  
-    
-#     if patient_id not in list(info['PTID']) or patient_id is None:
-#         return 'Wrong patient ID', 'No prediction'
-#     else:
-    
-#         # Get subtype labels
-#         unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-#         if subtype_labels is None:
-#             subtype_labels = []
-#             for i in range(len(unique_subtypes)):
-#                 subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
-
-#         subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
-
-#         subtypes = S['subtypes']
-#         subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
-
-#         weights = S['subtypes_weights']
-
-#         # Create weight DataFrame
-#         df_weights = pd.DataFrame(weights, columns=subtype_labels)
-#         df_weights['Sum']=df_weights[subtype_labels].sum(axis = 1, skipna = True)
-#         df_weights['Prediction'] = subtypes
-
-#         prediction = df_weights['Prediction'].loc[patient_id]
-
-#         # Count probabilities
-#         df_prob = pd.DataFrame()
-
-#         # TO CHANHE WHEN I GET DATA
-#         df_prob['Patient ID'] = info['PTID']
-#         for s in subtype_labels:
-#             df_prob[s]=round(df_weights[s]/df_weights['Sum']*100,2)
-
-
-#         data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]
-
-#         df = pd.DataFrame(data.values[0], data.columns)
-#         df = df.rename(columns={0: "Probability"})
-
-#         fig = px.bar(df, x=df.index, y="Probability",
-#                 text=data.values[0],
-#                 text_auto=True,
-#                 width=width,
-#                 height=height,
-#                 opacity=0.8)
-
-#         # Styling 
-#         font_title, font_axes, font_ticks, font_bars = fontlist
-
-#         fig.update_layout(
-#             title_text='Subtype probabilities', # title of plot
-#             title_x=0.5,
-#             title_font_size=font_title,
-#             xaxis_title_text='Subtype', # xaxis label
-#             yaxis_title_text='Probability (%)', # yaxis label
-#             bargap=0.2, # gap between bars of adjacent location coordinates
-#         )
-
-#         fig.update_traces(marker_color=color,
-#                         textfont_size=font_bars,
-#                         texttemplate='%{text} %')
-
-#         fig.update_yaxes(title_font_size = font_axes, 
-#                         tickfont_size=font_ticks)
-
-#         fig.update_xaxes(title_font_size = font_axes, 
-#                         tickfont_size = font_ticks)
-
-
-#         return fig, prediction
 
 def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
     """
@@ -239,6 +154,8 @@ def individual_staging(data, Sboot, patient_id, color='#000000', fontsize=18, wi
                 width=width,
                 height=height
             )
+
+    fig.update_xaxes(range=[0.0, 1.0])
     
     fig.update_xaxes(title_font_size=fontsize)
     
@@ -1003,6 +920,44 @@ def staging_scatterplot(S, diagnosis, subtype_labels = None, chosen_subtypes = N
 
 # ============= 2D PLOTTING =============================================================================================================================================================
 
+# def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
+
+#     """
+#     Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
+#     :param T: Timeline object
+#     :param S: subtyping dictionary, subtypes for each patient individually
+#     :param subtype_labels: a list with names of the subtypes (optional)
+#     :param subtype: name or index of the subtype to visualise (optional)  
+#     :param slider: int (optional)
+#     :returns a figures by plt.show() -> ggseg.plot_dk() 
+#     """   
+    
+#     if slider is None:
+#         dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)  
+#     else:
+#         dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
+#         dk = {k: v for k, v in dk_.items() if v <= slider}
+    
+
+    
+#     if subtype is None:
+#         # subtype = 'default = 0'
+#         pass
+    
+#     # save the images for animation
+#     elif save is True:
+                
+#         custom_dk(dk, cmap='Reds_r', figsize=(6,6),
+#                   vminmax = [0,1],
+#                   background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 24,
+#                  filename=filename)          
+    
+#     else:
+#          return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
+#               vminmax = [0,1],
+#               background='black', edgecolor='white', bordercolor='gray', 
+#                 title=f'{subtype}',fontsize = 24)
+
 def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
 
     """
@@ -1036,7 +991,7 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
                  filename=filename)          
     
     else:
-         return ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
+         ggseg.plot_dk(dk, cmap='Reds_r', figsize=(6,6),
               vminmax = [0,1],
               background='black', edgecolor='white', bordercolor='gray', 
                 title=f'{subtype}',fontsize = 24)
@@ -1077,6 +1032,51 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
 
 # Customized function to save plt
 
+# def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
+#              figsize=(15, 15), bordercolor='w', vminmax=[], title='',
+#              fontsize=15, filename="file"):
+    
+#     import ggseg
+#     import matplotlib.pyplot as plt
+#     import os.path as op
+#     from glob import glob
+#     from ggseg import _create_figure_, _render_regions_, _get_cmap_, _render_data_, _add_colorbar_
+
+#     wd = op.join(op.dirname(ggseg.__file__), 'data', 'dk')
+
+#     # A figure is created by the joint dimensions of the whole-brain outlines
+#     whole_reg = ['lateral_left', 'medial_left', 'lateral_right',
+#                  'medial_right']
+#     files = [open(op.join(wd, e)).read() for e in whole_reg]
+#     ax = _create_figure_(files, figsize, background, title, fontsize, edgecolor)
+
+#     # Each region is outlined
+#     reg = glob(op.join(wd, '*'))
+#     files = [open(e).read() for e in reg]
+#     _render_regions_(files, ax, bordercolor, edgecolor)
+
+#     # For every region with a provided value, we draw a patch with the color
+#     # matching the normalized scale
+#     cmap, norm = _get_cmap_(cmap, data.values(), vminmax=vminmax)
+#     _render_data_(data, wd, cmap, norm, ax, edgecolor)
+
+#     # DKT regions with no provided values are rendered in gray
+#     data_regions = list(data.keys())
+#     dkt_regions = [op.splitext(op.basename(e))[0] for e in reg]
+#     NA = set(dkt_regions).difference(data_regions).difference(whole_reg)
+#     files = [open(op.join(wd, e)).read() for e in NA]
+#     _render_regions_(files, ax, 'gray', edgecolor)
+
+#     # A colorbar is added
+#     _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
+
+#     plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.2)
+#     plt.close()
+
+    # print('PROGRESS: Animations for cortinal regions created.')
+
+    # Customized function to save plt
+
 def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
              figsize=(15, 15), bordercolor='w', vminmax=[], title='',
              fontsize=15, filename="file"):
@@ -1115,10 +1115,11 @@ def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
     # A colorbar is added
     _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
 
-    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.2)
-    plt.close()
+    # plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.20)
+    plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.20)
 
-    print('PROGRESS: Animations for cortinal regions created.')
+    plt.close()
+    
 
 
 def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
@@ -1163,10 +1164,12 @@ def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
     # A colorbar is added
     _add_colorbar_(ax, cmap, norm, edgecolor, fontsize*0.75, ylabel)
 
+    # plt.savefig(f'temp_folder/snapshots/{filename}.png', bbox_inches='tight', pad_inches=0.1)
     plt.savefig(f'video/{filename}.png', bbox_inches='tight', pad_inches=0.1)
+
     plt.close()
 
-    print('PROGRESS: Animations for subcortinal regions created.')
+    # print('PROGRESS: Animations for subcortinal regions created.')
 
 def plot_ggseg(T,S, map_dk, map_aseg, subtype_labels = None, subtype = None, slider = None, filename='file'): # slider = None, save = False, filename='file'
     

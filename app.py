@@ -66,7 +66,7 @@ def make_gif(frame_folder, subtype, atlas):
     file_list.sort()
     frames = [Image.open(image) for image in file_list]
     frame_one = frames[0]
-    frame_one.save(f"animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
+    frame_one.save(f"temp_folder/2D_animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
                save_all=True, duration=200, loop=0) 
 
 labels = get_labels(S=S)
@@ -77,7 +77,7 @@ labels = get_labels(S=S)
 def main():
 
     st.set_page_config(layout="wide")
-    st.sidebar.title("Adjusting Plots")
+    st.sidebar.title("Menu")
 
     # Connect .css file for styling the app components
     def local_css(file_name):
@@ -87,13 +87,13 @@ def main():
 
     # SELECT PLOT
     plot_type_list = ['Disease timeline for AD','Patient-specific information']
-    chosen_plot_type = st.sidebar.radio("Menu", plot_type_list)
+    chosen_plot_type = st.sidebar.radio("", plot_type_list)
 
     # st.radio('Select barmode:', ['group','stack'])
 
     if chosen_plot_type == 'Disease timeline for AD':
 
-        st.header('Disease progression timeline')
+        st.header('Disease progression timeline for AD')
 
         # CHOOSE WIDTH AND HEIGHT
         chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1000, max_value=1130)
@@ -122,15 +122,16 @@ def main():
 
         # ======================= 2D ===============================================================================================================
         
+        chosen_2D = st.radio('2D display', ['Static','Animation'])
         col_cortical, col_subcortical, col_button = st.columns([2,3.2,3])
 
         if subtype_visualize != None:
 
             # Clear folder
-            directory = 'video'
-            filelist = glob.glob(os.path.join(directory, "*"))
-            for f in filelist:
-                os.remove(f)
+            # directory = 'temp_folder'
+            # filelist = glob.glob(os.path.join(directory, "*"))
+            # for f in filelist:
+            #     os.remove(f)
 
             col_slider, col_slider_blank = st.columns([5.2,3])
             with col_slider:
@@ -139,23 +140,79 @@ def main():
                                     min_value = 0.0, 
                                     max_value = 1.0, 
                                     value=1.0, step=0.01)
+
+
+            if chosen_2D == 'Static':
         
-            with col_cortical:
-                ggseg_dk = plot_dk_atlas(T = T, 
-                                        S = S,
-                                        map_dk=map_dk,
-                                        subtype = subtype_visualize, 
-                                        slider = slider)
+                with col_cortical:
+                    ggseg_dk = plot_dk_atlas(T = T, 
+                                            S = S,
+                                            map_dk=map_dk,
+                                            subtype = subtype_visualize, 
+                                            slider = slider)
 
-                st.pyplot(ggseg_dk)
+                    st.pyplot(ggseg_dk)
 
-            with col_subcortical:     
-                ggseg_aseg = plot_aseg_atlas(T = T, 
-                                        S = S, 
-                                        map_aseg=map_aseg,
-                                        subtype = subtype_visualize, 
-                                        slider = slider)       
-                st.pyplot(ggseg_aseg)
+                with col_subcortical:     
+                    ggseg_aseg = plot_aseg_atlas(T = T, 
+                                            S = S, 
+                                            map_aseg=map_aseg,
+                                            subtype = subtype_visualize, 
+                                            slider = slider)       
+                    st.pyplot(ggseg_aseg)
+
+            elif chosen_2D == 'Animation':
+
+                # Clear folder
+                directory = 'video'
+                filelist = glob.glob(os.path.join(directory, "*"))
+                for f in filelist:
+                    os.remove(f)
+
+                video_slider = np.linspace(0,1,50)
+
+                for value in video_slider:
+                    filename = f"{subtype_visualize}-{value}"
+                    
+                    plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
+                                  subtype = subtype_visualize, 
+                                  slider=value,
+                                  save=True, 
+                                  filename=filename)
+
+                make_gif("video", subtype_visualize,'DK')
+
+                # Clear folder
+                directory = 'video'
+                filelist = glob.glob(os.path.join(directory, "*"))
+                for f in filelist:
+                    os.remove(f)
+
+                for value in video_slider:
+                    filename = f"ASEG-{subtype_visualize}-{value}"
+                    
+                    plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
+                                  subtype = subtype_visualize, 
+                                  slider=value,
+                                  save=True, 
+                                  filename=filename)  # , save=True
+
+                make_gif("video", subtype_visualize,'ASEG')
+
+
+                with col_cortical:
+                    st.image(f"animations/DK-{subtype_visualize}.gif")
+                with col_subcortical:
+                    st.image(f"animations/ASEG-{subtype_visualize}.gif")
+            
+
+                
+                # with col_cortical:
+                #     st.image(f"temp_folder/2D_animations/DK-{subtype_visualize}.gif")
+                # with col_subcortical:
+                #     st.image(f"temp_folder/2D_animations/ASEG-{subtype_visualize}.gif")
+
+
 
             # BUTTONS
             html_file = subtype_visualize
@@ -177,49 +234,51 @@ def main():
 # ======================= ANIMATIONS ===============================================================================================================
 
                 # DK animation
-                if st.button('Generate 2D animations'):
+                # chosen_2D = st.radio('2D display', ['Static','Animation'])
 
-                    # Clear folder
-                    directory = 'video'
-                    filelist = glob.glob(os.path.join(directory, "*"))
-                    for f in filelist:
-                        os.remove(f)
+                # if chosen_2D == 'Static':
 
-                    video_slider = np.linspace(0,1,50)
+                    # # Clear folder
+                    # directory = 'video'
+                    # filelist = glob.glob(os.path.join(directory, "*"))
+                    # for f in filelist:
+                    #     os.remove(f)
 
-                    for value in video_slider:
-                        filename = f"{subtype_visualize}-{value}"
+                    # video_slider = np.linspace(0,1,50)
+
+                    # for value in video_slider:
+                    #     filename = f"{subtype_visualize}-{value}"
                         
-                        plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
-                                      subtype = subtype_visualize, 
-                                      slider=value,
-                                      save=True, 
-                                      filename=filename)
+                    #     plot_dk_atlas(T = T, S = S, map_dk = map_dk, 
+                    #                   subtype = subtype_visualize, 
+                    #                   slider=value,
+                    #                   save=True, 
+                    #                   filename=filename)
 
-                    make_gif("video", subtype_visualize,'DK')
+                    # make_gif("video", subtype_visualize,'DK')
 
-                    # Clear folder
-                    directory = 'video'
-                    filelist = glob.glob(os.path.join(directory, "*"))
-                    for f in filelist:
-                        os.remove(f)
+                    # # Clear folder
+                    # directory = 'video'
+                    # filelist = glob.glob(os.path.join(directory, "*"))
+                    # for f in filelist:
+                    #     os.remove(f)
 
-                    for value in video_slider:
-                        filename = f"ASEG-{subtype_visualize}-{value}"
+                    # for value in video_slider:
+                    #     filename = f"ASEG-{subtype_visualize}-{value}"
                         
-                        plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
-                                      subtype = subtype_visualize, 
-                                      slider=value,
-                                      save=True, 
-                                      filename=filename)  # , save=True
+                    #     plot_aseg_atlas(T = T, S = S, map_aseg = map_aseg, 
+                    #                   subtype = subtype_visualize, 
+                    #                   slider=value,
+                    #                   save=True, 
+                    #                   filename=filename)  # , save=True
 
-                    make_gif("video", subtype_visualize,'ASEG')
+                    # make_gif("video", subtype_visualize,'ASEG')
 
 
-                    with col_cortical:
-                        st.image(f"animations/DK-{subtype_visualize}.gif")
-                    with col_subcortical:
-                        st.image(f"animations/ASEG-{subtype_visualize}.gif")
+                    # with col_cortical:
+                    #     st.image(f"animations/DK-{subtype_visualize}.gif")
+                    # with col_subcortical:
+                    #     st.image(f"animations/ASEG-{subtype_visualize}.gif")
 
 
         # ======================= EVENT CENTERS ===============================================================================================================

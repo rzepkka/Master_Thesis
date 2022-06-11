@@ -106,8 +106,8 @@ colors = c("indianred4",'indianred2','coral1','lightpink1','mistyrose1')
 
 # ==================== SAVING FILES TO: /TEMP_FOLDER =============================================================================================================================
 i = strtoi(args[1])
-dk_data <- read.csv(file = paste('temp_folder/dk_R_Subtype ',i,'.csv', sep=''))
-aseg_data <- read.csv(file = paste('temp_folder/aseg_R_Subtype ',i,'.csv', sep=''))
+dk_data <- read.csv(file = paste('temp_folder/csv/dk_R_Subtype ',i,'.csv', sep=''))
+aseg_data <- read.csv(file = paste('temp_folder/csv/aseg_R_Subtype ',i,'.csv', sep=''))
 
 
 dk = custom_ggseg(.data = dk_data,
@@ -142,9 +142,9 @@ fig <- fig %>% layout(title = paste('Subtype', i),
 
 fig
 
-saveWidget(fig, paste('temp_folder/Subtype ',i,'.html', sep=''), selfcontained = F, libdir = paste('subtype ',i,' files', sep=''))
+saveWidget(fig, paste('temp_folder/3D_files/Subtype ',i,'.html', sep=''), selfcontained = F, libdir = paste('subtype ',i,' files', sep=''))
 
-print(paste('PROGRESS: Subtype ',i,' files SUCCESFULLY saved in: /temp_folder', sep=''))
+print(paste('PROGRESS: Subtype ',i,' files SUCCESFULLY saved in: /temp_folder/3D_files', sep=''))
 
 
 
