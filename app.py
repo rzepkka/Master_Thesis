@@ -15,8 +15,6 @@ import json
 import re
 import glob
 from PIL import Image
-
-
 import matplotlib.pyplot as plt
 from matplotlib import rc
 
@@ -24,11 +22,8 @@ import plotly.graph_objs as go
 from ipywidgets import Output
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
-
 from visualize import piechart_multiple, custom_dk, custom_aseg
-
 from visualize import subtype_probabilities, individual_staging, biomarker_distribution
-
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -71,9 +66,7 @@ def make_gif(frame_folder, subtype, atlas):
 
 labels = get_labels(S=S)
 
-# Setup the APP - saving all files 
-
-# ===================== APP ==============================================================================================================================
+# ===================== STREAMLIT APP ==============================================================================================================================
 def main():
 
     st.set_page_config(layout="wide")
@@ -89,8 +82,6 @@ def main():
     plot_type_list = ['Disease timeline for AD','Patient-specific information']
     chosen_plot_type = st.sidebar.radio("", plot_type_list)
 
-    # st.radio('Select barmode:', ['group','stack'])
-
     if chosen_plot_type == 'Disease timeline for AD':
 
         st.header('Disease progression timeline for AD')
@@ -104,7 +95,8 @@ def main():
         with col_piechart:
             diagnosis_labels = list(set(diagnosis))
             diagnosis_labels.remove('CN')
-            choose_pieplot = st.multiselect('Diagnoses included in the piechart:', diagnosis_labels, default=diagnosis_labels)
+            choose_pieplot = st.multiselect('Diagnoses included in the piechart:', diagnosis_labels, default=diagnosis_labels,
+                                            help ='Pie chart present the distribution of patients with respect to different diagnoses and subtypes of the disease.')
             plot_piechart = piechart_multiple(S=S,
                                             diagnosis=diagnosis,
                                             chosen_subtypes=choose_pieplot)
@@ -120,9 +112,10 @@ def main():
             subtype_visualize = st.selectbox('Select a subtype to visualize:',labels)       
         subtype_list.append(subtype_visualize) 
 
-        # ======================= 2D ===============================================================================================================
+        # ======================= 2D STATIC ===============================================================================================================
         
-        chosen_2D = st.radio('2D display', ['Static','Animation'])
+        chosen_2D = st.radio('2D display', ['Static','Animation'], 
+                            help = '2D brain visualisations of the sequence in which biomarkers for a particular disease subtype become abnormal, for both cortical and subcortical regions of the brain.')
         col_cortical, col_subcortical, col_button = st.columns([2,3.2,3])
 
         if subtype_visualize != None:
@@ -134,7 +127,6 @@ def main():
                                     min_value = 0.0, 
                                     max_value = 1.0, 
                                     value=1.0, step=0.01)
-
 
             if chosen_2D == 'Static':
         
@@ -155,7 +147,7 @@ def main():
                                             slider = slider)       
                     st.pyplot(ggseg_aseg)
 
-# ======================= ANIMATIONS ===============================================================================================================
+# ======================= 2D ANIMATIONS ===============================================================================================================
 
             elif chosen_2D == 'Animation':
 
@@ -175,7 +167,7 @@ def main():
             with col_button:
                 if st.button('Open 3D visualization in a new tab'):
                     try:
-                        filename = "file://"+os.getcwd()+ f"/temp_folder/{html_file}.html"
+                        filename = "file://"+os.getcwd()+ f"/temp_folder/3D_files/{html_file}.html"
                         webbrowser.open(filename)
 
                     except FileNotFoundError:
@@ -183,7 +175,7 @@ def main():
                         st.sidebar.error('Please run app_setup file before trying to download 3D visualisations')
 
 
-        # ======================= EVENT CENTERS ===============================================================================================================
+# ======================= EVENT CENTERS ===============================================================================================================
 
         # list for additional subtypes to compare
         options_compare = []
@@ -197,7 +189,8 @@ def main():
 
         with col_event_centers_options:
             st.subheader('Style event centers graph')
-            chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare)
+            chosen_subtypes = st.multiselect('Select additional subtypes to compare:', options_compare,
+                                                help='Boxplot of event centers for each disease subtype, which illustrates the estimated order of the occurring abnormalities, measured by a 100 repetitions of bootstrapping.')
 
             title_font = st.number_input('Title size:',value=34)
             title_axes = st.number_input('Axis labels size:',value=18)
@@ -220,7 +213,6 @@ def main():
                     color_list.append(default_color_list[idx])
                     st.error('Please specify a valid hex volor value, e.g. #000000.')
 
-
         eventCenters = event_centers(T = T,
                                     S = S, 
                                     color_list = color_list,
@@ -239,7 +231,7 @@ def main():
         # ADD DIVIDER
         st.markdown('---')
 
-        # ======================= PATIENT STAGING ===============================================================================================================
+# ======================= PATIENT STAGING ===============================================================================================================
 
         col_staging, col_staging_options = st.columns([3,1])
 
@@ -248,8 +240,6 @@ def main():
 
         color_list = ['#e41a1c','#377eb8','#0000ff','#00D612','#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd']
         color_diagnosis =[]
-
-        #  ================== PATIENT STAGING =================================================================================================================
 
         with col_staging_options:
             st.subheader('Style the graphs') 
@@ -270,7 +260,6 @@ def main():
                 if label != 'CN':
                     color = st.text_input(f'Select color for {label}', value = f'{color_list[idx]}',placeholder='e.g. #000000')
 
-
                     match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
 
                     if match:
@@ -281,7 +270,8 @@ def main():
                     
 
         with col_staging:
-            barmode = st.radio('Select barmode:', ['group','stack'])
+            barmode = st.radio('Select barmode:', ['group','stack'],
+                                help='Patient staging plots that present the distribution of patients within each diagnostic group, with respect to the predicted disease stage.')
 
             # BARPLOT
             plot_staging = patient_staging(S=S,
@@ -349,7 +339,6 @@ def main():
 
             if patient_id in list(data['PTID']):
 
-
                 plot_probabilities, prediction = subtype_probabilities(info=data,
                                                                 S=S,
                                                                 patient_id=patient_id,
@@ -360,8 +349,8 @@ def main():
                                                                 )
 
                 d = np.array(data['Diagnosis'][data['PTID']==patient_id])[0]
-                st.subheader(f"Patients diagnosis: {d}")
-                st.subheader(f"Patients prediction: {prediction}")
+                st.subheader(f"Patient's diagnosis: {d}")
+                st.subheader(f"Predicted subtype: {prediction}")
 
                 color_list = ['#e41a1c','#377eb8','#4daf4a','#FFA500']
 
