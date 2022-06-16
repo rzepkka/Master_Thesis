@@ -116,7 +116,7 @@ dk = custom_ggseg(.data = dk_data,
                   colour = "p",
                   palette = colors,
                   text = "p",
-                  options.legend = list(title=list(text="Cortical"),dtick=0.1,
+                  options.legend = list(title=list(text="Disease Stage"),dtick=0.1,
                                         tickformatstops=list(dtickrange=c(0,1))),
                   scene = 'scene')
 
@@ -125,7 +125,7 @@ aseg = custom_ggseg(.data = aseg_data,
                     colour = "p", 
                     palette = colors,
                     text = "p", 
-                    options.legend = list(title=list(text="Subcortical"),dtick=0.1,
+                    options.legend = list(title=list(text="Disease Stage"),dtick=0.1,
                                           tickformatstops=list(dtickrange=c(0,1))),
                     scene = 'scene2'
 )
