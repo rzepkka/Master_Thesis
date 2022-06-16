@@ -77,8 +77,7 @@ def dk_3D(T,S, mapped_dict, subtype_labels = None, subtype = None):
     
     labels_ordered = []
     for o in order:
-        labels_ordered.append(labels_dict[o])   
-       
+        labels_ordered.append(labels_dict[o])       
     
     dic = dict(zip(labels_ordered, T.sequence_model['event_centers'][subtype_labels[subtype]]))
                     
@@ -95,8 +94,7 @@ def dk_3D(T,S, mapped_dict, subtype_labels = None, subtype = None):
             dk_flat[idx]=dk_flat[idx].replace(' right','')
         else:
             hemi.append('subcort')
-            
-    
+              
     #Match T.biomarker_labels to DK labels
     list_plot = list()
     for key in mapped_dict.keys():

@@ -4,10 +4,8 @@ import pandas as pd
 import os, glob
 from PIL import Image
 
-# from visualize import plot_dk_atlas, plot_aseg_atlas
 
-# ====================================== NEW DATA ==================================================================================================================
-# FUNCTIONS FOR T.BIOMARKER_LABELS WITH BRAIN REGIONS CONSIDERED SEPARATELY FOR LEFT AND RIGHT HEMISPHERE
+# ====================================== MAPPINGS ==================================================================================================================
 
 def dk_dict(T,S, mapped_dict, subtype_labels = None, subtype = None):
     
@@ -28,8 +26,7 @@ def dk_dict(T,S, mapped_dict, subtype_labels = None, subtype = None):
             subtype = next(iter(subtype_labels))
     elif subtype is None:
         subtype = subtype_labels[0]  
-        
-        
+           
     # clean names from capital letters
     labels = list(map(lambda x: x.lower(), T.biomarker_labels))
     labels_dict = {num: label.lower() for num, label in enumerate(labels)}
@@ -46,7 +43,7 @@ def dk_dict(T,S, mapped_dict, subtype_labels = None, subtype = None):
     # flat list of dict values (single list of DK-labels)
     dk_flat = [x for v in mapped_dict.values() for x in v]
                 
-    #Match T.biomarker_labels to DK labels
+    # Match T.biomarker_labels to DK labels
     list_plot = list()
     for key in mapped_dict.keys():
             for item in mapped_dict[key]:
