@@ -1,5 +1,3 @@
-# Author: Vikram Venkatraghavan, Amsterdam UMC
-
 from matplotlib import pyplot as plt 
 import numpy as np 
 import pandas as pd 
@@ -27,18 +25,17 @@ def get_labels(S):
       subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
     return subtype_labels
 
-
-# ============= INDIVIDUAL PLOTS =============================================================================================================================================================
-
+# ============= PATIENT-SPECIFIC PLOTS =============================================================================================================================================================
 
 def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['#000000'],fontlist = [24, 18, 14, 22], width=900, height=600):
     """
     Creates a barplot for subtype probabilities
-    :param info: csv with patients' data
+    :param info: pandas DataFrame with patients' data
     :param S: subtyping dictionary, subtypes for each patient individually
-    :param patient_id: ID of a patient to visualize
+    :param patient_id: ID of a patient to visualize (optional)
     :param subtype_labels: list with label name for the subtypes (optional)
     :param colort: hex color value (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
     :param width: int (optional)
     :param height: int (optional)
     :return: plotly express bar figure
@@ -67,8 +64,6 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
         df_weights['Sum']=df_weights[subtype_labels].sum(axis = 1, skipna = True)
         df_weights['Prediction'] = subtypes
         
-    
-
         # Count probabilities
         df_prob = pd.DataFrame()
 
@@ -76,11 +71,8 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
         df_prob['Patient ID'] = info['PTID']
         for s in subtype_labels:
             df_prob[s]=round(df_weights[s]/df_weights['Sum']*100,2)
-
             
-        data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]
-        
-        
+        data = df_prob[subtype_labels][df_prob['Patient ID']==patient_id]        
         prediction = np.array(df_weights['Prediction'][df_prob['Patient ID']==patient_id])[0]
 
         df = pd.DataFrame(data.values[0], data.columns)
@@ -118,55 +110,16 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
         return fig, prediction
 
 
-# def individual_staging(data, Sboot, patient_id, color='#000000', fontsize=18, width=900, height=400):
-    
-#     """
-#     Creates a boxplot
-#     :param Sboot: bootstrap samples for individual patients
-#     :param patient_id: patient id
-#     :param color: hex color values (optional)
-#     :param width: int (optional)
-#     :param height: int (optional)
-#     :return: plotly go Box figure
-#     """
-        
-#     boot = []
-    
-#     for b in range(len(Sboot)):
-#         boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
-        
-#     print(boot)
-        
-#     fig = go.Figure()
-
-#     fig.add_trace(go.Box(x=boot, 
-#                          name='',
-#                          fillcolor=color,
-#                          line_color='#000000',
-#                          opacity=0.8))
-    
-#     # fig.update_xaxes(range=[-0.05, 1.0])
-
-#     fig.update_layout(
-#                 xaxis_title="Disease Stage",
-#                 showlegend=False,
-#                 autosize = False,
-#                 width=width,
-#                 height=height
-#             )
-
-#     fig.update_xaxes(range=[0.0, 1.0])
-    
-#     fig.update_xaxes(title_font_size=fontsize)
-    
-#     return fig
 
 def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
     """
     Creates a boxplot
+    :param info: pandas DataFrame with patients' data
     :param S: subtyping dictionary, subtypes for each patient individually
+    :param Sboot: bootstraping samples for S predictions
     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
-    :param color_list: list with color hex values (optional)
+    :param patient_id: ID of a patient to visualize
+    :param color_list: a string with color hex values (optional)
     :param width: int (optional)
     :param height: int (optional)
     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
@@ -194,12 +147,10 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
             idx = np.where(diagnosis==l)
             idx = idx[0]
             idx_list.append(idx)
-            
-            
-           
+                               
     fig = go.Figure()
     
-    # ADD PATIENT-SPECIFIC
+    # ADD PATIENT-SPECIFIC INFO
     boot=[]
     for b in range(len(Sboot)):
         boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
@@ -215,10 +166,9 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
         fig.add_trace(go.Box(x=staging[idx], name=labels[count],
                              fillcolor=color_list[count],
                             line_color='#000000',
-                            opacity=0.4))
-    
-    
+                            opacity=0.4))  
 
+    # STYLINg
     fig.update_xaxes(range=[-0.05, 1.0])
 
     font_title, font_axes, font_ticks, font_legend = fontsize
@@ -254,22 +204,18 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
     """
     Creates bimodal distribution plots for each biomarker, for chosen subtype; 
     vertical line corresponds to the patient-specific information
-    :param data: csv with patients' data
-    :param T: pSnowphlake timeline object
+    :param data: pandas DataFrame with patients' data
+    :param T: Snowphlake timeline object
     :param subtype: chosen disease subtype
-    :param patient_id: chosen patient (optional)
-    :return: plotly go Box figure
+    :param patient_id: ID of the chosen patient (optional)
+    :return: plotly subplots with go Scatter figures
     """
     
     titles = [label.lower().replace("_"," ") for label in list(T.biomarker_labels)]
     num_rows = int(np.ceil(len(titles)/3))
     num_cols = 3
-
-
     fig = make_subplots(rows=num_rows, cols = num_cols, subplot_titles=titles)
-
     labels = T.biomarker_labels
-
 
     biomarker=0
     for row in range(1,num_rows+1):
@@ -283,19 +229,15 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
             else: showlegend=False
 
             Dallis = data[labels[biomarker]]
-
             x_grid = np.linspace(np.min(data[labels[biomarker]]), np.max(data[labels[biomarker]]),1000)
 
             # CASES
             mu_cases = T.mixture_model.cases[biomarker]['mu'][0][subtype]
             sigma_cases = T.mixture_model.cases[biomarker]['std'][0][subtype]
-
             norm_pre = scipy.stats.norm(loc=mu_cases, scale=sigma_cases)
             likeli_pre=norm_pre.pdf(x_grid)
 
             likeli_pre=likeli_pre*(T.mixture_model.mixing[biomarker][subtype])
-
-
 
             # CONTROLS
             mu_controls = T.mixture_model.controls[biomarker]['mu'][0]
@@ -338,16 +280,10 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
                     opt_score=score
                     scaling_opt=s;
 
+            # SCALE THE GAUSSIANS
             likeli_pre=likeli_pre*scaling_opt;
             likeli_post=likeli_post*scaling_opt;
             likeli_tot=likeli_pre+likeli_post;
-
-
-            fig.add_trace(go.Histogram(x=Dallis, marker_color='#90b7f5',
-                                       name='EDADS',
-                                      showlegend=showlegend), row=row, col=col)
-
-
 
             fig.add_trace(go.Scatter(x=x_grid, y=likeli_pre,
                                 mode='lines',
@@ -363,40 +299,28 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
                                 showlegend=showlegend,
                                     ), row=row, col=col)
 
-            fig.add_trace(go.Scatter(x=x_grid, y = likeli_tot,
-                                    mode='lines',
-                                    name='Mix',
-                                    line=dict(color='black', width=2),
-                                     showlegend=showlegend,
-                                    ), row=row, col=col)
 
             if patient_id not in list(data['PTID']) or patient_id is None:
                 continue
             else:
                 patient = np.array(data[labels[biomarker]][data['PTID']==patient_id])[0]
-                fig.add_vline(x=patient, line_width=2, line_dash="dash", line_color="red", row=row, col=col)
-
-#             if biomarker == (len(labels)-1):
-                
+                fig.add_vline(x=patient, line_width=2, line_dash="dash", line_color="red", row=row, col=col)            
 
             biomarker+=1
         
-
     # STYLING
     fig.update_layout(title = 'Biomarker Distribution',
                     title_x=0.5,
                     title_font_size=24,
                      height=1600,
                      width=1000,
-#                     showlegend=False
+                     legend_font_size=22
                      )
             
     return fig
 
 
-
 # ============= PIE CHART =============================================================================================================================================================
-
 
 def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None):
     """
@@ -405,7 +329,7 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
     :param diagnosis: np.array or list with diagnosis labels corresponding to records in S
     :param subtype_lables: a list with names of the subtype labels (optional)
     :param chosen_subtypes: a list with diagnosis labels to consider in the plot
-    :return: plotly Pie Figure
+    :return: plotly express Pie Figure
     """
     
     # Get subtype labels
@@ -420,9 +344,7 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
     color_map = {subtype_labels[i] : default_colors[i] for i in range(len(subtype_labels))}
     color_map['Outliers']='#8e9191'
             
-    subtype_labels.append("Outliers")
-    
-            
+    subtype_labels.append("Outliers")           
     subtypes = list(S['subtypes'])
     subtypes = ['Outliers' if np.isnan(s) else s for s in subtypes]
     
@@ -450,7 +372,7 @@ def piechart_multiple(S, diagnosis, subtype_labels=None, chosen_subtypes = None)
     fig = px.pie(df_plot, values='Counts', names='Subtype', title='Subtypes',color='Subtype',
                 color_discrete_map=color_map)
 
-    # style the plot
+    # STYLING
     fig.update_traces(textposition='inside', textinfo='value+percent')   
     
     fig.update_layout(title='',
@@ -477,6 +399,7 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
     :param width: chosen width of the returned plot (optional)
     :param height: chosen height of the returned plot (optional)
     :param slider: int, value of the slider from 2D visualizations (optional)
+    :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
     :return: plotly box figure
     """
 
@@ -543,12 +466,12 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
     # GROUP BY MEAN
     # df_sorted = df_sortBy.groupby('Region').aggregate('mean').sort_values(by='Score', ascending = True)
 
-
     labels_sorted = list(df_sorted.index)
     labels_sorted.reverse()
 
     font_title, font_axes, font_ticks, font_legend = fontsize
 
+    # STYLING
     fig.update_yaxes(categoryarray=labels_sorted, 
                     categoryorder="array", 
                     title_font_size = font_axes, 
@@ -562,7 +485,6 @@ def event_centers(T, S, color_list=['#000000'], chosen_subtypes = None,
                                    dtick = 0.1),
                       title_font_size=font_title,
                       title_x=0.5,
-                      # hovermode=False,
                       legend_font_size=font_legend)
 
     fig.add_vline(x=slider, line_width=2, line_dash="dash", line_color="red",
@@ -640,6 +562,7 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
                 
     font_title, font_axes, font_ticks, font_legend = fontsize
 
+    # STYLING
     fig.update_layout(
         title="Patient Staging",
         title_font_size=font_title,
@@ -675,12 +598,12 @@ def patient_staging(S, diagnosis, color_list=['#000000'], num_bins=10, bin_width
 
 
 
-def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
+def staging_boxes(S, diagnosis, color_list=['#000000'], width=950, height=400, fontsize=[34,18,14,22]):
     """
     Creates a boxplot
     :param S: subtyping dictionary, subtypes for each patient individually
     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
-    :param color_list: list with color hex values (optional)
+    :param color_list: a list with color hex values (optional)
     :param width: int (optional)
     :param height: int (optional)
     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
@@ -721,6 +644,7 @@ def staging_boxes(S, diagnosis, color_list='#000000', width=950, height=400, fon
 
     font_title, font_axes, font_ticks, font_legend = fontsize
 
+    # STYLING
     fig.update_layout(
             # title="Staging - Boxplots",
             title_font_size=font_title,
@@ -756,10 +680,13 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
     Creates a dictionary, which can be used as input to ggseg.plot_dk() and plots it
     :param T: Timeline object
     :param S: subtyping dictionary, subtypes for each patient individually
+    :param map_dk: dictionary with loaded JSON file for mapping cortical regions
     :param subtype_labels: a list with names of the subtypes (optional)
     :param subtype: name or index of the subtype to visualise (optional)  
     :param slider: int (optional)
-    :returns a figures by plt.show() -> ggseg.plot_dk() 
+    :param save: boolean, indicates whether plot should be displayed or saved in /temp_folder (optional)
+    :param filename: string, how the saved filed should be names (if save=True, optional)
+    :returns a figures by plt.show() from ggseg.plot_dk(), or saves the file using custom_dk() funtion
     """   
     
     if slider is None:
@@ -768,10 +695,7 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
         dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
         dk = {k: v for k, v in dk_.items() if v <= slider}
     
-
-    
     if subtype is None:
-        # subtype = 'default = 0'
         pass
     
     # save the images for animation
@@ -797,10 +721,13 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
     Creates a dictionary, which can be used as input to ggseg.plot_aseg() function
     :param T: Timeline object
     :param S: subtyping dictionary, subtypes for each patient individually
+    :param map_aseg: dictionary with loaded JSON file for mapping subcortical regions
     :param subtype_labels: a list with names of the subtypes (optional)
     :param subtype: name or index of the subtype to visualise (optional)  
     :param slider: int (optional)
-    :returns a figures by plt.show() -> ggseg.plot_aseg()
+    :param save: boolean, indicates whether plot should be displayed or saved in /temp_folder (optional)
+    :param filename: string, how the saved filed should be names (if save=True, optional)
+    :returns a figures by plt.show() from ggseg.plot_aseg(), or saves the file using custom_aseg() funtion
     """
     if slider is None:  
         aseg = aseg_dict(T,S, map_aseg,subtype = subtype)
@@ -809,7 +736,6 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
         aseg = {k: v for k, v in aseg_.items() if v <= slider}
 
     if subtype is None:
-        # subtype = 'Subtype 0'
         pass 
     
     elif save is True:
@@ -828,6 +754,10 @@ def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
              figsize=(15, 15), bordercolor='w', vminmax=[], title='',
              fontsize=15, filename="file"):
     
+    """
+    plot_dk() function from ggseg library, customized so that output plots can be saven in /temp_folder and used for 2D animations
+    """
+
     import ggseg
     import matplotlib.pyplot as plt
     import os.path as op
@@ -871,6 +801,11 @@ def custom_dk(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
 def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
               figsize=(15, 5), bordercolor='w', vminmax=[],
               title='', fontsize=15, filename=""):
+
+    """
+    plot_aseg() function from ggseg library, customized so that output plots can be saven in /temp_folder and used for 2D animations
+    """
+
     import matplotlib.pyplot as plt
     import os.path as op
     from glob import glob
