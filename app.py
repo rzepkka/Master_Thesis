@@ -85,6 +85,8 @@ def displayPDF(file):
 
 labels = get_labels(S=S)
 
+# labels=['A','B','C','D']
+
 # ===================== STREAMLIT APP ==============================================================================================================================
 def main():
 
@@ -118,7 +120,9 @@ def main():
                                             help ='Pie chart present the distribution of patients with respect to different diagnoses and subtypes of the disease.')
             plot_piechart = piechart_multiple(S=S,
                                             diagnosis=diagnosis,
-                                            chosen_subtypes=choose_pieplot)
+                                            chosen_subtypes=choose_pieplot,
+                                            subtype_labels=labels
+                                            )
             st.plotly_chart(plot_piechart)
 
         # SELECTION
@@ -154,7 +158,8 @@ def main():
                                             S = S,
                                             map_dk=map_dk,
                                             subtype = subtype_visualize, 
-                                            slider = slider)
+                                            slider = slider,
+                                            subtype_labels=labels)
 
                     st.pyplot(ggseg_dk)
 
@@ -163,7 +168,8 @@ def main():
                                             S = S, 
                                             map_aseg=map_aseg,
                                             subtype = subtype_visualize, 
-                                            slider = slider)       
+                                            slider = slider,
+                                            subtype_labels=labels)       
                     st.pyplot(ggseg_aseg)
 
 # ======================= 2D ANIMATIONS ===============================================================================================================
@@ -236,7 +242,7 @@ def main():
                                     S = S, 
                                     color_list = color_list,
                                     chosen_subtypes = subtype_list,
-                                    subtype_labels = labels, 
+                                    # subtype_labels = labels, 
                                     orderBy = subtype_visualize,
                                     width = chosen_width,
                                     height = chosen_height,
@@ -406,7 +412,7 @@ def main():
     else:
         st.subheader('Presentation slides')
 
-        path_to_pdf = st.text_input(f'Specify location to pdf file from the current folder:', value = f'',placeholder='...')
+        path_to_pdf = st.text_input(f'Input path to PDF file and press Enter to apply: ', value = f'',placeholder='...')
 
         if path_to_pdf != "":
 
