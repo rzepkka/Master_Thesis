@@ -111,6 +111,99 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
 
 
 
+# def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[24,20,20,22]):
+#     """
+#     Creates a boxplot
+#     :param S: subtyping dictionary, subtypes for each patient individually
+#     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
+#     :param color_list: list with color hex values (optional)
+#     :param width: int (optional)
+#     :param height: int (optional)
+#     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
+#     :return: plotly go Box figure
+#     """
+    
+#     # Convert NaNs to 0.0
+#     staging = np.array([np.float64(0.0) if np.isnan(stage) else stage for stage in S['staging']])
+   
+#     # Count number of each subtype occurences
+#     counter = dict(Counter(diagnosis))
+        
+#     # Get labels
+#     labels = list(set(diagnosis[diagnosis!='CN']))
+#     labels.sort()
+    
+#     # Get indexes
+#     diagnosis = np.array(diagnosis)
+#     staging = np.array(staging)
+    
+#     # Get indexes for each diagnostic label
+#     idx_list = []
+#     for l in labels:
+#         if l!='CN':
+#             idx = np.where(diagnosis==l)
+#             idx = idx[0]
+#             idx_list.append(idx)
+            
+            
+           
+# #     fig = go.Figure()
+#     fig = make_subplots(rows=2, cols = 1)
+
+    
+#     # ADD PATIENT-SPECIFIC
+#     boot=[]
+#     for b in range(len(Sboot)):
+#         boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
+        
+        
+        
+#     fig.add_trace(go.Box(x=boot, 
+#                          name='Patient',
+#                          fillcolor=color_list[-1],
+#                          line_color='#000000',
+#                          opacity=0.8), row=1, col=1)
+
+#     for count, idx in enumerate(idx_list):
+#         fig.add_trace(go.Box(x=staging[idx], name=labels[count],
+#                              fillcolor=color_list[count],
+#                             line_color='#000000',
+#                             opacity=0.4),row=2,col=1)
+
+#     fig.update_xaxes(range=[0.0, 1.0])
+
+#     font_title, font_axes, font_ticks, font_legend = fontsize
+
+#     fig.update_layout(
+#             # title="Staging - Boxplots",
+#             title_text = 'Reference disease stage for different diagnostic groups',
+#             title_font_size=font_title,
+#             title_x=0.5,
+# #             xaxis_title="Disease Stage",
+# #             yaxis_title="Diagnosis",
+#             xaxis = dict(
+#                 tickmode = 'linear',
+#                 tick0 = 0.0,
+#                 dtick = 0.1
+#             ),
+#             legend_font_size=font_legend,
+#             showlegend=False,
+#             autosize = False,
+#             width=width,
+#             height=height
+#         )
+    
+    
+#     fig.update_yaxes(title_font_size = font_axes, 
+#                     tickfont_size=font_ticks)
+    
+#     fig.update_xaxes(title_font_size = font_axes, 
+#                     tickfont_size = font_ticks)
+    
+#     fig.update_xaxes(title_text="Disease Stage", showgrid=False, tick0 = 0.0, dtick = 0.1,  row=2, col=1)
+
+#     return fig
+
 def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[24,20,20,22]):
     """
     Creates a boxplot
@@ -148,7 +241,9 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
             
            
 #     fig = go.Figure()
-    fig = make_subplots(rows=2, cols = 1)
+    fig = make_subplots(rows=2, cols = 1, 
+                        subplot_titles=['Disease stage of the patient (representing mean and uncertainty of estimation)','Reference disease stage for different diagnostic groups'],
+                       row_heights=[200,400])
 
     
     # ADD PATIENT-SPECIFIC
@@ -159,7 +254,7 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
         
         
     fig.add_trace(go.Box(x=boot, 
-                         name='Patient',
+                         name='',
                          fillcolor=color_list[-1],
                          line_color='#000000',
                          opacity=0.8), row=1, col=1)
@@ -176,7 +271,7 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
 
     fig.update_layout(
             # title="Staging - Boxplots",
-            title_text = 'Reference diagnosis stage for different diagnostic groups',
+#             title_text = 'Reference disease stage for different diagnostic groups',
             title_font_size=font_title,
             title_x=0.5,
 #             xaxis_title="Disease Stage",
@@ -199,8 +294,12 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
     
     fig.update_xaxes(title_font_size = font_axes, 
                     tickfont_size = font_ticks)
+
     
-    fig.update_xaxes(title_text="Disease Stage", showgrid=False, tick0 = 0.0, dtick = 0.1,  row=2, col=1)
+    fig.update_xaxes(title_text="Disease Stage", tick0 = 0.0, dtick = 0.1,  row=2, col=1)
+    
+    for i in fig['layout']['annotations']:
+        i['font'] = dict(size=20)
 
     return fig
 

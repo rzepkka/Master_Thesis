@@ -18,6 +18,11 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib import rc
 
+import docx2txt
+from PyPDF2 import PdfFileReader
+import pdfplumber
+import base64
+
 import plotly.graph_objs as go
 from ipywidgets import Output
 
@@ -26,6 +31,9 @@ from visualize import piechart_multiple, custom_dk, custom_aseg
 from visualize import subtype_probabilities, individual_staging, biomarker_distribution
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
+
+# ======= PRESENTATION SLIDES PATH =============================================================================================================================================
+path_to_pdf = "/Users/macos/Documents/GitHub/Master_Thesis/data/example_slides.pdf"
 
 
 # ===================== LOAD FILES ==============================================================================================================================
@@ -65,6 +73,16 @@ def make_gif(frame_folder, subtype, atlas):
     frame_one.save(f"temp_folder/2D_animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
                save_all=True, duration=200, loop=0) 
 
+def displayPDF(file):
+    # Opening file from file path
+    with open(file, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+    # Embedding PDF in HTML
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1300" height="1100" type="application/pdf"></iframe>'
+    # Displaying File
+    st.markdown(pdf_display, unsafe_allow_html=True)
+
 labels = get_labels(S=S)
 
 # ===================== STREAMLIT APP ==============================================================================================================================
@@ -80,7 +98,7 @@ def main():
     local_css("style.css")
 
     # SELECT PLOT
-    plot_type_list = ['Disease timeline for AD','Patient-specific information']
+    plot_type_list = ['Disease timeline for AD','Patient-specific information','Presentation PDF']
     chosen_plot_type = st.sidebar.radio("", plot_type_list)
 
     if chosen_plot_type == 'Disease timeline for AD':
@@ -386,7 +404,13 @@ def main():
         
 
     else:
-        st.subheader('Project presentation will be here')
+        st.subheader('Presentation slides')
+
+        path_to_pdf = st.text_input(f'Specify location to pdf file from the current folder:', value = f'',placeholder='...')
+
+        if path_to_pdf != "":
+
+            displayPDF(path_to_pdf)
 
 main()
 
