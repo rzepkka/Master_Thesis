@@ -111,15 +111,12 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
 
 
 
-def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[34,18,14,22]):
+def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[24,20,20,22]):
     """
     Creates a boxplot
-    :param info: pandas DataFrame with patients' data
     :param S: subtyping dictionary, subtypes for each patient individually
-    :param Sboot: bootstraping samples for S predictions
     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
-    :param patient_id: ID of a patient to visualize
-    :param color_list: a string with color hex values (optional)
+    :param color_list: list with color hex values (optional)
     :param width: int (optional)
     :param height: int (optional)
     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
@@ -147,38 +144,43 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
             idx = np.where(diagnosis==l)
             idx = idx[0]
             idx_list.append(idx)
-                               
-    fig = go.Figure()
+            
+            
+           
+#     fig = go.Figure()
+    fig = make_subplots(rows=2, cols = 1)
+
     
-    # ADD PATIENT-SPECIFIC INFO
+    # ADD PATIENT-SPECIFIC
     boot=[]
     for b in range(len(Sboot)):
         boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
+        
         
         
     fig.add_trace(go.Box(x=boot, 
                          name='Patient',
                          fillcolor=color_list[-1],
                          line_color='#000000',
-                         opacity=0.8))
+                         opacity=0.8), row=1, col=1)
 
     for count, idx in enumerate(idx_list):
         fig.add_trace(go.Box(x=staging[idx], name=labels[count],
                              fillcolor=color_list[count],
                             line_color='#000000',
-                            opacity=0.4))  
+                            opacity=0.4),row=2,col=1)
 
-    # STYLINg
-    fig.update_xaxes(range=[-0.05, 1.0])
+    fig.update_xaxes(range=[0.0, 1.0])
 
     font_title, font_axes, font_ticks, font_legend = fontsize
 
     fig.update_layout(
             # title="Staging - Boxplots",
+            title_text = 'Reference diagnosis stage for different diagnostic groups',
             title_font_size=font_title,
             title_x=0.5,
-            xaxis_title="Disease Stage",
-            yaxis_title="Diagnosis",
+#             xaxis_title="Disease Stage",
+#             yaxis_title="Diagnosis",
             xaxis = dict(
                 tickmode = 'linear',
                 tick0 = 0.0,
@@ -191,11 +193,14 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
             height=height
         )
     
+    
     fig.update_yaxes(title_font_size = font_axes, 
                     tickfont_size=font_ticks)
     
     fig.update_xaxes(title_font_size = font_axes, 
                     tickfont_size = font_ticks)
+    
+    fig.update_xaxes(title_text="Disease Stage", showgrid=False, tick0 = 0.0, dtick = 0.1,  row=2, col=1)
 
     return fig
 

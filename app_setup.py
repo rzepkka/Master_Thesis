@@ -18,9 +18,18 @@ read_input_file.close()
 
 T, S, Sboot = load_inputs
 
-# =================== 2. GET SUBTYPE LABELS=====================================================================================================================================
+# =================== 2. GET SUBTYPE LABELS (1.) OR SPECIFY YOUR OWN LABELS (2.) =====================================================================================================================================
 
+# 1. 
 labels = get_labels(S=S)
+# labels = np.array(labels)
+# np.array(labels).dump(open('temp_folder/csv/labels.npy', 'wb'))
+
+# 2. 
+# labels = ['A', 'B', 'C', 'D']
+# labels = np.array(labels)
+# np.array(labels).dump(open('temp_folder/csv/labels.npy', 'wb'))
+# labels=list(labels)
 
 # =================== 3. LOAD JSON FILES FOR BRAIN REGION MAPPINGS ===============================================================================================
 

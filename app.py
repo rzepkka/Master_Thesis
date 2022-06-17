@@ -27,6 +27,7 @@ from visualize import subtype_probabilities, individual_staging, biomarker_distr
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
+
 # ===================== LOAD FILES ==============================================================================================================================
 # LOAD PICKLE FILE
 read_input_file = open('data/EDADS_subtype_timelines_agecorrected_opt.pickle','rb')
@@ -359,7 +360,9 @@ def main():
                                                 Sboot=Sboot,
                                                 patient_id=patient_id,
                                                 diagnosis=diagnosis,
-                                                color_list=color_list)
+                                                color_list=color_list,
+                                                height=600,
+                                                width=900)
 
                 st.plotly_chart(plot_probabilities)
                 st.plotly_chart(box_individual)
