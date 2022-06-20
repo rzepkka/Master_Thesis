@@ -15,7 +15,7 @@
 
 >> python app_setup.py
 
-5. Wait 2-3 minutes before Streamlit App is ready. You can track the progress in cmd window. 
+5. Wait 2-3 minutes before Streamlit App is ready. You can track the progress in the cmd/terminal. 
 
 6. Run Streamlit App from command line:
 
