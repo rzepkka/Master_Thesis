@@ -10,8 +10,9 @@
 2. Create new conda environment
 3. Install requirements.txt
 4. Install Snowphlake
-5. Pass your data by editing *input_data.py* file
-6. Run setup file from command line:
+5. Within R, install Biobase, NMF, ggseg3d and htmlwidgets packages 
+6. Pass your data by editing *input_data.py* file
+7. Run setup file from command line:
 
 >> python app_setup.py
 
