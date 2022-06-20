@@ -12,7 +12,7 @@ from mapping_3D import save_subtype_data
 from visualize import get_labels, plot_dk_atlas, plot_aseg_atlas
 
 # =================== 1. LOAD PICKLE FILE ========================================================================================================================================================
-read_input_file = open('data/EDADS_subtype_timelines_agecorrected_opt.pickle','rb')
+read_input_file = open('data/Data.pickle','rb')
 load_inputs = pickle.load(read_input_file)
 read_input_file.close()
 
@@ -21,7 +21,10 @@ T, S, Sboot = load_inputs
 # =================== 2. GET SUBTYPE LABELS (1.) OR SPECIFY YOUR OWN LABELS (2.) =====================================================================================================================================
 
 # 1. 
-labels = get_labels(S=S)
+# labels = get_labels(S=S)
+
+labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
+
 # labels = np.array(labels)
 # np.array(labels).dump(open('temp_folder/csv/labels.npy', 'wb'))
 
@@ -58,8 +61,9 @@ arg = '--vanilla'
 path2script = 'subprocess.R'
 
 def safe_html(labels, command, path2script):
-    for i in range(len(labels)):
-        i=str(i)
+    for i in labels:
+        # print(i)
+        # i=str(i)
         output = subprocess.run([command, path2script,i])
 
     print('PROGRESS: All HTML files successfully saved in: /temp_folder')
@@ -76,9 +80,9 @@ def make_gif(frame_folder, subtype, atlas):
     frame_one.save(f"temp_folder/2D_animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
                save_all=True, duration=200, loop=0) 
 
-def generate_animations(T, S, labels, map_dk, map_aseg):
+def generate_animations(T, S, subtype_labels, map_dk, map_aseg):
 
-    for subtype in labels:
+    for subtype in subtype_labels:
 
         # Clear folder
         directory = 'temp_folder/snapshots'
@@ -95,7 +99,8 @@ def generate_animations(T, S, labels, map_dk, map_aseg):
                           subtype = subtype, 
                           slider=value,
                           save=True, 
-                          filename=filename)
+                          filename=filename,
+                          subtype_labels = subtype_labels)
 
         make_gif("temp_folder/snapshots", subtype,'DK')
 
@@ -112,7 +117,8 @@ def generate_animations(T, S, labels, map_dk, map_aseg):
                           subtype = subtype, 
                           slider=value,
                           save=True, 
-                          filename=filename)
+                          filename=filename,
+                          subtype_labels = subtype_labels)
 
         make_gif("temp_folder/snapshots", subtype,'ASEG')
 
@@ -123,13 +129,13 @@ def generate_animations(T, S, labels, map_dk, map_aseg):
 # =================== 5. SET-UP STREAMLIT APP ========================================================================================================================
 
 # RUN MAPPING FUNCTIONS - dk_3D() AND aseg_3D() FOR EACH Subtype AND SAVE DATA IN /temp_folder/csv
-save_subtype_data(T, S, map_dk, map_aseg)
+save_subtype_data(T, S, map_dk, map_aseg, labels)
 
-# SAVE 3D BRAIN VISUALIZATIONS IN /temp_folder/3D_files
+# # SAVE 3D BRAIN VISUALIZATIONS IN /temp_folder/3D_files
 safe_html(labels, command, path2script)
 
-# GENERATE AND SAVE 2D GIF ANIMATIONS IN /temp_folder/2D_animations
-generate_animations(T=T, S=S, labels=labels, map_dk=map_dk_2D, map_aseg=map_aseg_2D)
+# # GENERATE AND SAVE 2D GIF ANIMATIONS IN /temp_folder/2D_animations
+generate_animations(T=T, S=S, subtype_labels=labels, map_dk=map_dk_2D, map_aseg=map_aseg_2D)
 
 print('CONTINUE running Streamlit APP by calling ">> streamlit run app.py" from command line')
 
