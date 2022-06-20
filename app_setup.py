@@ -1,7 +1,7 @@
+# ================  IMPORT LIBRARIES =======================================================================================================================================================
+
 import pandas as pd
 import numpy as np
-import pickle
-import json
 import warnings
 import os, glob
 import subprocess
@@ -11,55 +11,17 @@ warnings.filterwarnings("ignore")
 from mapping_3D import save_subtype_data
 from visualize import get_labels, plot_dk_atlas, plot_aseg_atlas
 
-# =================== 1. LOAD PICKLE FILE ========================================================================================================================================================
-read_input_file = open('data/Data.pickle','rb')
-load_inputs = pickle.load(read_input_file)
-read_input_file.close()
+# ================  IMPORT DATA ========================================================================================================================================================
 
-T, S, Sboot = load_inputs
+from input_data import T, S, Sboot, diagnosis
+from input_data import subtype_labels as labels
 
-# =================== 2. GET SUBTYPE LABELS (1.) OR SPECIFY YOUR OWN LABELS (2.) =====================================================================================================================================
+from input_data import map_dk_2D
+from input_data import map_aseg_2D
+from input_data import map_dk
+from input_data import map_aseg
 
-# 1. 
-
-labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
-
-# =================== 3. LOAD JSON FILES FOR BRAIN REGION MAPPINGS ===============================================================================================
-
-# 3D mappings
-f = open('data/DK_3D_combined.json')
-map_dk = json.load(f)
-f.close()
-
-f = open('data/ASEG_3D_combined.json')
-map_aseg = json.load(f)
-f.close()
-
-# 2D mappings
-f = open('data/DK_2D_combined.json')
-map_dk_2D = json.load(f)
-f.close()
-
-f = open('data/ASEG_2D_combined.json')
-map_aseg_2D = json.load(f)
-f.close()
-
-
-# =================== 4. SET UP R ========================================================================================================================
-command = 'Rscript'
-arg = '--vanilla'
-path2script = 'subprocess.R'
-
-def safe_html(labels, command, path2script):
-    for i in labels:
-        # print(i)
-        # i=str(i)
-        output = subprocess.run([command, path2script,i])
-
-    print('PROGRESS: All HTML files successfully saved in: /temp_folder')
-
-
-# =================== 5. SAVE 2D ANIMATIONS ========================================================================================================================
+# =================== FUNSTIONS TO SAVE 2D ANIMATIONS ========================================================================================================================
 
 def make_gif(frame_folder, subtype, atlas):
     file_list = glob.glob(f'{frame_folder}/*.png')
@@ -68,6 +30,7 @@ def make_gif(frame_folder, subtype, atlas):
     frame_one = frames[0]
     frame_one.save(f"temp_folder/2D_animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
                save_all=True, duration=200, loop=0) 
+
 
 def generate_animations(T, S, subtype_labels, map_dk, map_aseg):
 
@@ -114,8 +77,21 @@ def generate_animations(T, S, subtype_labels, map_dk, map_aseg):
         print(f'PROGRESS: animations for {subtype} SUCCESSFULLY saved to folder: temp_folder/2D_animations')
 
 
+# ===================  SETTING UP R ========================================================================================================================
+command = 'Rscript'
+arg = '--vanilla'
+path2script = 'subprocess.R'
 
-# =================== 6. SET-UP STREAMLIT APP ========================================================================================================================
+def safe_html(labels, command, path2script):
+    for i in labels:
+        # print(i)
+        # i=str(i)
+        output = subprocess.run([command, path2script,i])
+
+    print('PROGRESS: All HTML files successfully saved in: /temp_folder')
+
+
+# ===================  SETING UP STREAMLIT APP ========================================================================================================================
 
 # RUN MAPPING FUNCTIONS - dk_3D() AND aseg_3D() FOR EACH Subtype AND SAVE DATA IN /temp_folder/csv
 save_subtype_data(T, S, map_dk, map_aseg, labels)

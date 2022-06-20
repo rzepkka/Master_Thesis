@@ -817,7 +817,53 @@ def custom_aseg(data, cmap='Spectral', background='k', edgecolor='w', ylabel='',
 
 
 
+# ============= ADDITIONAL =============================================================================================================================================================
+
+# Display patient's prediction on patient-specifin info page
+def get_prediction(data, S, patient_id, subtype_labels=None):
+
+    if patient_id not in list(data['PTID']) or patient_id is None:
+            return 'Wrong patient ID', 'No prediction'
+    else:
+        unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+        if subtype_labels is None:
+            subtype_labels = []
+            for i in range(len(unique_subtypes)):
+                subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
+
+    subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
+    subtypes = S['subtypes']
+    subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
+
+
+    # subtypes
+    patients = data['PTID']
+    df = pd.DataFrame({'ID':patients, 'Prediction':subtypes})
+
+    prediction = np.array(df['Prediction'][df['ID']==patient_id])[0]
+
+    return prediction
 
 
 
+# Create 2D gifs
+def make_gif(frame_folder, subtype, atlas):
+    file_list = glob.glob(f'{frame_folder}/*.png')
+    file_list.sort()
+    frames = [Image.open(image) for image in file_list]
+    frame_one = frames[0]
+    frame_one.save(f"temp_folder/2D_animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
+               save_all=True, duration=200, loop=0) 
+
+
+# Embed PDF presentation in the App
+def displayPDF(file):
+    # Opening file from file path
+    with open(file, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+    # Embedding PDF in HTML
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1300" height="1100" type="application/pdf"></iframe>'
+    # Displaying File
+    st.markdown(pdf_display, unsafe_allow_html=True)
 

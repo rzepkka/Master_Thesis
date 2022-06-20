@@ -5,121 +5,41 @@ import streamlit.components.v1 as components
 import scipy.stats 
 import pandas as pd
 import numpy as np
-import pickle
 import numpy as np
 import os
 import webbrowser
-from collections import Counter
-import collections
-import json
 import re
 import glob
 from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib import rc
-
-import docx2txt
-from PyPDF2 import PdfFileReader
-import pdfplumber
 import base64
-
 import plotly.graph_objs as go
 from ipywidgets import Output
 
 from visualize import event_centers, plot_dk_atlas, plot_aseg_atlas, patient_staging, staging_boxes
 from visualize import piechart_multiple, custom_dk, custom_aseg
 from visualize import subtype_probabilities, individual_staging, biomarker_distribution
+from visualize import get_prediction, make_gif, displayPDF
+
+from input_data import data
+from input_data import T, S, Sboot, diagnosis
+from input_data import map_dk_2D as map_dk
+from input_data import map_aseg_2D as map_aseg
+from input_data import subtype_labels
+
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-# ======= PRESENTATION SLIDES PATH =============================================================================================================================================
-
-path_to_pdf = "/Users/macos/Documents/GitHub/Master_Thesis/data/example_slides.pdf"
-
-# ===================== LOAD FILES ==============================================================================================================================
-# LOAD PICKLE FILE
-read_input_file = open('data/Data.pickle','rb')
-load_inputs = pickle.load(read_input_file)
-read_input_file.close()
-
-T, S, Sboot = load_inputs
-
-# LOAD DIAGNOSIS VARIABLE
-diagnosis = np.load('data/diagnosis.npy', allow_pickle=True)
-
-# LOAD JSON FILES FOR MAPPING BRAIN REGIONS
-f = open('data/DK_2D_combined.json')
-map_dk = json.load(f)
-f.close()
-
-f = open('data/ASEG_2D_combined.json')
-map_aseg = json.load(f)
-f.close()
-
-# Get labels for options in select boxes, if labels not specifies in setup file
-def get_labels(S):
-      unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-      subtype_labels = []
-      for i in range(len(unique_subtypes)):
-          subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))        
-      return subtype_labels
-
-# Create 2D gifs
-def make_gif(frame_folder, subtype, atlas):
-    file_list = glob.glob(f'{frame_folder}/*.png')
-    file_list.sort()
-    frames = [Image.open(image) for image in file_list]
-    frame_one = frames[0]
-    frame_one.save(f"temp_folder/2D_animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
-               save_all=True, duration=200, loop=0) 
-
-# Embed PDF presentation in the App
-def displayPDF(file):
-    # Opening file from file path
-    with open(file, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-
-    # Embedding PDF in HTML
-    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1300" height="1100" type="application/pdf"></iframe>'
-    # Displaying File
-    st.markdown(pdf_display, unsafe_allow_html=True)
-
-# Display patient's prediction on patient-specifin info page
-def get_prediction(data, S, patient_id, subtype_labels=None):
-
-    if patient_id not in list(data['PTID']) or patient_id is None:
-            return 'Wrong patient ID', 'No prediction'
-    else:
-        unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
-        if subtype_labels is None:
-            subtype_labels = []
-            for i in range(len(unique_subtypes)):
-                subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
-
-    subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
-    subtypes = S['subtypes']
-    subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
-
-
-    # subtypes
-    patients = data['PTID']
-    df = pd.DataFrame({'ID':patients, 'Prediction':subtypes})
-
-    prediction = np.array(df['Prediction'][df['ID']==patient_id])[0]
-
-    return prediction
-
 
 # ===================== STREAMLIT APP ==============================================================================================================================
-def main():
+def main(subtype_labels):
 
     st.set_page_config(layout="wide")
     st.sidebar.title("Menu")
 
-    # labels = get_labels(S=S)
-
     # Specify subtype labels
-    subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
+    # subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
 
     # Connect .css file for styling the app components
     def local_css(file_name):
@@ -146,17 +66,17 @@ def main():
             diagnosis_labels.remove('CN')
             choose_pieplot = st.multiselect('Diagnoses included in the piechart:', diagnosis_labels, default=diagnosis_labels,
                                             help ='Pie chart present the distribution of patients with respect to different diagnoses and subtypes of the disease.')
-            
+            labels = subtype_labels.copy()
 
             plot_piechart = piechart_multiple(S=S,
                                             diagnosis=diagnosis,
                                             chosen_subtypes=choose_pieplot,
-                                            subtype_labels=subtype_labels
+                                            subtype_labels=labels
                                             )
             st.plotly_chart(plot_piechart)
 
         # SELECTION
-        subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
+        # subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
         num_subtypes = len(subtype_labels)
         subtype_list = []
         col_select, col_select_blank = st.columns([5.2,3])
@@ -164,7 +84,7 @@ def main():
             subtype_visualize = st.selectbox('Select a subtype to visualize:',subtype_labels)       
         subtype_list.append(subtype_visualize) 
 
-        # ======================= 2D STATIC ===============================================================================================================
+# ======================= 2D STATIC ===============================================================================================================
         
         chosen_2D = st.radio('2D display', ['Static','Animation'], 
                             help = '2D brain visualisations of the sequence in which biomarkers for a particular disease subtype become abnormal, for both cortical and subcortical regions of the brain.')
@@ -349,9 +269,6 @@ def main():
 
     elif chosen_plot_type == 'Patient-specific information':
 
-        # LOAD PATIENTS' DATA
-        data = pd.read_csv("data/EDADS_data.csv")
-
         st.header('Patient-specific information')
 
         # CHOOSE WIDTH AND HEIGHT
@@ -444,7 +361,10 @@ def main():
 
             displayPDF(path_to_pdf)
 
-main()
+
+# ========== RUN THE APP ==================================================================================================================================
+
+main(subtype_labels)
 
 
 
