@@ -19,8 +19,11 @@
 5. Within R, install Biobase, NMF, ggseg3d and htmlwidgets packages 
 
 >> install.packages('Biobase')
+
 >> install.packages('NMF')
+
 >> install.packages('ggseg3d')
+
 >> install.packages('htmlwidgets')
 
 6. Pass your data by editing *input_data.py* file. Required inputs:
