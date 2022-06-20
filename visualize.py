@@ -111,98 +111,6 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
 
 
 
-# def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[24,20,20,22]):
-#     """
-#     Creates a boxplot
-#     :param S: subtyping dictionary, subtypes for each patient individually
-#     :param diagnosis: np.array or list; with diagnosis labels corresponding to records in S
-#     :param color_list: list with color hex values (optional)
-#     :param width: int (optional)
-#     :param height: int (optional)
-#     :param fontsize: a list of 4 ints, corresponding to [font_title, font_axes, font_ticks, font_legend] respectively (optional)
-#     :return: plotly go Box figure
-#     """
-    
-#     # Convert NaNs to 0.0
-#     staging = np.array([np.float64(0.0) if np.isnan(stage) else stage for stage in S['staging']])
-   
-#     # Count number of each subtype occurences
-#     counter = dict(Counter(diagnosis))
-        
-#     # Get labels
-#     labels = list(set(diagnosis[diagnosis!='CN']))
-#     labels.sort()
-    
-#     # Get indexes
-#     diagnosis = np.array(diagnosis)
-#     staging = np.array(staging)
-    
-#     # Get indexes for each diagnostic label
-#     idx_list = []
-#     for l in labels:
-#         if l!='CN':
-#             idx = np.where(diagnosis==l)
-#             idx = idx[0]
-#             idx_list.append(idx)
-            
-            
-           
-# #     fig = go.Figure()
-#     fig = make_subplots(rows=2, cols = 1)
-
-    
-#     # ADD PATIENT-SPECIFIC
-#     boot=[]
-#     for b in range(len(Sboot)):
-#         boot.append(Sboot[b]['staging'][data['PTID']==patient_id][0])
-        
-        
-        
-#     fig.add_trace(go.Box(x=boot, 
-#                          name='Patient',
-#                          fillcolor=color_list[-1],
-#                          line_color='#000000',
-#                          opacity=0.8), row=1, col=1)
-
-#     for count, idx in enumerate(idx_list):
-#         fig.add_trace(go.Box(x=staging[idx], name=labels[count],
-#                              fillcolor=color_list[count],
-#                             line_color='#000000',
-#                             opacity=0.4),row=2,col=1)
-
-#     fig.update_xaxes(range=[0.0, 1.0])
-
-#     font_title, font_axes, font_ticks, font_legend = fontsize
-
-#     fig.update_layout(
-#             # title="Staging - Boxplots",
-#             title_text = 'Reference disease stage for different diagnostic groups',
-#             title_font_size=font_title,
-#             title_x=0.5,
-# #             xaxis_title="Disease Stage",
-# #             yaxis_title="Diagnosis",
-#             xaxis = dict(
-#                 tickmode = 'linear',
-#                 tick0 = 0.0,
-#                 dtick = 0.1
-#             ),
-#             legend_font_size=font_legend,
-#             showlegend=False,
-#             autosize = False,
-#             width=width,
-#             height=height
-#         )
-    
-    
-#     fig.update_yaxes(title_font_size = font_axes, 
-#                     tickfont_size=font_ticks)
-    
-#     fig.update_xaxes(title_font_size = font_axes, 
-#                     tickfont_size = font_ticks)
-    
-#     fig.update_xaxes(title_text="Disease Stage", showgrid=False, tick0 = 0.0, dtick = 0.1,  row=2, col=1)
-
-#     return fig
 
 def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[24,20,20,22]):
     """
@@ -352,42 +260,42 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
             likeli_post=likeli_post*(1-T.mixture_model.mixing[biomarker][subtype])
 
             # TOTAL
-            likeli_tot=likeli_pre+likeli_post
+            # likeli_tot=likeli_pre+likeli_post
 
             # SCALING
-            h=np.histogram(Dallis,50)   # values, bins
-            maxh=np.nanmax(h[0])
+            # h=np.histogram(Dallis,50)   # values, bins
+            # maxh=np.nanmax(h[0])
 
-            likeli_tot_corres = np.zeros(len(h[1])-1)
-            bin_size=h[1][1]-h[1][0]
+            # likeli_tot_corres = np.zeros(len(h[1])-1)
+            # bin_size=h[1][1]-h[1][0]
 
-            for k in range(len(h[1])-1):
-                bin_loc=h[1][k]+bin_size
-                idx=np.argmin(np.abs(x_grid-bin_loc))
-                likeli_tot_corres[k] = likeli_tot[idx]
+            # for k in range(len(h[1])-1):
+            #     bin_loc=h[1][k]+bin_size
+            #     idx=np.argmin(np.abs(x_grid-bin_loc))
+            #     likeli_tot_corres[k] = likeli_tot[idx]
 
-            max_scaling=maxh/np.max(likeli_tot)
+            # max_scaling=maxh/np.max(likeli_tot)
 
-            scaling_opt=1; opt_score=np.inf
-            if max_scaling>1:
-                scale_range=np.arange(1,max_scaling+1,max_scaling/1000.)
-            else:
-                scale_range=np.arange(1,(10/max_scaling)+1,max_scaling/1000.)
-                scale_range=np.reciprocal(scale_range)
+            # scaling_opt=1; opt_score=np.inf
+            # if max_scaling>1:
+            #     scale_range=np.arange(1,max_scaling+1,max_scaling/1000.)
+            # else:
+            #     scale_range=np.arange(1,(10/max_scaling)+1,max_scaling/1000.)
+            #     scale_range=np.reciprocal(scale_range)
 
-            for s in scale_range:
-                l2norm=(likeli_tot_corres*s - h[0])**2
-                idx_nonzero=h[0]>0
-                l2norm=l2norm[idx_nonzero]
-                score=np.sum(l2norm)
-                if score < opt_score:
-                    opt_score=score
-                    scaling_opt=s;
+            # for s in scale_range:
+            #     l2norm=(likeli_tot_corres*s - h[0])**2
+            #     idx_nonzero=h[0]>0
+            #     l2norm=l2norm[idx_nonzero]
+            #     score=np.sum(l2norm)
+            #     if score < opt_score:
+            #         opt_score=score
+            #         scaling_opt=s;
 
             # SCALE THE GAUSSIANS
-            likeli_pre=likeli_pre*scaling_opt;
-            likeli_post=likeli_post*scaling_opt;
-            likeli_tot=likeli_pre+likeli_post;
+            # likeli_pre=likeli_pre*scaling_opt;
+            # likeli_post=likeli_post*scaling_opt;
+            # likeli_tot=likeli_pre+likeli_post;
 
             fig.add_trace(go.Scatter(x=x_grid, y=likeli_pre,
                                 mode='lines',
@@ -794,20 +702,20 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
     """   
     
     if slider is None:
-        dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)  
+        dk = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype,subtype_labels=subtype_labels)  
     else:
-        dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype)
+        dk_ = dk_dict(T, S, mapped_dict = map_dk, subtype = subtype,subtype_labels=subtype_labels)
         dk = {k: v for k, v in dk_.items() if v <= slider}
     
     if subtype is None:
         pass
     
     # save the images for animation
-    elif save is True:
+    if save is True:
                 
         custom_dk(dk, cmap='Reds_r', figsize=(6,6),
                   vminmax = [0,1],
-                  background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 24,
+                  background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 24,
                  filename=filename)          
     
     else:
@@ -816,7 +724,6 @@ def plot_dk_atlas(T,S, map_dk, subtype_labels = None, subtype = None, slider = N
               background='black', edgecolor='white', bordercolor='gray', 
                 title=f'{subtype}',fontsize = 24)
 
-         print(dk)
 
 
 def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider = None, save = False, filename='file'):     
@@ -834,19 +741,19 @@ def plot_aseg_atlas(T,S, map_aseg, subtype_labels = None, subtype = None, slider
     :returns a figures by plt.show() from ggseg.plot_aseg(), or saves the file using custom_aseg() funtion
     """
     if slider is None:  
-        aseg = aseg_dict(T,S, map_aseg,subtype = subtype)
+        aseg = aseg_dict(T,S, map_aseg,subtype = subtype,subtype_labels=subtype_labels)
     else:
-        aseg_ = aseg_dict(T,S, map_aseg, subtype = subtype)
+        aseg_ = aseg_dict(T,S, map_aseg, subtype = subtype,subtype_labels=subtype_labels)
         aseg = {k: v for k, v in aseg_.items() if v <= slider}
 
     if subtype is None:
         pass 
     
-    elif save is True:
+    if save is True:
         
         custom_aseg(aseg, cmap='Reds_r', figsize=(6,6),
                   vminmax = [0,1],
-                  background='black', edgecolor='white', bordercolor='gray', title=f'Subtype 0',fontsize = 20,
+                  background='black', edgecolor='white', bordercolor='gray', title=f'{subtype}',fontsize = 20,
                  filename=filename)      
         
     else:
