@@ -38,7 +38,9 @@ path_to_pdf = "/Users/macos/Documents/GitHub/Master_Thesis/data/example_slides.p
 
 # ===================== LOAD FILES ==============================================================================================================================
 # LOAD PICKLE FILE
-read_input_file = open('data/EDADS_subtype_timelines_agecorrected_opt.pickle','rb')
+read_input_file = open('data/Data.pickle','rb')
+
+
 load_inputs = pickle.load(read_input_file)
 read_input_file.close()
 
@@ -83,7 +85,30 @@ def displayPDF(file):
     # Displaying File
     st.markdown(pdf_display, unsafe_allow_html=True)
 
-labels = get_labels(S=S)
+def get_prediction(data, S, patient_id, subtype_labels=None):
+
+    if patient_id not in list(data['PTID']) or patient_id is None:
+            return 'Wrong patient ID', 'No prediction'
+    else:
+        unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+        if subtype_labels is None:
+            subtype_labels = []
+            for i in range(len(unique_subtypes)):
+                subtype_labels.append('Subtype '+str(int(unique_subtypes[i])))
+
+    subtype_map = {unique_subtypes[i]: subtype_labels[i] for i in range(len(subtype_labels))}
+    subtypes = S['subtypes']
+    subtypes = ['Outlier' if np.isnan(s) else subtype_map[s] for s in subtypes]    
+
+
+    # subtypes
+    patients = data['PTID']
+    df = pd.DataFrame({'ID':patients, 'Prediction':subtypes})
+
+    prediction = np.array(df['Prediction'][df['ID']==patient_id])[0]
+
+    return prediction
+
 
 # labels=['A','B','C','D']
 
@@ -92,6 +117,10 @@ def main():
 
     st.set_page_config(layout="wide")
     st.sidebar.title("Menu")
+
+    labels = get_labels(S=S)
+
+    subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
 
     # Connect .css file for styling the app components
     def local_css(file_name):
@@ -118,21 +147,23 @@ def main():
             diagnosis_labels.remove('CN')
             choose_pieplot = st.multiselect('Diagnoses included in the piechart:', diagnosis_labels, default=diagnosis_labels,
                                             help ='Pie chart present the distribution of patients with respect to different diagnoses and subtypes of the disease.')
+            
+
             plot_piechart = piechart_multiple(S=S,
                                             diagnosis=diagnosis,
                                             chosen_subtypes=choose_pieplot,
-                                            subtype_labels=labels
+                                            subtype_labels=subtype_labels
                                             )
             st.plotly_chart(plot_piechart)
 
         # SELECTION
+        subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
         num_subtypes = len(labels)
- 
+        labels = get_labels(S=S)
         subtype_list = []
-
         col_select, col_select_blank = st.columns([5.2,3])
         with col_select:
-            subtype_visualize = st.selectbox('Select a subtype to visualize:',labels)       
+            subtype_visualize = st.selectbox('Select a subtype to visualize:',subtype_labels)       
         subtype_list.append(subtype_visualize) 
 
         # ======================= 2D STATIC ===============================================================================================================
@@ -142,7 +173,6 @@ def main():
         col_cortical, col_subcortical, col_button = st.columns([2,3.2,3])
 
         if subtype_visualize != None:
-
             col_slider, col_slider_blank = st.columns([5.2,3])
             with col_slider:
                 slider = st.slider(label = 'Choose regions to display', 
@@ -152,6 +182,7 @@ def main():
                                     value=1.0, step=0.01)
 
             if chosen_2D == 'Static':
+                subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
         
                 with col_cortical:
                     ggseg_dk = plot_dk_atlas(T = T, 
@@ -159,7 +190,7 @@ def main():
                                             map_dk=map_dk,
                                             subtype = subtype_visualize, 
                                             slider = slider,
-                                            subtype_labels=labels)
+                                            subtype_labels=subtype_labels)
 
                     st.pyplot(ggseg_dk)
 
@@ -169,7 +200,7 @@ def main():
                                             map_aseg=map_aseg,
                                             subtype = subtype_visualize, 
                                             slider = slider,
-                                            subtype_labels=labels)       
+                                            subtype_labels=subtype_labels)       
                     st.pyplot(ggseg_aseg)
 
 # ======================= 2D ANIMATIONS ===============================================================================================================
@@ -204,7 +235,7 @@ def main():
 
         # list for additional subtypes to compare
         options_compare = []
-        for label in labels:
+        for label in subtype_labels:
             if label == subtype_visualize:
                 pass
             else: 
@@ -242,7 +273,7 @@ def main():
                                     S = S, 
                                     color_list = color_list,
                                     chosen_subtypes = subtype_list,
-                                    # subtype_labels = labels, 
+                                    subtype_labels = subtype_labels, 
                                     orderBy = subtype_visualize,
                                     width = chosen_width,
                                     height = chosen_height,
@@ -370,8 +401,14 @@ def main():
                                                                 fontlist=font_list,
                                                                 color=color,
                                                                 width = chosen_width,
-                                                                height = chosen_height
+                                                                height = chosen_height,
+                                                                subtype_labels=subtype_labels
                                                                 )
+
+                prediction = get_prediction(data=data,
+                                             S=S,
+                                              patient_id=patient_id,
+                                             subtype_labels=subtype_labels)
 
                 d = np.array(data['Diagnosis'][data['PTID']==patient_id])[0]
                 st.subheader(f"Patient's diagnosis: {d}")
@@ -391,10 +428,14 @@ def main():
                 st.plotly_chart(plot_probabilities)
                 st.plotly_chart(box_individual)
 
-                if prediction not in  ['Outlier', 'No prediction']:
-                    subtype = int(prediction[-1])
-                else:
-                    subtype = 0
+                # if prediction not in  ['Outlier', 'No prediction']:
+                #     subtype = prediction
+                # else:
+                #     subtype = 0
+
+                unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
+                s = {subtype_labels[i]: i for i in range(len(unique_subtypes))}
+                subtype = s[prediction]
 
                 st.markdown('---')
 
