@@ -105,9 +105,11 @@ environment(custom_ggseg) <- asNamespace('ggseg3d')
 colors = c("indianred4",'indianred2','coral1','lightpink1','mistyrose1')  
 
 # ==================== SAVING FILES TO: /TEMP_FOLDER =============================================================================================================================
-i = strtoi(args[1])
-dk_data <- read.csv(file = paste('temp_folder/csv/dk_R_Subtype ',i,'.csv', sep=''))
-aseg_data <- read.csv(file = paste('temp_folder/csv/aseg_R_Subtype ',i,'.csv', sep=''))
+# i = strtoi(args[1])
+i = args[1]
+# print(i)
+dk_data <- read.csv(file = paste('temp_folder/csv/dk_R_',i,'.csv', sep=''))
+aseg_data <- read.csv(file = paste('temp_folder/csv/aseg_R_',i,'.csv', sep=''))
 
 
 dk = custom_ggseg(.data = dk_data,
@@ -131,7 +133,7 @@ aseg = custom_ggseg(.data = aseg_data,
 )
 
 fig <- subplot(dk, aseg)
-fig <- fig %>% layout(title = paste('Subtype', i),
+fig <- fig %>% layout(title = paste(i),
                       scene = list(domain=list(x=c(0,1),y=c(0.5,1)),
                                    aspectmode='auto',
                                    xaxis=list(backgroundcolor='white')
@@ -142,9 +144,9 @@ fig <- fig %>% layout(title = paste('Subtype', i),
 
 fig
 
-saveWidget(fig, paste('temp_folder/3D_files/Subtype ',i,'.html', sep=''), selfcontained = F, libdir = paste('subtype ',i,' files', sep=''))
+saveWidget(fig, paste('temp_folder/3D_files/',i,'.html', sep=''), selfcontained = F, libdir = paste(i,' files', sep=''))
 
-print(paste('PROGRESS: Subtype ',i,' files SUCCESFULLY saved in: /temp_folder/3D_files', sep=''))
+print(paste('PROGRESS: ',i,' files SUCCESFULLY saved in: /temp_folder/3D_files', sep=''))
 
 
 
