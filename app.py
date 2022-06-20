@@ -33,14 +33,12 @@ from visualize import subtype_probabilities, individual_staging, biomarker_distr
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # ======= PRESENTATION SLIDES PATH =============================================================================================================================================
-path_to_pdf = "/Users/macos/Documents/GitHub/Master_Thesis/data/example_slides.pdf"
 
+path_to_pdf = "/Users/macos/Documents/GitHub/Master_Thesis/data/example_slides.pdf"
 
 # ===================== LOAD FILES ==============================================================================================================================
 # LOAD PICKLE FILE
 read_input_file = open('data/Data.pickle','rb')
-
-
 load_inputs = pickle.load(read_input_file)
 read_input_file.close()
 
@@ -58,7 +56,7 @@ f = open('data/ASEG_2D_combined.json')
 map_aseg = json.load(f)
 f.close()
 
-# Get labels for options in select boxes
+# Get labels for options in select boxes, if labels not specifies in setup file
 def get_labels(S):
       unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
       subtype_labels = []
@@ -75,6 +73,7 @@ def make_gif(frame_folder, subtype, atlas):
     frame_one.save(f"temp_folder/2D_animations/{atlas}-{subtype}.gif", format="GIF", append_images=frames,
                save_all=True, duration=200, loop=0) 
 
+# Embed PDF presentation in the App
 def displayPDF(file):
     # Opening file from file path
     with open(file, "rb") as f:
@@ -85,6 +84,7 @@ def displayPDF(file):
     # Displaying File
     st.markdown(pdf_display, unsafe_allow_html=True)
 
+# Display patient's prediction on patient-specifin info page
 def get_prediction(data, S, patient_id, subtype_labels=None):
 
     if patient_id not in list(data['PTID']) or patient_id is None:
@@ -110,16 +110,15 @@ def get_prediction(data, S, patient_id, subtype_labels=None):
     return prediction
 
 
-# labels=['A','B','C','D']
-
 # ===================== STREAMLIT APP ==============================================================================================================================
 def main():
 
     st.set_page_config(layout="wide")
     st.sidebar.title("Menu")
 
-    labels = get_labels(S=S)
+    # labels = get_labels(S=S)
 
+    # Specify subtype labels
     subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
 
     # Connect .css file for styling the app components
@@ -158,8 +157,7 @@ def main():
 
         # SELECTION
         subtype_labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
-        num_subtypes = len(labels)
-        labels = get_labels(S=S)
+        num_subtypes = len(subtype_labels)
         subtype_list = []
         col_select, col_select_blank = st.columns([5.2,3])
         with col_select:
@@ -207,12 +205,10 @@ def main():
 
             elif chosen_2D == 'Animation':
 
-
                 with col_cortical:
                     st.image(f"temp_folder/2D_animations/DK-{subtype_visualize}.gif")
                 with col_subcortical:
                     st.image(f"temp_folder/2D_animations/ASEG-{subtype_visualize}.gif")
-
 
             # BUTTONS
             html_file = subtype_visualize
@@ -229,7 +225,6 @@ def main():
                     except FileNotFoundError:
                         st.sidebar.error('File not found')
                         st.sidebar.error('Please run app_setup file before trying to download 3D visualisations')
-
 
 # ======================= EVENT CENTERS ===============================================================================================================
 
@@ -306,7 +301,6 @@ def main():
             title_legend = st.number_input('Legend font:',value=22)
             font_list = [title_font, title_axes, title_ticks, title_legend]
 
-
         with col_staging_options:
 
             num_bins = st.number_input('Select the number of bins', value = 10)
@@ -322,8 +316,7 @@ def main():
                         color_diagnosis.append(color)
                     else:
                         color_diagnosis.append(color_list[idx])
-                        st.error('Please specify a valid hex volor value, e.g. #000000.')
-                    
+                        st.error('Please specify a valid hex volor value, e.g. #000000.')                  
 
         with col_staging:
             barmode = st.radio('Select barmode:', ['group','stack'],
@@ -348,16 +341,15 @@ def main():
                                     width=chosen_width,
                                     fontsize=font_list)
 
-
             st.plotly_chart(plot_staging)
             st.plotly_chart(box_staging)  
-
 
         # ADD DIVIDER
         st.markdown('---')
 
     elif chosen_plot_type == 'Patient-specific information':
 
+        # LOAD PATIENTS' DATA
         data = pd.read_csv("data/EDADS_data.csv")
 
         st.header('Patient-specific information')
@@ -369,7 +361,6 @@ def main():
         patient_id = int(st.text_input(f"Select patient's ID", value = 0,placeholder='id...'))
 
         col_probabilities, col_probabilities_options = st.columns([3,1])
-
 
         with col_probabilities_options:
             st.subheader('Style the graphs') 
@@ -428,11 +419,6 @@ def main():
                 st.plotly_chart(plot_probabilities)
                 st.plotly_chart(box_individual)
 
-                # if prediction not in  ['Outlier', 'No prediction']:
-                #     subtype = prediction
-                # else:
-                #     subtype = 0
-
                 unique_subtypes = np.unique(S['subtypes'][~np.isnan(S['subtypes'])])
                 s = {subtype_labels[i]: i for i in range(len(unique_subtypes))}
                 subtype = s[prediction]
@@ -448,8 +434,7 @@ def main():
 
             else: 
                 st.info("Provide an existing patient's ID")
-        
-
+  
     else:
         st.subheader('Presentation slides')
 

@@ -110,8 +110,6 @@ def subtype_probabilities(info, S, patient_id=0, subtype_labels = None, color=['
         return fig, prediction
 
 
-
-
 def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#000000', width=950, height=400, fontsize=[24,20,20,22]):
     """
     Creates a boxplot
@@ -145,15 +143,11 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
             idx = np.where(diagnosis==l)
             idx = idx[0]
             idx_list.append(idx)
-            
-            
-           
-#     fig = go.Figure()
+                    
     fig = make_subplots(rows=2, cols = 1, 
                         subplot_titles=['Disease stage of the patient (representing mean and uncertainty of estimation)','Reference disease stage for different diagnostic groups'],
                        row_heights=[200,400])
-
-    
+ 
     # ADD PATIENT-SPECIFIC
     boot=[]
     for b in range(len(Sboot)):
@@ -178,12 +172,8 @@ def individual_staging(data, S, Sboot, diagnosis, patient_id,  color_list='#0000
     font_title, font_axes, font_ticks, font_legend = fontsize
 
     fig.update_layout(
-            # title="Staging - Boxplots",
-#             title_text = 'Reference disease stage for different diagnostic groups',
             title_font_size=font_title,
             title_x=0.5,
-#             xaxis_title="Disease Stage",
-#             yaxis_title="Diagnosis",
             xaxis = dict(
                 tickmode = 'linear',
                 tick0 = 0.0,
@@ -258,44 +248,6 @@ def biomarker_distribution(data, T, subtype, patient_id=None):
             norm_post = scipy.stats.norm(loc=mu_controls, scale=sigma_controls)
             likeli_post=norm_post.pdf(x_grid)
             likeli_post=likeli_post*(1-T.mixture_model.mixing[biomarker][subtype])
-
-            # TOTAL
-            # likeli_tot=likeli_pre+likeli_post
-
-            # SCALING
-            # h=np.histogram(Dallis,50)   # values, bins
-            # maxh=np.nanmax(h[0])
-
-            # likeli_tot_corres = np.zeros(len(h[1])-1)
-            # bin_size=h[1][1]-h[1][0]
-
-            # for k in range(len(h[1])-1):
-            #     bin_loc=h[1][k]+bin_size
-            #     idx=np.argmin(np.abs(x_grid-bin_loc))
-            #     likeli_tot_corres[k] = likeli_tot[idx]
-
-            # max_scaling=maxh/np.max(likeli_tot)
-
-            # scaling_opt=1; opt_score=np.inf
-            # if max_scaling>1:
-            #     scale_range=np.arange(1,max_scaling+1,max_scaling/1000.)
-            # else:
-            #     scale_range=np.arange(1,(10/max_scaling)+1,max_scaling/1000.)
-            #     scale_range=np.reciprocal(scale_range)
-
-            # for s in scale_range:
-            #     l2norm=(likeli_tot_corres*s - h[0])**2
-            #     idx_nonzero=h[0]>0
-            #     l2norm=l2norm[idx_nonzero]
-            #     score=np.sum(l2norm)
-            #     if score < opt_score:
-            #         opt_score=score
-            #         scaling_opt=s;
-
-            # SCALE THE GAUSSIANS
-            # likeli_pre=likeli_pre*scaling_opt;
-            # likeli_post=likeli_post*scaling_opt;
-            # likeli_tot=likeli_pre+likeli_post;
 
             fig.add_trace(go.Scatter(x=x_grid, y=likeli_pre,
                                 mode='lines',

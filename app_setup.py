@@ -21,18 +21,8 @@ T, S, Sboot = load_inputs
 # =================== 2. GET SUBTYPE LABELS (1.) OR SPECIFY YOUR OWN LABELS (2.) =====================================================================================================================================
 
 # 1. 
-# labels = get_labels(S=S)
 
 labels = ['Subcortical subtype', 'Frontal subtype', 'Parietal subtype','Typical subtype']
-
-# labels = np.array(labels)
-# np.array(labels).dump(open('temp_folder/csv/labels.npy', 'wb'))
-
-# 2. 
-# labels = ['A', 'B', 'C', 'D']
-# labels = np.array(labels)
-# np.array(labels).dump(open('temp_folder/csv/labels.npy', 'wb'))
-# labels=list(labels)
 
 # =================== 3. LOAD JSON FILES FOR BRAIN REGION MAPPINGS ===============================================================================================
 
@@ -67,10 +57,9 @@ def safe_html(labels, command, path2script):
         output = subprocess.run([command, path2script,i])
 
     print('PROGRESS: All HTML files successfully saved in: /temp_folder')
-      # print('CONTINUE running Streamlit APP by calling ">> streamlit run app.py" from command line')
 
 
-# =================== 6. SAVE 2D ANIMATIONS ========================================================================================================================
+# =================== 5. SAVE 2D ANIMATIONS ========================================================================================================================
 
 def make_gif(frame_folder, subtype, atlas):
     file_list = glob.glob(f'{frame_folder}/*.png')
@@ -126,7 +115,7 @@ def generate_animations(T, S, subtype_labels, map_dk, map_aseg):
 
 
 
-# =================== 5. SET-UP STREAMLIT APP ========================================================================================================================
+# =================== 6. SET-UP STREAMLIT APP ========================================================================================================================
 
 # RUN MAPPING FUNCTIONS - dk_3D() AND aseg_3D() FOR EACH Subtype AND SAVE DATA IN /temp_folder/csv
 save_subtype_data(T, S, map_dk, map_aseg, labels)
