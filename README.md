@@ -28,7 +28,7 @@
 
 6. Pass your data by editing *input_data.py* file. Required inputs:
 - pickle file with Snowphlake outputs
-- csv with patients' data
+- csv with patients' data (not included in this repo)
 - JSON mapping files for brain regions
 - disease name
 - a list of subtype names
