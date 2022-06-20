@@ -27,13 +27,14 @@ from input_data import T, S, Sboot, diagnosis
 from input_data import map_dk_2D as map_dk
 from input_data import map_aseg_2D as map_aseg
 from input_data import subtype_labels
+from input_data import disease
 
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
 # ===================== STREAMLIT APP ==============================================================================================================================
-def main(subtype_labels):
+def main(disease, subtype_labels):
 
     st.set_page_config(layout="wide")
     st.sidebar.title("Menu")
@@ -48,12 +49,12 @@ def main(subtype_labels):
     local_css("style.css")
 
     # SELECT PLOT
-    plot_type_list = ['Disease timeline for AD','Patient-specific information','Presentation PDF']
+    plot_type_list = [f'Disease timeline for {disease}','Patient-specific information','Presentation PDF']
     chosen_plot_type = st.sidebar.radio("", plot_type_list)
 
-    if chosen_plot_type == 'Disease timeline for AD':
+    if chosen_plot_type == f'Disease timeline for {disease}':
 
-        st.header('Disease progression timeline for AD')
+        st.header(f'Disease progression timeline for {disease}')
 
         # CHOOSE WIDTH AND HEIGHT
         chosen_width = st.sidebar.number_input('Select width of the plot in px',value=1000, max_value=1130)
@@ -364,7 +365,7 @@ def main(subtype_labels):
 
 # ========== RUN THE APP ==================================================================================================================================
 
-main(subtype_labels)
+main(disease, subtype_labels)
 
 
 
