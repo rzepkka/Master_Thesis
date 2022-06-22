@@ -49,7 +49,7 @@ def main(disease, subtype_labels):
     local_css("style.css")
 
     # SELECT PLOT
-    plot_type_list = [f'Disease timeline for {disease}','Patient-specific information','Presentation PDF']
+    plot_type_list = [f'Disease timeline for {disease}','Patient-specific information','Load a report']
     chosen_plot_type = st.sidebar.radio("", plot_type_list)
 
     if chosen_plot_type == f'Disease timeline for {disease}':
